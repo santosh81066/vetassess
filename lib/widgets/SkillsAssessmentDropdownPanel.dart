@@ -9,7 +9,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
       elevation: 4,
       color: Colors.white,
       child: Container(
-        width: double.infinity,
+        width: MediaQuery.of(context).size.width.clamp(300, 1200),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

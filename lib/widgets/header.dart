@@ -15,37 +15,44 @@ class _HeaderState extends State<Header> {
   bool _isDropdownOpen = false;
   final GlobalKey _migrationNavKey = GlobalKey();
 
-  void _toggleDropdown() {
-    if (_isDropdownOpen) {
-      _dropdownOverlay?.remove();
-      _dropdownOverlay = null;
-      setState(() => _isDropdownOpen = false);
-    } else {
-      final RenderBox renderBox = _migrationNavKey.currentContext!.findRenderObject() as RenderBox;
-      final Offset offset = renderBox.localToGlobal(Offset.zero);
-      final Size size = renderBox.size;
+  void _showDropdown() {
+    if (_isDropdownOpen) return;
 
-      final overlay = Overlay.of(context);
-      _dropdownOverlay = OverlayEntry(
-        builder: (context) => GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: _toggleDropdown,
-          child: Stack(
-            children: [
-              Positioned(
-                top: offset.dy + size.height + 8,
-                left: offset.dx,
-                child: const SkillsAssessmentDropdownPanel(),
-              ),
-            ],
-          ),
+    // ✅ SAFETY CHECK: prevent crash if widget not laid out yet
+    if (_migrationNavKey.currentContext == null) return;
+
+    final RenderBox renderBox = _migrationNavKey.currentContext!.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+    print('Dropdown Offset: $offset');
+    print('Dropdown Size: $size');
+    final overlay = Overlay.of(context);
+    _dropdownOverlay = OverlayEntry(
+      builder: (context) => Positioned(
+        top: offset.dy + size.height + 8,
+        left: offset.dx,
+        child: MouseRegion(
+          onExit: (_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _hideDropdown();
+            });
+          },
+          child: const SkillsAssessmentDropdownPanel(),
         ),
-      );
+      ),
+    );
 
-      overlay.insert(_dropdownOverlay!);
-      setState(() => _isDropdownOpen = true);
-    }
+
+    overlay.insert(_dropdownOverlay!);
+    setState(() => _isDropdownOpen = true);
   }
+  void _hideDropdown() {
+    if (!_isDropdownOpen) return;
+    _dropdownOverlay?.remove();
+    _dropdownOverlay = null;
+    setState(() => _isDropdownOpen = false);
+  }
+
 
   @override
   void dispose() {
@@ -120,7 +127,7 @@ class _HeaderState extends State<Header> {
                       _NavItem(
                         key: _migrationNavKey,
                         title: "Skills Assessment For Migration",
-                        onTap: _toggleDropdown,
+                        onTap: _showDropdown,
                       ),
                       const _NavItem(title: "Skills Assessment Non Migration"),
                       const _NavItem(title: "Check my Occupation"),
@@ -187,16 +194,23 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Color(0xFF004D40),
-          fontWeight: FontWeight.w600,
+    return MouseRegion(
+      onEnter: (_) => onTap?.call(),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF004D40),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ),
     );
   }
 }
+
