@@ -21,35 +21,43 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: true,
             ),
             const SizedBox(width: 40),
-            _LinkBlock(title: "Professionals", links: [
-              "Application Process",
-              "Nominate an Occupation",
-              "Fees",
-              "Eligibility Criteria",
-              "Skills Assessment Support",
-              "Priority Processing",
-            ]),
+            _LinkBlock(
+              title: "Professionals",
+              links: [
+                "Application Process",
+                "Nominate an Occupation",
+                "Fees",
+                "Eligibility Criteria",
+                "Skills Assessment Support",
+                "Priority Processing",
+              ],
+            ),
             const SizedBox(width: 40),
-            _LinkBlock(title: "Trades", links: [
-              "Application Process",
-              "Fees",
-              "Eligibility Criteria",
-            ]),
+            _LinkBlock(
+              title: "Trades",
+              links: [
+                "Application Process",
+                "Fees",
+                "Eligibility Criteria",
+              ],
+            ),
             const SizedBox(width: 40),
-            _LinkBlock(title: "Other", links: [
-              "Designated Area Migration Agreements (DAMA)",
-              "Chinese Qualifications Verification",
-              "Post-Vocational Education Work (Subclass 485) Visa",
-              "Industry Labour Agreement",
-              "Forms and Templates",
-            ]),
+            _LinkBlock(
+              title: "Other",
+              links: [
+                "Designated Area Migration Agreements (DAMA)",
+                "Chinese Qualifications Verification",
+                "Post-Vocational Education Work (Subclass 485) Visa",
+                "Industry Labour Agreement",
+                "Forms and Templates",
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 }
-
 
 class _CategoryBlock extends StatelessWidget {
   final String title;
@@ -71,25 +79,30 @@ class _CategoryBlock extends StatelessWidget {
         children: [
           Text(title,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
                 color: Color(0xFF004D40),
               )),
           const SizedBox(height: 8),
           Text(description,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 color: Colors.black87,
               )),
-          const SizedBox(height: 16),
-          if (showButton)
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFA000),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFA000),
+              foregroundColor: Colors.black,
+              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2),
               ),
-              onPressed: () {},
-              child: const Text("View All"),
             ),
+            onPressed: () {},
+            child: const Text("View All"),
+          ),
         ],
       ),
     );
@@ -105,32 +118,53 @@ class _LinkBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 220,
+      width: 240,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              )),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF004D40),
+            ),
+          ),
           const SizedBox(height: 12),
-          ...links.map((link) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Text(
-              link,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.teal,
-                decoration: TextDecoration.underline,
+          ...links.map(
+                (link) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                link,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.teal,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
-          )),
-          const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 20),
           OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(
+                color: Color(0xFF004D40),
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             onPressed: () {},
-            child: const Text("View All"),
-          )
+            child: const Text(
+              "View All",
+              style: TextStyle(
+                color: Color(0xFF004D40),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );

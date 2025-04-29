@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'BusinessIndustryDropdownPanel.dart';
 import 'SkillsAssessmentDropdownPanel.dart';
+import 'SkillsAssessmentNonMigrationDropdownPanel.dart';
 
 class Header extends StatefulWidget {
   const Header({super.key});
@@ -14,38 +16,40 @@ class _HeaderState extends State<Header> {
   OverlayEntry? _dropdownOverlay;
   bool _isDropdownOpen = false;
   final GlobalKey _migrationNavKey = GlobalKey();
+  final GlobalKey _nonMigrationNavKey = GlobalKey();
+  final GlobalKey _businessNavKey = GlobalKey();
 
-  void _showDropdown() {
+
+  void _showDropdown(GlobalKey key, Widget panel) {
     if (_isDropdownOpen) return;
+    if (key.currentContext == null) return;
 
-    // ✅ SAFETY CHECK: prevent crash if widget not laid out yet
-    if (_migrationNavKey.currentContext == null) return;
-
-    final RenderBox renderBox = _migrationNavKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Size size = renderBox.size;
-    print('Dropdown Offset: $offset');
-    print('Dropdown Size: $size');
+
     final overlay = Overlay.of(context);
     _dropdownOverlay = OverlayEntry(
       builder: (context) => Positioned(
-        top: offset.dy + size.height + 8,
-        left: offset.dx,
+        top: offset.dy + size.height,
+        left: 0,
+        right: 0,
+
         child: MouseRegion(
           onExit: (_) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _hideDropdown();
             });
           },
-          child: const SkillsAssessmentDropdownPanel(),
+          child: panel,
         ),
       ),
     );
 
-
     overlay.insert(_dropdownOverlay!);
     setState(() => _isDropdownOpen = true);
   }
+
   void _hideDropdown() {
     if (!_isDropdownOpen) return;
     _dropdownOverlay?.remove();
@@ -127,11 +131,20 @@ class _HeaderState extends State<Header> {
                       _NavItem(
                         key: _migrationNavKey,
                         title: "Skills Assessment For Migration",
-                        onTap: _showDropdown,
+                        onTap: () => _showDropdown(_migrationNavKey, const SkillsAssessmentDropdownPanel()),
                       ),
-                      const _NavItem(title: "Skills Assessment Non Migration"),
+                      _NavItem(
+                        key: _nonMigrationNavKey,
+                        title: "Skills Assessment Non Migration",
+                        onTap: () => _showDropdown(_nonMigrationNavKey, const SkillsAssessmentNonMigrationDropdownPanel()),
+                      ),
+
                       const _NavItem(title: "Check my Occupation"),
-                      const _NavItem(title: "Business and Industry"),
+                      _NavItem(
+                        key: _businessNavKey,
+                        title: "Business and Industry",
+                        onTap: () => _showDropdown(_businessNavKey, const BusinessIndustryDropdownPanel()),
+                      ),
                       const _NavItem(title: "Contact"),
                       const _NavItem(title: "Start Your Application"),
                       IconButton(
