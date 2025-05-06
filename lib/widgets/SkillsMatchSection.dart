@@ -33,9 +33,9 @@ class SkillsMatchSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Match your skills and experience to an\nAustralian occupation.",
+            "Match your skills and experience to an Australian occupation.",
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 28,
               color: Color(0xFF004D40),
               fontWeight: FontWeight.bold,
               height: 1.3,
@@ -48,13 +48,12 @@ class SkillsMatchSection extends StatelessWidget {
                 "VETASSESS can recognise and validate the skills, qualifications and experience "
                 "you gained in your home country to give you the opportunity to continue your skilled career in Australia.",
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
+              fontSize: 15,
+              color: Color(0xFF54555A),
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 40),
-
+          const SizedBox(height: 32),
           LayoutBuilder(
             builder: (context, constraints) {
               bool isMobile = constraints.maxWidth < 800;
@@ -62,11 +61,13 @@ class SkillsMatchSection extends StatelessWidget {
                 spacing: 24,
                 runSpacing: 24,
                 children: cards.map((card) {
+                  double cardWidth = isMobile
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - 48) / 3;
+
                   return SizedBox(
-                    width: isMobile
-                        ? double.infinity
-                        : (constraints.maxWidth - 48) / 3,
-                    child: _HoverCard(
+                    width: cardWidth,
+                    child: _CardItem(
                       image: card["image"]!,
                       title: card["title"]!,
                       description: card["description"]!,
@@ -83,13 +84,13 @@ class SkillsMatchSection extends StatelessWidget {
   }
 }
 
-class _HoverCard extends StatefulWidget {
+class _CardItem extends StatelessWidget {
   final String image;
   final String title;
   final String description;
   final String link;
 
-  const _HoverCard({
+  const _CardItem({
     required this.image,
     required this.title,
     required this.description,
@@ -97,90 +98,100 @@ class _HoverCard extends StatefulWidget {
   });
 
   @override
-  State<_HoverCard> createState() => _HoverCardState();
-}
-
-class _HoverCardState extends State<_HoverCard> {
-  bool isHovering = false;
-
-  @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovering = true),
-      onExit: (_) => setState(() => isHovering = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        transform: isHovering
-            ? Matrix4.translationValues(0, -8, 0)
-            : Matrix4.identity(),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: isHovering
-              ? [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10,
-              spreadRadius: 2,
-              offset: Offset(0, 4),
+    return Card(
+      elevation: 0,
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // only top corners rounded
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
             ),
-          ]
-              : [],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+            child: AspectRatio(
+              aspectRatio: 500 / 300,
               child: Image.asset(
-                widget.image,
-                height: 300,
-                width: 500,
+                image,
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF004D40),
-                height: 1.3,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.description,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.link,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: const Color(0xFF004D40),
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
+                    color: Color(0xFF004D40),
+                    height: 1.3,
                   ),
                 ),
-                const SizedBox(width: 4),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  transform: isHovering
-                      ? Matrix4.translationValues(4, 0, 0)
-                      : Matrix4.identity(),
-                  child: const Icon(Icons.arrow_right_alt, size: 20, color: Color(0xFF004D40)),
+                const SizedBox(height: 12),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF54555A),
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {},
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // text with underline below (like CSS border-bottom)
+                      Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Text(
+                              link,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF004D40),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height: 2,
+                              color: Color(0xFF004D40),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      const CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Color(0xFF004D40),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

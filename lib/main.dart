@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vetassess/screens/not_found_screen.dart';
 
 import 'screens/home_screen.dart';
@@ -32,6 +33,7 @@ class VetassessApp extends StatelessWidget {
       title: 'VETASSESS - Skills Assessment Australia',
       routerConfig: router,
       theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
         primaryColor: Colors.blue,
         useMaterial3: true,
       ),

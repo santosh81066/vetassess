@@ -37,6 +37,10 @@ dependencies:
   go_router: ^15.1.1
   font_awesome_flutter: ^10.8.0
   flutter_svg: ^2.1.0
+  carousel_slider: ^5.0.0
+  google_fonts: ^6.2.1
+  dotted_line: ^3.2.3
+  flutter_html: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -61,12 +65,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/vetassess_logo.png
-    - assets/images/hero-img.png
-    - assets/images/trades_assessment.png
-    - assets/images/professional_general.png
-    - assets/images/application_status.jpg
-    - assets/images/logo.svg
+    - assets/images/
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -79,13 +80,7 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
+
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf

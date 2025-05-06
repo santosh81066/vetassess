@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart'; // Add this import if not added
 
 import 'BusinessIndustryDropdownPanel.dart';
 import 'SkillsAssessmentDropdownPanel.dart';
@@ -19,7 +20,6 @@ class _HeaderState extends State<Header> {
   final GlobalKey _nonMigrationNavKey = GlobalKey();
   final GlobalKey _businessNavKey = GlobalKey();
 
-
   void _showDropdown(GlobalKey key, Widget panel) {
     if (_isDropdownOpen) return;
     if (key.currentContext == null) return;
@@ -34,7 +34,6 @@ class _HeaderState extends State<Header> {
         top: offset.dy + size.height,
         left: 0,
         right: 0,
-
         child: MouseRegion(
           onExit: (_) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -57,7 +56,6 @@ class _HeaderState extends State<Header> {
     setState(() => _isDropdownOpen = false);
   }
 
-
   @override
   void dispose() {
     _dropdownOverlay?.remove();
@@ -73,7 +71,6 @@ class _HeaderState extends State<Header> {
 
     return Column(
       children: [
-        // Top Utility Bar
         Container(
           color: const Color(0xFFF5F5F5),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -96,7 +93,7 @@ class _HeaderState extends State<Header> {
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFFA000),
-                  foregroundColor: Colors.black,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   textStyle: const TextStyle(fontWeight: FontWeight.bold),
                   shape: RoundedRectangleBorder(
@@ -109,17 +106,22 @@ class _HeaderState extends State<Header> {
           ),
         ),
 
-        // Main Navigation Bar
         Container(
           color: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                'assets/logo.svg',
-                height: isMobile ? 40 : 55,
+              GestureDetector(
+                onTap: () {
+                  context.go('/'); // Go to HomeScreen using go_router
+                },
+                child: Image.asset(
+                  'assets/images/vetassess_logo.png',
+                  height: isMobile ? 40 : 48,
+                ),
               ),
+
               const SizedBox(width: 32),
               if (isDesktop)
                 Expanded(
@@ -138,7 +140,6 @@ class _HeaderState extends State<Header> {
                         title: "Skills Assessment Non Migration",
                         onTap: () => _showDropdown(_nonMigrationNavKey, const SkillsAssessmentNonMigrationDropdownPanel()),
                       ),
-
                       const _NavItem(title: "Check my Occupation"),
                       _NavItem(
                         key: _businessNavKey,
@@ -199,25 +200,33 @@ class _TopLink extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _NavItem extends StatefulWidget {
   final String title;
   final VoidCallback? onTap;
 
   const _NavItem({Key? key, required this.title, this.onTap}) : super(key: key);
 
   @override
+  State<_NavItem> createState() => _NavItemState();
+}
+
+class _NavItemState extends State<_NavItem> {
+  bool _isHovering = false;
+
+  @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => onTap?.call(),
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           child: Text(
-            title,
-            style: const TextStyle(
+            widget.title,
+            style: TextStyle(
               fontSize: 16,
-              color: Color(0xFF004D40),
+              color: _isHovering ? const Color(0xFFFFA000) : const Color(0xFF004D40),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -226,4 +235,3 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
-

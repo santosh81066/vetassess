@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/widgets/skills_assessment_page.dart';
 
 class SkillsAssessmentDropdownPanel extends StatelessWidget {
   const SkillsAssessmentDropdownPanel({super.key});
@@ -100,9 +101,15 @@ class _CategoryBlock extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SkillsAssessmentPage()),
+              );
+            },
             child: const Text("View All"),
-          ),
+          )
+
         ],
       ),
     );
@@ -156,7 +163,12 @@ class _LinkBlock extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SkillsAssessmentPage()),
+              );
+            },
             child: const Text(
               "View All",
               style: TextStyle(
@@ -164,7 +176,8 @@ class _LinkBlock extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ),
+          )
+
         ],
       ),
     );
