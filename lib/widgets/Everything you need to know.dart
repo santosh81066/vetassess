@@ -10,7 +10,7 @@ class EverythingYouNeedToKnow extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
               'Everything you need to know:',
@@ -22,15 +22,19 @@ class EverythingYouNeedToKnow extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             TabBar(
-              labelColor: const Color(0xFF004D40),
-              unselectedLabelColor: Colors.black54,
-              indicatorColor: const Color(0xFFFFA000),
-              indicatorWeight: 3,
-              tabs: const [
-                Tab(text: 'For professional skilled migration'),
-                Tab(text: 'For trades skilled migration'),
-              ],
-            ),
+                labelColor: const Color(0xFF004D40),
+                unselectedLabelColor: Colors.black54,
+                indicator: const UnderlineTabIndicator(
+                  borderSide: BorderSide(color: Color(0xFFFFA000), width: 3),
+                  insets: EdgeInsets.symmetric(horizontal: 1), // Adjust this value to change length
+                ),
+                labelStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                tabs: const [
+                  Tab(text: 'For professional skilled migration'),
+                  Tab(text: 'For trades skilled migration'),
+                ],
+              ),
+
             const SizedBox(height: 24),
             SizedBox(
               height: 600, // give it enough height for content
@@ -171,48 +175,60 @@ class _LeftContent extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         GridView.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 4,
-          shrinkWrap: true,
+           crossAxisCount: 2,
+            mainAxisSpacing: 6, // Reduced vertical spacing
+            crossAxisSpacing: 12,
+            childAspectRatio: 6, // Increased ratio to make each item shorter vertically
+            shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          children: links
-              .map(
+          
+              children: links.map(
                 (link) => InkWell(
-              onTap: () {},
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: Text(
-                      link,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF004D40),
-                        decoration: TextDecoration.underline,
+                  onTap: () {},
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        alignment: Alignment.bottomLeft,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4), // Gap between text and underline
+                            child: Text(
+                              link,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF004D40),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 2.5, // Thicker underline
+                            width: link.length * 8.5, // Dynamic underline width (tweak if needed)
+                            color: const Color(0xFF004D40),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(width: 6), // Tighter space between text and arrow
+                      const Icon(
+                        Icons.arrow_forward,
+                        size: 18,
+                        color: Color(0xFF004D40),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.arrow_forward,
-                    size: 14,
-                    color: Color(0xFF004D40),
-                  ),
-                ],
-              ),
-            ),
-          )
-              .toList(),
+                ),
+              ).toList(),
+
         ),
         const SizedBox(height: 24),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFFFA000),
             foregroundColor: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold,fontSize: 18,),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           ),
           onPressed: () {},

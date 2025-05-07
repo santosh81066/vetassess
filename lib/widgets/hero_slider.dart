@@ -8,9 +8,9 @@ class HeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 660,
+      height: 680,
       decoration: const BoxDecoration(
-        color: Color(0xFF006064),
+        color:  Color(0xFF0d5257),
         image: DecorationImage(
           image: AssetImage('assets/images/hero-img.png'),
           alignment: Alignment.centerLeft,
@@ -25,7 +25,7 @@ class HeroSection extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(width: 300),
+                const SizedBox(width: 450),
 
                 Expanded(
                   child: Column(
@@ -34,17 +34,17 @@ class HeroSection extends StatelessWidget {
                       Text(
                         "Australia’s largest skills\nassessment service.",
                         style: GoogleFonts.poppins(
-                          fontSize: 54,
+                          fontSize: 40,
                           height: 64 / 54,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 34),
+                      const SizedBox(height: 24),
                       Text(
                         "Check your occupation",
                         style: GoogleFonts.poppins(
-                          fontSize: 36,
+                          fontSize: 30,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFFFFA000),
                         ),
@@ -53,19 +53,19 @@ class HeroSection extends StatelessWidget {
                       Text(
                         "Find out if we can assess your skills and experience.",
                         style: GoogleFonts.poppins(
-                          fontSize: 17,
+                          fontSize: 16,
                           height: 1.48,
-                          color: Colors.white70,
+                          color: Colors.white,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                       const SizedBox(height: 24),
                       const _SearchBar(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 28),
                       Text(
                         "QUICK LINKS",
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
+                          fontSize: 18,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
@@ -76,15 +76,26 @@ class HeroSection extends StatelessWidget {
                         onTap: () {
                           // TODO: Add navigation
                         },
-                        child: Text(
-                          "VETASSESS New Webinar – May 6 | Engineering Trades",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.lightBlueAccent,
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.w400,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "VETASSESS New Webinar – May 6 | Engineering Trades",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 2), // Adjust spacing here
+                              Container(
+                                height: 3,
+                                width: 500, // Adjust to match text width or wrap dynamically
+                                color: const Color.fromARGB(255, 69, 198, 221),
+                              ),
+                            ],
                           ),
-                        ),
+
                       ),
                     ],
                   ),
@@ -103,55 +114,51 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: 57,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFFFA000), width: 2),
+      ),
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(6),
-                  bottomLeft: Radius.circular(6),
-                ),
-                border: Border.fromBorderSide(
-                  BorderSide(color: Color(0xFFFFA000), width: 2),
-                ),
+            child: TextField(
+              style: GoogleFonts.poppins(
+                fontSize: 16.8,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF54555A),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                style: GoogleFonts.poppins(
-                  fontSize: 16.8,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF54555A),
-                ),
-                decoration: const InputDecoration(
-                  hintText: "Enter your occupation",
-                  border: InputBorder.none,
-                ),
+              decoration: const InputDecoration(
+                hintText: "Enter your occupation",
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.search, color: Color(0xFFFFA000),size: 30,weight: 20,),
+                contentPadding: EdgeInsets.symmetric(vertical: 18),
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFA000),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(6),
-                  bottomRight: Radius.circular(6),
-                ),
+          Container(
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFA000),
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(4),
+                bottomRight: Radius.circular(4),
               ),
-              elevation: 0,
             ),
-            child: Text(
-              "Search",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.black,
+            child: TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
+              child: Text(
+                "Search",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
