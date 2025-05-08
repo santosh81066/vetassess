@@ -228,7 +228,7 @@ class _HeaderState extends State<Header> {
                                       onTap:
                                           () => _showDropdown(
                                             _nonMigrationNavKey,
-                                            const SkillsAssessmentNonMigrationDropdownPanel(),
+                                            const SkillsAssessmentNonMigrationPanel(),
                                           ),
                                     ),
                                     const SizedBox(width: 28),

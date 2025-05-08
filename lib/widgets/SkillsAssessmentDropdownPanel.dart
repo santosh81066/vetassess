@@ -6,54 +6,69 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenwidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Material(
       elevation: 4,
       color: Colors.white,
       child: Container(
-        width: MediaQuery.of(context).size.width.clamp(300, 1200),
+        width: double.infinity,
+        height: screenHeight*0.8,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _CategoryBlock(
-              title: "Skilled Assessments for Migration",
-              description:
-              "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
-              showButton: true,
-            ),
-            const SizedBox(width: 40),
-            _LinkBlock(
-              title: "Professionals",
-              links: [
-                "Application Process",
-                "Nominate an Occupation",
-                "Fees",
-                "Eligibility Criteria",
-                "Skills Assessment Support",
-                "Priority Processing",
-              ],
-            ),
-            const SizedBox(width: 40),
-            _LinkBlock(
-              title: "Trades",
-              links: [
-                "Application Process",
-                "Fees",
-                "Eligibility Criteria",
-              ],
-            ),
-            const SizedBox(width: 40),
-            _LinkBlock(
-              title: "Other",
-              links: [
-                "Designated Area Migration Agreements (DAMA)",
-                "Chinese Qualifications Verification",
-                "Post-Vocational Education Work (Subclass 485) Visa",
-                "Industry Labour Agreement",
-                "Forms and Templates",
-              ],
-            ),
-          ],
+        child: Container(
+
+          padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 32),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _CategoryBlock(
+                title: "Skilled Assessments\nfor Migration",
+                description:
+                "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
+                buttonColor: const Color(0xFFFFA000),
+                buttonTextColor: Colors.black,
+              ),
+              const SizedBox(width: 40),
+              _LinkBlock(
+                title: "Professionals",
+                links: [
+                  "Application Process",
+                  "Nominate an Occupation",
+                  "Fees",
+                  "Eligibility Criteria",
+                  "Skills Assessment Support",
+                  "Priority Processing",
+                ],
+                buttonColor: Colors.transparent,
+                buttonBorderColor: const Color(0xFF004D40),
+              ),
+              const SizedBox(width: 40),
+              _LinkBlock(
+                title: "Trades",
+                links: [
+                  "Application Process",
+                  "Fees",
+                  "Eligibility Criteria",
+                ],
+                buttonColor: Colors.transparent,
+                buttonBorderColor: const Color(0xFF004D40),
+              ),
+              const SizedBox(width: 40),
+              _LinkBlock(
+                title: "Other",
+                links: [
+                  "Designated Area Migration Agreements (DAMA)",
+                  "Chinese Qualifications Verification",
+                  "Post-Vocational Education Work (Subclass 485) Visa",
+                  "Industry Labour Agreement",
+                  "Forms and Templates",
+                ],
+                buttonColor: Colors.transparent,
+                buttonBorderColor: const Color(0xFF004D40),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -63,53 +78,55 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
 class _CategoryBlock extends StatelessWidget {
   final String title;
   final String description;
-  final bool showButton;
+  final Color buttonColor;
+  final Color buttonTextColor;
 
   const _CategoryBlock({
     required this.title,
     required this.description,
-    this.showButton = false,
+    required this.buttonColor,
+    required this.buttonTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
-      width: 250,
+      width: 230,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF004D40),
-              )),
-          const SizedBox(height: 8),
-          Text(description,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Colors.black87,
-              )),
+
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            description,
+            style: theme.textTheme.bodyMedium,
+
+          ),
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFA000),
-              foregroundColor: Colors.black,
+              backgroundColor: buttonColor,
+              foregroundColor: buttonTextColor,
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(0),
               ),
             ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SkillsAssessmentPage()),
+                MaterialPageRoute(builder: (context) => const SkillsAssessmentPage()),
               );
             },
             child: const Text("View All"),
           )
-
         ],
       ),
     );
@@ -119,48 +136,53 @@ class _CategoryBlock extends StatelessWidget {
 class _LinkBlock extends StatelessWidget {
   final String title;
   final List<String> links;
+  final Color buttonColor;
+  final Color buttonBorderColor;
 
-  const _LinkBlock({required this.title, required this.links});
+  const _LinkBlock({
+    required this.title,
+    required this.links,
+    required this.buttonColor,
+    required this.buttonBorderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
-      width: 240,
+      width: 230,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w700,
               color: Color(0xFF004D40),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           ...links.map(
                 (link) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
                 link,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.teal,
-                  decoration: TextDecoration.underline,
-                ),
+                style: theme.textTheme.titleSmall,
               ),
             ),
           ),
           const SizedBox(height: 20),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(
-                color: Color(0xFF004D40),
+              backgroundColor: buttonColor,
+              side: BorderSide(
+                color: buttonBorderColor,
                 width: 2,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(0),
               ),
             ),
             onPressed: () {
@@ -169,15 +191,14 @@ class _LinkBlock extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const SkillsAssessmentPage()),
               );
             },
-            child: const Text(
+            child: Text(
               "View All",
-              style: TextStyle(
-                color: Color(0xFF004D40),
-                fontWeight: FontWeight.w600,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: const Color(0xFF004D40),
               ),
             ),
-          )
 
+          )
         ],
       ),
     );

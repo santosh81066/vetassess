@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // If you're using go_router for navigation
+import 'package:go_router/go_router.dart';
 
 class SupportSection extends StatelessWidget {
   const SupportSection({super.key});
@@ -9,47 +9,59 @@ class SupportSection extends StatelessWidget {
     final bool isDesktop = MediaQuery.of(context).size.width >= 768;
 
     return Container(
-      color: const Color(0xFF0F5D60), // teal background
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            "I need help, what support is available?",
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Flex(
-            direction: isDesktop ? Axis.horizontal : Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.center,
+      color: const Color(0xFF00565A), // Darker teal color as shown in screenshot
+      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 16),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1244),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: _SupportCard(
-                  title: "Help with a Skills Assessment",
-                  description:
-                  "Skills Assessment Support (SAS) services are for migration agents, legal practitioners and prospective applicants who are yet to submit their Skills Assessment application to VETASSESS.",
-                  linkText: "Skills Assessment Support",
-                  linkUrl: "/skills-assessment-for-migration/skills-assessment-support",
+              const Text(
+                "I need help, what support is available?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 36, // Larger font size to match screenshot
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 24, height: 24),
-              Expanded(
-                child: _SupportCard(
-                  title: "Help with an urgent application",
-                  description:
-                  "For general and professional occupations, priority processing can be used to fast-track urgent applications.",
-                  linkText: "Fast-track applications",
-                  linkUrl: "/skills-assessment-for-migration/professional-occupations/priority-processing",
-                ),
+              const SizedBox(height: 40), // Adjusted spacing
+              Flex(
+                direction: isDesktop ? Axis.horizontal : Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      child: const _SupportCard(
+                        title: "Help with a Skills Assessment",
+                        description:
+                        "Skills Assessment Support (SAS) services are for migration agents, legal practitioners and prospective applicants who are yet to submit their Skills Assessment application to VETASSESS.",
+                        linkText: "Skills Assessment Support",
+                        linkUrl: "/skills-assessment-for-migration/skills-assessment-support",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16, height: 24),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      child: const _SupportCard(
+                        title: "Help with an urgent application",
+                        description:
+                        "For general and professional occupations, priority processing can be used to fast-track urgent applications.",
+                        linkText: "Fast-track applications",
+                        linkUrl: "/skills-assessment-for-migration/professional-occupations/priority-processing",
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -70,19 +82,19 @@ class _SupportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Container(
-        padding: const EdgeInsets.all(24),
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
               style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF004D40),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF00565A),
               ),
             ),
             const SizedBox(height: 16),
@@ -90,36 +102,55 @@ class _SupportCard extends StatelessWidget {
               description,
               style: const TextStyle(
                 fontSize: 16,
+                height: 1.5,
                 color: Colors.black87,
               ),
             ),
             const SizedBox(height: 24),
+            // Link with underline and circle arrow
             GestureDetector(
               onTap: () {
-                context.go(linkUrl); // if using go_router
-                // Or Navigator.pushNamed(context, linkUrl);
+                context.go(linkUrl);
               },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    linkText,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF004D40),
-                      decoration: TextDecoration.underline,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        linkText,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00565A),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        height: 24,
+                        width: 24,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF00565A),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Color(0xFF004D40),
-                    child: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                  Container(
+                    height: 2,
+                    width: 210, // Match the width to the text + margin
+                    margin: const EdgeInsets.only(top: 8),
+                    color: const Color(0xFF00565A),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
