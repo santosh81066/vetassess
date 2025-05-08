@@ -69,7 +69,7 @@ flutter:
 
 
 
-  # An image asset can refer to one or more resolution-specific "variants", see
+    # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see
@@ -81,10 +81,15 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
 
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Axiforma
+      fonts:
+        - asset: assets/fonts/Axiforma-Regular.ttf
+        - asset: assets/fonts/Axiforma-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Axiforma-Bold.ttf
+          weight: 700
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
