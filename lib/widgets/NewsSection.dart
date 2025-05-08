@@ -235,7 +235,7 @@ class _NewsItem extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   height: 1.3,
-                  fontSize: 15,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF004D40),
                 ),
@@ -244,29 +244,26 @@ class _NewsItem extends StatelessWidget {
               // Read article link
               GestureDetector(
                 onTap: () => context.go(link),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Read article',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF004D40),
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFF004D40),
-                      ),
-                      child: const Icon(Icons.arrow_forward,
-                          color: Colors.white, size: 14),
-                    ),
-                  ],
-                ),
+                child: Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(
+      'Read article',
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF004D40),
+      ),
+    ),
+    const SizedBox(height: 4), // Space between text and underline
+    Container(
+      width: 80, // Match "Read article" width or set as needed
+      height: 2,
+      color: Color(0xFF004D40),
+    ),
+  ],
+)
+
               )
             ],
           ),
