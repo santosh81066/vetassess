@@ -186,7 +186,7 @@ class _HelpCard extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-               SizedBox(height: title == 'Contact us' ? 70 : 50),
+               SizedBox(height: title == 'Contact us' ? 60 : 40),
                 SizedBox(
                   width: 160,
                   height: 50,

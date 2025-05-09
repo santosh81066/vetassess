@@ -6,106 +6,139 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
+    final isMobile = width < 600;
+    final isTablet = width >= 600 && width < 1024;
+    final isDesktop = width >= 1024;
+
     return Container(
       width: double.infinity,
-      height: 680,
-      decoration: const BoxDecoration(
-        color:  Color(0xFF0d5257),
-        image: DecorationImage(
+      height: isMobile ? height * 0.9 : 675,
+      decoration: BoxDecoration(
+  color: const Color(0xFF0d5257),
+  image: width >= 100
+      ? const DecorationImage(
           image: AssetImage('assets/images/hero-img.png'),
           alignment: Alignment.centerLeft,
           fit: BoxFit.contain,
-        ),
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1244),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(100, 160, 132, 70),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(width: 450),
+        )
+      : null,
+),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Australia’s largest skills\nassessment service.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 40,
-                          height: 64 / 54,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        "Check your occupation",
-                        style: GoogleFonts.poppins(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFFFFA000),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Find out if we can assess your skills and experience.",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          height: 1.48,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const _SearchBar(),
-                      const SizedBox(height: 28),
-                      Text(
-                        "QUICK LINKS",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          // TODO: Add navigation
-                        },
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "VETASSESS New Webinar – May 6 | Engineering Trades",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2), // Adjust spacing here
-                              Container(
-                                height: 3,
-                                width: 500, // Adjust to match text width or wrap dynamically
-                                color: const Color.fromARGB(255, 69, 198, 221),
-                              ),
-                            ],
-                          ),
-
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final isMobile = width < 600;
+          final isTablet = width >= 600 && width < 1024;
+      
+          return Padding(
+            padding: EdgeInsets.symmetric(
+      horizontal: isMobile ? 16 : isTablet ? 40 : 100,
+      vertical: isMobile ? 24 : isTablet ? 60 : 100,
             ),
-          ),
+            
+          child: isMobile
+              ? _buildMobileLayout(context)
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!isMobile) SizedBox(width: isTablet ? 100 : 450),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _buildContent(context, width, isMobile, isTablet),
+                      ),
+                    ),
+                  ],
+                ),
+        );
+        },
+      ),
+    
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  return SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: _buildContent(context, width, true, false),
+    ),
+  );
+}
+
+
+  List<Widget> _buildContent(BuildContext context, double screenWidth, bool isMobile, bool isTablet) {
+    return [
+      Text(
+        "Australia’s largest skills\nassessment service.",
+        style: GoogleFonts.poppins(
+          fontSize: isMobile ? 24 : isTablet ? 32 : 40,
+          height: isMobile ? 1.3 : 1.4,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
         ),
       ),
-    );
+      const SizedBox(height: 24),
+      Text(
+        "Check your occupation",
+        style: GoogleFonts.poppins(
+          fontSize: isMobile ? 18 : isTablet ? 24 : 30,
+          fontWeight: FontWeight.w600,
+          color: const Color(0xFFFFA000),
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        "Find out if we can assess your skills and experience.",
+        style: GoogleFonts.poppins(
+          fontSize: isMobile ? 14 : 16,
+          height: 1.5,
+          color: Colors.white,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      const SizedBox(height: 24),
+      const _SearchBar(),
+      const SizedBox(height: 28),
+      Text(
+        "QUICK LINKS",
+        style: GoogleFonts.poppins(
+          fontSize: isMobile ? 16 : 18,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+      const SizedBox(height: 8),
+      GestureDetector(
+        onTap: () {
+          // TODO: Add navigation
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "VETASSESS New Webinar – May 6 | Engineering Trades",
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 16 : 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Container(
+              height: 3,
+              width: isMobile ? screenWidth * 0.7 : 500,
+              color: const Color.fromARGB(255, 69, 198, 221),
+            ),
+          ],
+        ),
+      ),
+    ];
   }
 }
 
@@ -114,6 +147,10 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+    final isTablet = width >= 600 && width < 1024;
+
     return Container(
       height: 57,
       decoration: BoxDecoration(
@@ -126,14 +163,18 @@ class _SearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               style: GoogleFonts.poppins(
-                fontSize: 16.8,
+                fontSize: isMobile ? 14 : 16.8,
                 fontWeight: FontWeight.w400,
                 color: const Color(0xFF54555A),
               ),
               decoration: const InputDecoration(
                 hintText: "Enter your occupation",
                 border: InputBorder.none,
-                prefixIcon: Icon(Icons.search, color: Color(0xFFFFA000),size: 30,weight: 20,),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Color(0xFFFFA000),
+                  size: 28,
+                ),
                 contentPadding: EdgeInsets.symmetric(vertical: 18),
               ),
             ),
@@ -156,7 +197,7 @@ class _SearchBar extends StatelessWidget {
                 "Search",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   color: Colors.black,
                 ),
               ),
