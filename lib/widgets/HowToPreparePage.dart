@@ -7,7 +7,7 @@ class HowToPreparePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 150),
       decoration: const BoxDecoration(color: Colors.white),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -16,13 +16,13 @@ class HowToPreparePage extends StatelessWidget {
           const Text(
             'How to prepare your application',
             style: TextStyle(
-              fontSize: 32, // Larger font size to match image
+              fontSize: 36,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF00695C), // Darker teal color from image
+              color: Color(0xFF00695C),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 48), // More spacing to match image
+          const SizedBox(height: 48),
           // Tabs
           DefaultTabController(
             length: 2,
@@ -31,16 +31,15 @@ class HowToPreparePage extends StatelessWidget {
                 const TabBar(
                   labelColor: Color(0xFF00695C),
                   unselectedLabelColor: Colors.black45,
-                  indicatorColor: Color(0xFFFFA000), // Amber/orange color
-                  indicatorWeight: 3,
-                  indicatorSize:
-                      TabBarIndicatorSize.tab, // Match image indicator size
+                  indicatorColor: Color(0xFFFFA000),
+                  indicatorWeight: 4,
+                  indicatorSize: TabBarIndicatorSize.tab,
                   labelStyle: TextStyle(
-                    fontSize: 18, // Larger text to match image
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                   unselectedLabelStyle: TextStyle(
-                    fontSize: 18, // Larger text to match image
+                    fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
                   tabs: [
@@ -48,11 +47,10 @@ class HowToPreparePage extends StatelessWidget {
                     Tab(text: 'Trade Occupations'),
                   ],
                 ),
-                const SizedBox(height: 48), // More spacing to match image
+                const SizedBox(height: 48),
                 // Tab content
                 SizedBox(
-                  height:
-                      370, // Set a fixed height for the tab content to match image
+                  height: 400, // Slightly taller to accommodate larger boxes
                   child: TabBarView(
                     children: [
                       // Professional Occupations Tab
@@ -85,59 +83,56 @@ class _ProfessionalOccupationsContent extends StatelessWidget {
           "experience and qualifications.",
           style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
         ),
-        const SizedBox(height: 48), // More spacing to match image
-        // Steps
-        // Using SizedBox to constrain width like in the image
-        SizedBox(
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Step 1
-              _StepColumn(
-                number: "1",
-                title: "Find",
-                description:
-                    "Find the VETASSESS occupation that most closely fits your skills and experience.",
-              ),
+        const SizedBox(height: 60), // Increased spacing to match image
+        // Steps with connected lines - using Row with mainAxisAlignment
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Changed to center to align the dots
+          children: [
+            // Step 1
+            _StepColumn(
+              number: "1",
+              title: "Find",
+              description:
+                  "Find the VETASSESS occupation that most closely fits your skills and experience.",
+            ),
 
-              // Dotted line 1
-              _DottedLine(),
+            // Dotted line 1
+            _DottedLine(),
 
-              // Step 2
-              _StepColumn(
-                number: "2",
-                title: "Match",
-                description:
-                    "Match your skills and experience to your chosen occupation.",
-              ),
+            // Step 2
+            _StepColumn(
+              number: "2",
+              title: "Match",
+              description:
+                  "Match your skills and experience to your chosen occupation.",
+            ),
 
-              // Dotted line 2
-              _DottedLine(),
+            // Dotted line 2
+            _DottedLine(),
 
-              // Step 3
-              _StepColumn(
-                number: "3",
-                title: "Prepare",
-                description:
-                    "Get ready to apply by preparing all the information and documents you need.",
-              ),
+            // Step 3
+            _StepColumn(
+              number: "3",
+              title: "Prepare",
+              description:
+                  "Get ready to apply by preparing all the information and documents you need.",
+            ),
 
-              // Dotted line 3
-              _DottedLine(),
+            // Dotted line 3
+            _DottedLine(),
 
-              // Step 4
-              _StepColumn(
-                number: "4",
-                title: "Apply",
-                description:
-                    "Apply online when you're ready. If you're still unsure,",
-                linkText: "skills assessment support",
-                linkDescription: "is available when you need it.",
-              ),
-            ],
-          ),
+            // Step 4
+            _StepColumn(
+              number: "4",
+              title: "Apply",
+              description:
+                  "Apply online when you're ready. If you're still unsure,",
+              linkText: "skills assessment support",
+              linkDescription: "is available when you need it.",
+            ),
+          ],
         ),
       ],
     );
@@ -155,9 +150,57 @@ class _TradeOccupationsContent extends StatelessWidget {
           "If you're a tradesperson, your skills and experience will be assessed by someone who has worked in your trade and understands your skills and qualifications. VETASSESS is Australia's leading assessment body for trades and we can assess 27 different trade occupations.",
           style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
         ),
-        const SizedBox(height: 48), // More spacing to match image
-        // Steps would go here - similar structure to Professional tab
-        // Not shown in the image so not implemented here
+        const SizedBox(height: 60), // Increased spacing to match image
+        // Steps with connected lines - similar structure
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.center, // Changed to center to align the dots
+          children: [
+            // Step 1
+            _StepColumn(
+              number: "1",
+              title: "Find",
+              description:
+                  "Find the VETASSESS occupation that most closely fits your skills and experience.",
+            ),
+
+            // Dotted line 1
+            _DottedLine(),
+
+            // Step 2
+            _StepColumn(
+              number: "2",
+              title: "Match",
+              description:
+                  "Match your skills and experience to your chosen occupation.",
+            ),
+
+            // Dotted line 2
+            _DottedLine(),
+
+            // Step 3
+            _StepColumn(
+              number: "3",
+              title: "Prepare",
+              description:
+                  "Get ready to apply by preparing all the information and documents you need.",
+            ),
+
+            // Dotted line 3
+            _DottedLine(),
+
+            // Step 4
+            _StepColumn(
+              number: "4",
+              title: "Apply",
+              description:
+                  "Apply online when you're ready. If you're still unsure,",
+              linkText: "skills assessment support",
+              linkDescription: "is available when you need it.",
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -185,20 +228,27 @@ class _StepColumn extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Number box
+          // Number box - LARGER SIZE
           Container(
-            width: 50,
-            height: 50,
+            width: 70, // Increased from 50
+            height: 70, // Increased from 50
             decoration: BoxDecoration(
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
             alignment: Alignment.center,
             child: Text(
               number,
               style: TextStyle(
-                fontSize: 24, // Larger text for number
-                fontWeight: FontWeight.bold,
+                fontSize: 38, // Increased from 32
+                fontWeight: FontWeight.w900,
                 color: Color(0xFF00695C),
               ),
             ),
@@ -209,7 +259,7 @@ class _StepColumn extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 18, // Larger text for title
+              fontSize: 20, // Increased from 18
               fontWeight: FontWeight.w700,
               color: Color(0xFF00695C),
             ),
@@ -235,9 +285,7 @@ class _StepColumn extends StatelessWidget {
                       text: linkText,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Color(
-                          0xFF0288D1,
-                        ), // Blue link color to match image
+                        color: Color(0xFF0288D1),
                         decoration: TextDecoration.underline,
                         height: 1.4,
                       ),
@@ -264,15 +312,10 @@ class _StepColumn extends StatelessWidget {
 class _DottedLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 40, // Wider to match image
-      height: 20,
-      margin: EdgeInsets.only(
-        top: 25,
-      ), // More top margin to match image alignment
-      child: CustomPaint(
-        painter: _DottedLinePainter(),
-        size: Size(40, 2), // Explicit size to match image
+    return SizedBox(
+      width: 60,
+      child: Center(
+        child: CustomPaint(painter: _DottedLinePainter(), size: Size(60, 2)),
       ),
     );
   }
@@ -283,12 +326,13 @@ class _DottedLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = Color(0xFFFFA000) // Amber/orange color to match image
-          ..strokeWidth = 2
+          ..color = Color(0xFFFFA000)
+          ..strokeWidth =
+              3 // Slightly thicker to match image
           ..strokeCap = StrokeCap.round;
 
-    final dashWidth = 5.0; // Longer dashes to match image
-    final dashSpace = 4.0;
+    final dashWidth = 4.0; // Longer dashes to match image
+    final dashSpace = 6.0; // More space between dashes
     double startX = 0;
 
     while (startX < size.width) {

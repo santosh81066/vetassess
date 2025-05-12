@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/skills_assessment_page.dart';
 
+import '../screens/application_process.dart';
+
 class SkillsAssessmentDropdownPanel extends StatelessWidget {
   const SkillsAssessmentDropdownPanel({super.key});
 
@@ -8,22 +10,30 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 1200;
-    final bool isMediumScreen = screenSize.width >= 1200 && screenSize.width < 1600;
+    final bool isMediumScreen =
+        screenSize.width >= 1200 && screenSize.width < 1600;
     final bool isLargeScreen = screenSize.width >= 1600;
-    
+
     return Material(
       elevation: 4,
       color: Colors.white,
       child: Container(
         width: double.infinity,
-        height: isSmallScreen ? screenSize.height * 0.9 : screenSize.height * 0.8,
+        height:
+            isSmallScreen ? screenSize.height * 0.9 : screenSize.height * 0.8,
         padding: EdgeInsets.symmetric(
-          horizontal: isSmallScreen ? 16 : isMediumScreen ? 24 : 40, 
-          vertical: isSmallScreen ? 16 : 32
+          horizontal:
+              isSmallScreen
+                  ? 16
+                  : isMediumScreen
+                  ? 24
+                  : 40,
+          vertical: isSmallScreen ? 16 : 32,
         ),
-        child: isSmallScreen 
-            ? _buildMobileLayout(context)
-            : _buildDesktopLayout(context, isMediumScreen),
+        child:
+            isSmallScreen
+                ? _buildMobileLayout(context)
+                : _buildDesktopLayout(context, isMediumScreen),
       ),
     );
   }
@@ -31,10 +41,13 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
   Widget _buildDesktopLayout(BuildContext context, bool isMediumScreen) {
     final double spacing = isMediumScreen ? 20 : 40;
     final double blockWidth = isMediumScreen ? 200 : 230;
-    
+
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: isMediumScreen ? 40 : 80, vertical: 32),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMediumScreen ? 40 : 80,
+          vertical: 32,
+        ),
         child: Flex(
           direction: Axis.horizontal,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +56,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
             _CategoryBlock(
               title: "Skilled Assessments\nfor Migration",
               description:
-              "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
+                  "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
               buttonColor: const Color(0xFFFFA000),
               buttonTextColor: Colors.black,
               width: blockWidth,
@@ -63,19 +76,35 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: true,
               width: blockWidth,
+              onLinkTap: (String link) {
+                if (link == "Application Process") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ApplicationProcess(),
+                    ),
+                  );
+                }
+              },
             ),
             SizedBox(width: spacing),
             _LinkBlock(
               title: "Trades",
-              links: [
-                "Application Process",
-                "Fees",
-                "Eligibility Criteria",
-              ],
+              links: ["Application Process", "Fees", "Eligibility Criteria"],
               buttonColor: Colors.transparent,
               buttonBorderColor: const Color(0xFF004D40),
               showButton: true,
               width: blockWidth,
+              onLinkTap: (String link) {
+                if (link == "Application Process") {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const SkillsAssessmentPage(),
+                  //   ),
+                  // );
+                }
+              },
             ),
             SizedBox(width: spacing),
             _LinkBlock(
@@ -91,6 +120,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: false,
               width: blockWidth,
+              onLinkTap: (String link) {},
             ),
           ],
         ),
@@ -108,7 +138,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
             _CategoryBlock(
               title: "Skilled Assessments\nfor Migration",
               description:
-              "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
+                  "We recognise and assess your skills and experience enabling you to continue skilled employment in Australia.",
               buttonColor: const Color(0xFFFFA000),
               buttonTextColor: Colors.black,
               width: double.infinity,
@@ -128,19 +158,35 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: true,
               width: double.infinity,
+              onLinkTap: (String link) {
+                if (link == "Application Process") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ApplicationProcess(),
+                    ),
+                  );
+                }
+              },
             ),
             const SizedBox(height: 32),
             _LinkBlock(
               title: "Trades",
-              links: [
-                "Application Process",
-                "Fees",
-                "Eligibility Criteria",
-              ],
+              links: ["Application Process", "Fees", "Eligibility Criteria"],
               buttonColor: Colors.transparent,
               buttonBorderColor: const Color(0xFF004D40),
               showButton: true,
               width: double.infinity,
+              onLinkTap: (String link) {
+                if (link == "Application Process") {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const ApplicationProcess(),
+                  //   ),
+                  // );
+                }
+              },
             ),
             const SizedBox(height: 32),
             _LinkBlock(
@@ -156,6 +202,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: false,
               width: double.infinity,
+              onLinkTap: (String link) {},
             ),
           ],
         ),
@@ -187,15 +234,9 @@ class _CategoryBlock extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: theme.textTheme.headlineSmall,
-          ),
+          Text(title, style: theme.textTheme.headlineSmall),
           const SizedBox(height: 12),
-          Text(
-            description,
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(description, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -211,11 +252,13 @@ class _CategoryBlock extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SkillsAssessmentPage()),
+                MaterialPageRoute(
+                  builder: (context) => const SkillsAssessmentPage(),
+                ),
               );
             },
             child: const Text("View All"),
-          )
+          ),
         ],
       ),
     );
@@ -229,6 +272,7 @@ class _LinkBlock extends StatelessWidget {
   final Color buttonBorderColor;
   final bool showButton;
   final double width;
+  final Function(String) onLinkTap;
 
   const _LinkBlock({
     required this.title,
@@ -236,6 +280,7 @@ class _LinkBlock extends StatelessWidget {
     required this.buttonColor,
     required this.buttonBorderColor,
     required this.width,
+    required this.onLinkTap,
     this.showButton = true,
   });
 
@@ -259,9 +304,9 @@ class _LinkBlock extends StatelessWidget {
           ...links.map(
             (link) => Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                link,
-                style: theme.textTheme.titleSmall,
+              child: InkWell(
+                onTap: () => onLinkTap(link),
+                child: Text(link, style: theme.textTheme.titleSmall),
               ),
             ),
           ),
@@ -270,11 +315,11 @@ class _LinkBlock extends StatelessWidget {
             OutlinedButton(
               style: OutlinedButton.styleFrom(
                 backgroundColor: buttonColor,
-                side: BorderSide(
-                  color: buttonBorderColor,
-                  width: 2,
+                side: BorderSide(color: buttonBorderColor, width: 2),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(0),
                 ),
@@ -282,7 +327,9 @@ class _LinkBlock extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SkillsAssessmentPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const SkillsAssessmentPage(),
+                  ),
                 );
               },
               child: Text(

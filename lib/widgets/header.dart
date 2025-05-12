@@ -70,19 +70,20 @@ class _HeaderState extends State<Header> {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final double width = mediaQuery.size.width;
     final double height = mediaQuery.size.height;
-    
+
     // Define responsive breakpoints
     final bool isLargeDesktop = width >= 1400;
     final bool isDesktop = width >= 1024;
     final bool isTablet = width >= 768 && width < 1024;
     final bool isSmallTablet = width >= 600 && width < 768;
     final bool isMobile = width < 600;
-    
+
     // Calculate dynamic sizes based on screen width
     final double logoHeight = isDesktop ? 110 : (isTablet ? 90 : 70);
-    final double topBarWidth = isDesktop ? width * 0.490 : (isTablet ? width * 0.7 : width * 0.85);
+    final double topBarWidth =
+        isDesktop ? width * 0.490 : (isTablet ? width * 0.7 : width * 0.85);
     final double navItemSpacing = isLargeDesktop ? 32 : (isDesktop ? 24 : 16);
-    
+
     return Container(
       color: Colors.white,
       child: Row(
@@ -148,7 +149,7 @@ class _HeaderState extends State<Header> {
                             ],
                           ),
                           SizedBox(width: isDesktop ? 24 : 16),
-                          
+
                           if (isDesktop) ...[
                             const _TopLink(text: "About"),
                             const SizedBox(width: 24),
@@ -157,7 +158,7 @@ class _HeaderState extends State<Header> {
                             const _TopLink(text: "News & Updates"),
                             const SizedBox(width: 24),
                           ],
-                          
+
                           InkWell(
                             onTap: () {},
                             child: Row(
@@ -220,9 +221,10 @@ class _HeaderState extends State<Header> {
                   height: isDesktop ? 70 : 60,
                   width: width,
                   padding: EdgeInsets.only(top: isDesktop ? 12 : 8),
-                  child: isDesktop 
-                    ? _buildDesktopNavBar(navItemSpacing, isLargeDesktop)
-                    : _buildMobileNavBar(),
+                  child:
+                      isDesktop
+                          ? _buildDesktopNavBar(navItemSpacing, isLargeDesktop)
+                          : _buildMobileNavBar(),
                 ),
               ],
             ),
@@ -238,7 +240,7 @@ class _HeaderState extends State<Header> {
     final double iconSize = isLargeDesktop ? 50.0 : 40.0;
     final double searchIconSize = isLargeDesktop ? 25.0 : 25.0;
     final double sideMargin = isLargeDesktop ? 20.0 : 12.0;
-    
+
     return Container(
       alignment: Alignment.center,
       child: Row(
@@ -254,10 +256,11 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment For\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _migrationNavKey,
-                    const SkillsAssessmentDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _migrationNavKey,
+                        const SkillsAssessmentDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(
@@ -265,32 +268,28 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment Non\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _nonMigrationNavKey,
-                    const SkillsAssessmentNonMigrationPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _nonMigrationNavKey,
+                        const SkillsAssessmentNonMigrationPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
-                _NavItem(
-                  title: "Check my\nOccupation",
-                  fontSize: fontSize,
-                ),
+                _NavItem(title: "Check my\nOccupation", fontSize: fontSize),
                 SizedBox(width: spacing),
                 _NavItem(
                   key: _businessNavKey,
                   title: "Business and\nIndustry",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _businessNavKey,
-                    const BusinessIndustryDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _businessNavKey,
+                        const BusinessIndustryDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
-                _NavItem(
-                  title: "Contact",
-                  fontSize: fontSize,
-                ),
+                _NavItem(title: "Contact", fontSize: fontSize),
                 SizedBox(width: sideMargin),
                 // Search icon with circular background
                 Container(
@@ -302,7 +301,7 @@ class _HeaderState extends State<Header> {
                   ),
                   child: Icon(
                     Icons.search,
-                    color:Color(0xFFFFA000),
+                    color: Color(0xFFFFA000),
                     size: searchIconSize,
                   ),
                 ),
@@ -334,11 +333,7 @@ class _HeaderState extends State<Header> {
             color: Color(0xFFFFA000),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.search,
-            color: Colors.white,
-            size: 20,
-          ),
+          child: const Icon(Icons.search, color: Colors.white, size: 20),
         ),
         // Menu icon for mobile navigation
         Container(
@@ -403,19 +398,21 @@ class _NavItemState extends State<_NavItem> {
     // Get screen width for responsive adjustments
     final double width = MediaQuery.of(context).size.width;
     final bool isLargeScreen = width >= 1200;
-    
+
     // Colors based on highlighted state
-    final Color defaultColor = widget.isHighlighted 
-        ? const Color(0xFF0D5E63) 
-        : const Color(0xFF0D5E63);
-    
-    final Color hoverColor = widget.isHighlighted
-        ? const Color(0xFF0D5E63)
-        : const Color(0xFFFFA000);
-    
+    final Color defaultColor =
+        widget.isHighlighted
+            ? const Color(0xFF0D5E63)
+            : const Color(0xFF0D5E63);
+
+    final Color hoverColor =
+        widget.isHighlighted
+            ? const Color(0xFF0D5E63)
+            : const Color(0xFFFFA000);
+
     // Responsive icon size
     final double iconSize = isLargeScreen ? 16.0 : 14.0;
-    
+
     // Responsive letter spacing
     final double letterSpacing = isLargeScreen ? 0.3 : 0.2;
 

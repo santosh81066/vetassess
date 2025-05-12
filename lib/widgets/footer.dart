@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'HelpSection.dart';
+
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
@@ -8,6 +10,7 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        HelpSection(),
         // Main Footer Section with columns
         Container(
           color: const Color(0xFF0D5257), // Dark Teal background
@@ -82,8 +85,6 @@ class Footer extends StatelessWidget {
 
               // Contact Us section
               _ContactSection(),
-
-
             ],
           ),
         ),
@@ -121,7 +122,8 @@ class Footer extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               const SizedBox(height: 15),
-             /* Align(
+
+              /* Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 80),
@@ -133,14 +135,13 @@ class Footer extends StatelessWidget {
                 ),
               ),*/
               // Acknowledgment Text
-              
               Align(
                 alignment: Alignment.centerLeft,
                 child: const Text(
                   'In the spirit of reconciliation VETASSESS acknowledges the Traditional Custodians of country throughout Australia and their\n'
-                      'connections to land, sea and community. We pay our respects to their Elders past and present and extend that respect to all\n'
-                      'Aboriginal and Torres Strait Islander peoples today.',
-                
+                  'connections to land, sea and community. We pay our respects to their Elders past and present and extend that respect to all\n'
+                  'Aboriginal and Torres Strait Islander peoples today.',
+
                   style: TextStyle(color: Colors.white70, fontSize: 12),
                   textAlign: TextAlign.left,
                 ),
@@ -177,7 +178,6 @@ class Footer extends StatelessWidget {
         ),
 
         // ISO certifications at bottom right
-
       ],
     );
   }
@@ -205,13 +205,19 @@ class _FooterLinksSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...links.map((link) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              link,
-              style: const TextStyle(color: Colors.white, fontSize: 14,fontWeight: FontWeight.bold),
+          ...links.map(
+            (link) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                link,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -237,10 +243,14 @@ class _ContactSection extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             'Level 1,\n'
-                '85 Cremorne Street\n'
-                'Cremorne, Victoria 3121\n'
-                'Australia',
-            style: TextStyle(color: Colors.white, fontSize: 14,fontWeight: FontWeight.w100),
+            '85 Cremorne Street\n'
+            'Cremorne, Victoria 3121\n'
+            'Australia',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w100,
+            ),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -264,9 +274,7 @@ class _ContactSection extends StatelessWidget {
                 backgroundColor: const Color(0xFFFFA000),
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
@@ -277,7 +285,7 @@ class _ContactSection extends StatelessWidget {
               ),
               child: const Text(
                 "Contact Us",
-                style: TextStyle(color: Colors.black,fontSize: 16,),
+                style: TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
           ),
