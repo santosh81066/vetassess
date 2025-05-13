@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vetassess/screens/login.dart';
+import 'package:vetassess/screens/login_page.dart';
 
+import '../screens/home_screen.dart';
 import 'BusinessIndustryDropdownPanel.dart';
 import 'SkillsAssessmentDropdownPanel.dart';
 import 'SkillsAssessmentNonMigrationDropdownPanel.dart';
@@ -97,7 +100,10 @@ class _HeaderState extends State<Header> {
             ),
             child: GestureDetector(
               onTap: () {
-                context.go('/');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
               },
               child: Container(
                 color: Colors.white,
@@ -169,13 +175,23 @@ class _HeaderState extends State<Header> {
                                   color: Colors.black54,
                                 ),
                                 const SizedBox(width: 6),
-                                const Text(
-                                  "Login",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2, // Better vertical alignment
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Login",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1.2, // Better vertical alignment
+                                    ),
                                   ),
                                 ),
                               ],

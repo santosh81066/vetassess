@@ -3,6 +3,7 @@ import 'package:vetassess/widgets/skills_assessment_page.dart';
 
 import '../screens/application_process.dart';
 import '../screens/fee_screen.dart';
+import '../screens/skills_assessment_support.dart';
 
 class SkillsAssessmentDropdownPanel extends StatelessWidget {
   const SkillsAssessmentDropdownPanel({super.key});
@@ -89,8 +90,14 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
                 if (link == "Fees") {
                   Navigator.push(
                     context,
+                    MaterialPageRoute(builder: (context) => const FeeScreen()),
+                  );
+                }
+                if (link == "Skills Assessment Support") {
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(
-                      builder: (context) => const FeeScreen(),
+                      builder: (context) => const SkillsAssessmentSupport(),
                     ),
                   );
                 }
