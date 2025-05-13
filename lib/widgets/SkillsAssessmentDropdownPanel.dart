@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/skills_assessment_page.dart';
 
 import '../screens/application_process.dart';
+import '../screens/fee_screen.dart';
 
 class SkillsAssessmentDropdownPanel extends StatelessWidget {
   const SkillsAssessmentDropdownPanel({super.key});
@@ -82,6 +83,14 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ApplicationProcess(),
+                    ),
+                  );
+                }
+                if (link == "Fees") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FeeScreen(),
                     ),
                   );
                 }

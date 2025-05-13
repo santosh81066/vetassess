@@ -37,12 +37,6 @@ class HelpSection extends StatelessWidget {
       ),
     ),
 
-    // Optional dark overlay to subtly mute background
-    // Positioned.fill(
-    //   child: Container(
-    //     color: Colors.black.withOpacity(0.02), // Adjust 0.05–0.2 as needed
-    //   ),
-    // ),
           // Content
           Padding(
             padding: EdgeInsets.symmetric(
