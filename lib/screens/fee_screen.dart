@@ -27,6 +27,7 @@ class FeeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 150),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionTitle(context, 'Full Skills Assessment Fees'),
 

@@ -13,7 +13,7 @@ class ApplicationProcess extends StatelessWidget {
     final isLargeScreen = screenWidth > 1100;
 
     // Color constants
-    const Color tealColor = Color(0xFF0A594C);
+    const Color tealColor = Color(0xFF00565B);
     const Color yellowColor = Color(0xFFF9C700);
     const Color dottedLineColor = Color(0xFF008996);
 
@@ -81,6 +81,86 @@ class ApplicationProcess extends StatelessWidget {
             yellowColor,
             dottedLineColor,
             context,
+          ),
+
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 100, top: 50),
+              child: Container(
+                width: screenWidth * 0.78,
+
+                height: 340,
+                color: tealColor,
+
+                child: Row(
+                  children: [
+                    // Left side with teal background and content
+                    Container(
+                      padding: EdgeInsets.only(top: 60, left: 110, bottom: 60),
+                      width: screenWidth * 0.52,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Apply to get your skills assessed",
+                            style: TextStyle(
+                              color: Color(0xFFFFA000),
+                              fontSize: 36,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                          const Text(
+                            "Start the application process and if you have any questions, you can contact \nour customer support team at any stage.",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              height: 1.5,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                            width: 150,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFA000),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                              ),
+                              child: const Text(
+                                "Apply Online",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Right side with desert landscape image
+                    Image.asset(
+                      'assets/images/During_your_application.jpg',
+                      width: screenWidth * 0.26,
+                      height: 340,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -643,295 +723,295 @@ class ApplicationProcess extends StatelessWidget {
 
     return expandableSections;
   }
+}
 
-  Widget _buildFaqSection(
-    String sectionTitle,
-    List<String> expandableTitles,
-    bool includeParagraphs,
-    Color tealColor,
-    Color yellowColor,
-    Color dottedLineColor,
-    BuildContext context,
-  ) {
-    // Actual FAQ items from the image
-    final List<String> actualFaqTitles = [
-      'How long will it take for my assessment to be completed?',
-      'I am a recent graduate with no work experience. Can I apply for a full skills assessment?',
-      'I have extensive work experience in a field highly relevant to my nominated occupation but no formal qualifications. Can I still apply for a skills assessment?',
-      'Can I change my occupation while my application is pending?',
-    ];
+Widget _buildFaqSection(
+  String sectionTitle,
+  List<String> expandableTitles,
+  bool includeParagraphs,
+  Color tealColor,
+  Color yellowColor,
+  Color dottedLineColor,
+  BuildContext context,
+) {
+  // Actual FAQ items from the image
+  final List<String> actualFaqTitles = [
+    'How can VETASSESS be sure it can process my application in 10 business days?',
+    'What if my application for Priority Processing is not accepted?',
+    'I’ve applied for the standard service. Can I change to Priority Processing?'
+        'Once my application for Priority Processing is accepted, can I change my occupation?',
+    'What happens if you cannot process my priority processing application within 10 business days?',
+    "What happens if my occupation is removed from the Australian Government's Department of Home Affairs list of eligible occupations during Priority Processing?",
+  ];
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 60),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 150),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Left column - Only title and View all button
-            Container(
-              width: 250,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Explore FAQs",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0A594C),
-                      height: 1.3,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  InkWell(
-                    onTap: () {},
-                    child: Row(
-                      children: [
-                        Text(
-                          "View all",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF0A594C),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Color(0xFF0A594C),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.arrow_forward,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 60),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left column - Title and View all button
+        Expanded(
+          flex: 1,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Explore FAQs",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0A594C),
+                  height: 1.3,
+                ),
               ),
-            ),
+              SizedBox(height: 24),
+              InkWell(
+                onTap: () {},
+                child: Row(
+                  children: [
+                    Text(
+                      "View all",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0A594C),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF0A594C),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
 
-            // Right column - FAQ accordions with more space
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(top: 6),
-                child: Column(
-                  children:
-                      actualFaqTitles.map((title) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.grey.withOpacity(0.2),
-                                width: 1,
+        // Right column - FAQ accordions
+        Expanded(
+          flex: 2,
+          child: Container(
+            padding: EdgeInsets.only(top: 6),
+            child: Column(
+              children:
+                  actualFaqTitles.map((title) {
+                    return Theme(
+                      data: ThemeData(
+                        dividerColor: Colors.transparent,
+                        colorScheme: ColorScheme.light(
+                          surfaceTint: Colors.transparent,
+                          primary: Color(0xFF0A594C),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          ExpansionTile(
+                            tilePadding: EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 0,
+                            ),
+                            expandedCrossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            childrenPadding: EdgeInsets.only(
+                              left: 50,
+                              bottom: 16,
+                              right: 20,
+                            ),
+                            leading: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Color(0xFF0A594C),
+                                  width: 3,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Color(0xFF0A594C),
+                                size: 22,
+                                weight: 900,
+                              ),
+                            ),
+                            title: Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF0A594C),
+                              ),
+                            ),
+                            trailing: SizedBox.shrink(),
+                            children: [
+                              Text(
+                                'This is the answer to the FAQ question.',
+                                style: TextStyle(fontSize: 15, height: 1.5),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: double.infinity,
+                            height: 1,
+                            child: CustomPaint(
+                              painter: DottedLinePainter(
+                                color: Color(0xFF008996),
                               ),
                             ),
                           ),
-                          child: Theme(
-                            data: ThemeData(
-                              dividerColor: Colors.transparent,
-                              colorScheme: ColorScheme.light(
-                                surfaceTint: Colors.transparent,
-                                primary: Color(0xFF0A594C),
-                              ),
-                            ),
-                            child: ExpansionTile(
-                              tilePadding: EdgeInsets.symmetric(
-                                vertical: 20,
-                                horizontal: 0,
-                              ),
-                              expandedCrossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              childrenPadding: EdgeInsets.only(
-                                left: 50,
-                                bottom: 16,
-                                right: 20,
-                              ),
-                              leading: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Color(0xFF0A594C),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Color(0xFF0A594C),
-                                  size: 18,
-                                ),
-                              ),
-                              title: Text(
-                                title,
+                        ],
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildPreparingApplSection(
+  String sectionTitle,
+  List<String> expandableTitles,
+  bool includeParagraphs,
+  Color tealColor,
+  Color yellowColor,
+  Color dottedLineColor,
+  BuildContext context,
+) {
+  // Actual navigation items from the image
+  final List<String> actualLinks = [
+    'The application process',
+    'Acceptable documents you will need',
+    'Fees & Charges',
+    'Check your occupation',
+    'FAQs',
+    'Reviews, Reassessments, Appeals,\nReissues & Feedback',
+    'Priority Processing & Urgent\nApplications',
+    'Points Test Advice',
+    'Renewals',
+  ];
+
+  return Container(
+    width: double.infinity,
+    color: Colors.white,
+    padding: const EdgeInsets.symmetric(horizontal: 150),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left column - Title and description
+        Expanded(
+          flex: 2,
+          child: Container(
+            width: 450,
+            padding: EdgeInsets.only(top: 40, bottom: 40, right: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Preparing your application",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0A594C),
+                    height: 1.3,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Right column - Navigation links with dotted lines
+        Expanded(
+          flex: 1,
+          child: Container(
+            padding: EdgeInsets.only(top: 40, bottom: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children:
+                  actualLinks.asMap().entries.map((entry) {
+                    final int index = entry.key;
+                    final String link = entry.value;
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                link,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.arrow_forward,
                                   color: Color(0xFF0A594C),
+                                  size: 22,
                                 ),
                               ),
-                              trailing: SizedBox.shrink(),
-                              children: [
-                                Text(
-                                  'This is the answer to the FAQ question.',
-                                  style: TextStyle(fontSize: 15, height: 1.5),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Updated _buildPreparingApplSection method with dotted lines
-  Widget _buildPreparingApplSection(
-    String sectionTitle,
-    List<String> expandableTitles,
-    bool includeParagraphs,
-    Color tealColor,
-    Color yellowColor,
-    Color dottedLineColor,
-    BuildContext context,
-  ) {
-    // Actual navigation items from the image
-    final List<String> actualLinks = [
-      'The application process',
-      'Acceptable documents you will need',
-      'Fees & Charges',
-      'Check your occupation',
-      'FAQs',
-      'Reviews, Reassessments, Appeals, Reissues & Feedback',
-      'Priority Processing & Urgent Applications',
-      'Points Test Advice',
-      'Renewals',
-    ];
-
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 150),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Left column - Title and description
-            Container(
-              width: 450,
-              padding: EdgeInsets.only(top: 40, bottom: 40, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Preparing your application",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0A594C),
-                      height: 1.3,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Right column - Navigation links with dotted lines
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(top: 40, bottom: 40),
-                child: Column(
-                  children:
-                      actualLinks.asMap().entries.map((entry) {
-                        final int index = entry.key;
-                        final String link = entry.value;
-                        return Container(
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        link,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 32,
-                                      height: 32,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF0A594C),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.arrow_forward,
-                                        color: Colors.white,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Add dotted line for all items except the last one
-                              if (index < actualLinks.length - 1)
-                                Container(
-                                  width: double.infinity,
-                                  height: 1,
-                                  child: CustomPaint(
-                                    painter: DottedLinePainterTwo(
-                                      color: Color(0xFFF9C700),
-                                    ),
-                                  ),
-                                ),
                             ],
                           ),
-                        );
-                      }).toList(),
-                ),
-              ),
+                        ),
+                        // Add dotted line for all items except the last one
+                        if (index < actualLinks.length - 1)
+                          Container(
+                            width: double.infinity,
+                            height: 1,
+                            child: CustomPaint(
+                              painter: DottedLinePainterTwo(
+                                color: Color(0xFFfd7e14),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  }).toList(),
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
 }
 
 // Custom painter for dotted line
-class DottedLinePainter extends CustomPainter {
+class DottedLinePainterTwo extends CustomPainter {
   final Color color;
 
-  DottedLinePainter({required this.color});
+  DottedLinePainterTwo({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -955,10 +1035,11 @@ class DottedLinePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class DottedLinePainterTwo extends CustomPainter {
+// Custom painter for dotted line
+class DottedLinePainter extends CustomPainter {
   final Color color;
 
-  DottedLinePainterTwo({required this.color});
+  DottedLinePainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
