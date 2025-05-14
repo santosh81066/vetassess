@@ -3,6 +3,7 @@ import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/widgets/skills_assessment_page.dart';
 
 import '../screens/application_process.dart';
+import '../screens/eligibility_criteria.dart';
 import '../screens/fee_screen.dart';
 import '../screens/skills_assessment_support.dart';
 
@@ -102,11 +103,19 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
                     ),
                   );
                 }
-                 if (link == "Nominate an Occupation") {
+                if (link == "Nominate an Occupation") {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const NominateScreen(),
+                    ),
+                  );
+                }
+                if (link == "Eligibility Criteria") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EligibilityCriteria(),
                     ),
                   );
                 }

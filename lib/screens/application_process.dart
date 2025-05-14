@@ -61,6 +61,7 @@ class ApplicationProcess extends StatelessWidget {
               'What is pre- and post-qualification employment?',
               'What is Date Deemed Skilled?',
               'What is closely related employment?',
+              "What happens if my occupation is removed from the Australian Government's Department of Home Affairs list of eligible occupations during Priority Processing?",
             ],
             false,
             tealColor,
