@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/widgets/skills_assessment_page.dart';
 
 import '../screens/application_process.dart';
@@ -98,6 +99,14 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SkillsAssessmentSupport(),
+                    ),
+                  );
+                }
+                 if (link == "Nominate an Occupation") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NominateScreen(),
                     ),
                   );
                 }
