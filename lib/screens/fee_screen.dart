@@ -287,7 +287,149 @@ class FeeScreen extends StatelessWidget {
 
                   _buildTaxOfficeFootnote(context),
 
-                  const SizedBox(height: 90),
+                  const SizedBox(height: 50),
+
+
+                   _buildDivider(),
+
+                    _buildStandardSection(
+              context,
+              'Other Information',
+              [
+                const Text(
+                  'Withdrawal, Closure and Reopening of an Application ',
+                  style: TextStyle(fontSize: 20,  color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
+                ),
+                SizedBox(height: 30,),
+                const Text(
+                  'Withdrawal: ',
+                  style: TextStyle(fontSize: 20, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
+                ),
+                const SizedBox(height: 20),
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      const TextSpan(
+                        text: 'If you request to withdraw an application before the assessment commences, a full refund will be considered, less an administration fee of AUD\$167. Please see our',
+                      ),
+                      TextSpan(
+                        text: 'Refund Policy ',
+                        style: const TextStyle(
+                          color: Color(0xFF0d5257),
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                       const TextSpan(
+                        text: 'for further details.',
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 30,),
+                const Text(
+                  'Closure: ',
+                  style: TextStyle(fontSize: 20, color: Color(0xFF0d5257), fontWeight: FontWeight.bold,),
+                ),
+               
+                const SizedBox(height: 20),
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      const TextSpan(
+                        text: 'You are expected to provide complete documentation at the time you submit your application.. Please find the list of documents under',
+                      ),
+                      TextSpan(
+                        text: ' Required Documents. ',
+                        style: const TextStyle(
+                          color: Color(0xFF0d5257),
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: ' If any information or documents are missing from the application, we will provide 15 calendar days to submit them. If the outstanding documents are not submitted within the given timeframe, a final notice will be issued giving seven additional days before the application is closed without further communication. Please note that refunds don''t apply to closed applications',
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+                const Text(
+                  'Reopening:',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'You may request to reopen an application after providing all required documents and information within 90 days of closure. A fee of \$167.00 will apply. Requests received after 90 days will not be accepted and you will need to lodge a new application and pay the full assessment fee.',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                ),
+                const SizedBox(height: 30),
+
+                const SizedBox(height: 20),
+                const Text(
+                  'Making a payment',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
+                ),
+                const SizedBox(height: 20),
+                 const SizedBox(height: 20),
+                const Text(
+                  'We have two payment options available. Payments must be:',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                ),
+                const SizedBox(height: 20),
+                _buildBulletPoints(
+                  'Made payable to VETASSESS',
+                ),
+                const SizedBox(height: 10),
+                _buildBulletPoints(
+                  'In Australian dollars ',
+                ),
+                const SizedBox(height: 10),
+                _buildBulletPoints(
+                  'Paid and cleared 7 days prior to your assessment',
+                ),
+                 const SizedBox(height: 20),
+                const Text(
+                  'You will be able to complete payment using any one of the following methods:',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                ),
+                 const SizedBox(height: 10),
+                _buildBulletPoints(
+                  'MasterCard',
+                ),
+                const SizedBox(height: 10),
+                _buildBulletPoints(
+                  'VISA',
+                ),
+                 const SizedBox(height: 30),
+                const Text(
+                  'Refunds',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
+                ),
+                RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      const TextSpan(
+                        text: 'You can find further information about our refund policy',
+                      ),
+                      TextSpan(
+                        text: 'here',
+                        style: const TextStyle(
+                          color: Color(0xFF0d5257),
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      
+                    ],
+                  ),
+                ),
+              ],
+            ),
+              SizedBox(height: 90,)
                 ],
               ),
             ),
@@ -496,6 +638,86 @@ class FeeScreen extends StatelessWidget {
       ],
     );
   }
+
+    // Helper method to build standard sections for consistent layout
+  Widget _buildStandardSection(BuildContext context, String title, List<Widget> content) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left column - Title
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0D5C63),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Right column - Content
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: content,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+    // Helper method to create consistent dividers
+  Widget _buildDivider() {
+    return Column(
+      children: [
+        const SizedBox(height: 30),
+        Container(
+          height: 1,
+          color: const Color(0xFFF9D342), // Yellow color for the line
+          width: double.infinity,
+        ),
+        const SizedBox(height: 30),
+      ],
+    );
+  }
+
+    Widget _buildBulletPoints(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '• ',
+          style: TextStyle(
+            fontSize: 16,
+            color: Color(0xFF5A5A5A),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF5A5A5A),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 
   // Build standard footnote text
   Widget _buildFootnoteText(BuildContext context, String text) {

@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:vetassess/theme.dart';
 import 'package:vetassess/widgets/BasePageLayout.dart';
 
 class NominateScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class NominateScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTabletOrLarger = screenWidth > 768;
+    final screenHeight = MediaQuery.of(context).size.height;
     
     return BasePageLayout(
       child: Padding(
@@ -16,9 +18,12 @@ class NominateScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 90),
+           // const SizedBox(height: 90),
 
-          _buildSkillednominateanoccupation(context),
+          ..._buildProcessSteps(screenWidth, screenHeight),
+
+         
+          // _buildSkillednominateanoccupation(context),
 
            const SizedBox(height: 90),
           _buildSkillednominate(context),
@@ -827,6 +832,90 @@ Widget _buildSkillednominate(BuildContext context) {
         ),
       ],
     );
+  }
+   
+    List<Widget> _buildProcessSteps(double screenWidth, double screenHeight) {
+    // Define all step data in a list
+    final List<Map<String, dynamic>> stepsData = [
+      {
+        'step': 'You will need to nominate an occupation when you apply for a Skills Assessment',
+        //'title': 'Choose a professional occupation',
+        'description':
+            'Generally, for a Skills Assessment application lodged under either ENS, GSM, RSMS or SID visa categories, applicants are required to hold a qualification that is at the educational level required and which is in a highly relevant field to the nominated occupation. ',
+        'descriptions':
+            'In addition to the qualification requirements you also have to provide evidence of having at least one year of highly relevant employment performed at the required skill level within the last five years, from the date of lodging your application.',
+        'image': 'assets/images/blog_metropolis.jpg',
+        'imageOnRight': true,
+      },
+    ];
+
+    // Generate widgets for each step
+    return stepsData.asMap().entries.map((entry) {
+      final int index = entry.key;
+      final Map<String, dynamic> stepData = entry.value;
+
+      final Widget stepInfoColumn = Container(
+        width: screenWidth * 0.3,
+        height: 500,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              stepData['step'],
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF006064),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              stepData['description'],
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5,
+                letterSpacing: 0.3,
+              ),
+            ),
+            SizedBox(height: 20),
+             Text(
+              stepData['descriptions'],
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+        ),
+      );
+
+      final Widget imageWidget = Image.asset(
+        stepData['image'],
+        height: 40,
+        width: 80,
+        fit: BoxFit.fitHeight,
+      );
+
+      final List<Widget> rowChildren =
+          stepData['imageOnRight']
+              ? [stepInfoColumn, imageWidget]
+              : [imageWidget, stepInfoColumn];
+
+      return Container(
+        color: AppColors.color12,
+        width: screenWidth,
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.1,
+          vertical: screenHeight / 35,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: rowChildren,
+        ),
+      );
+    }).toList();
   }
 
   // Helper method for bullet points with multiple highlighted segments
