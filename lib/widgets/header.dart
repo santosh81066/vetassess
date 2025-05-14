@@ -34,20 +34,19 @@ class _HeaderState extends State<Header> {
 
     final overlay = Overlay.of(context);
     _dropdownOverlay = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            top: offset.dy + size.height,
-            left: 0,
-            right: 0,
-            child: MouseRegion(
-              onExit: (_) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _hideDropdown();
-                });
-              },
-              child: panel,
-            ),
-          ),
+      builder: (context) => Positioned(
+        top: offset.dy + size.height,
+        left: 0,
+        right: 0,
+        child: MouseRegion(
+          onExit: (_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _hideDropdown();
+            });
+          },
+          child: panel,
+        ),
+      ),
     );
 
     overlay.insert(_dropdownOverlay!);
@@ -72,8 +71,7 @@ class _HeaderState extends State<Header> {
     // Get the current screen size
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final double width = mediaQuery.size.width;
-    final double height = mediaQuery.size.height;
-
+    
     // Define responsive breakpoints
     final bool isLargeDesktop = width >= 1400;
     final bool isDesktop = width >= 1024;
@@ -81,11 +79,22 @@ class _HeaderState extends State<Header> {
     final bool isSmallTablet = width >= 600 && width < 768;
     final bool isMobile = width < 600;
 
-    // Calculate dynamic sizes based on screen width
-    final double logoHeight = isDesktop ? 110 : (isTablet ? 90 : 70);
-    final double topBarWidth =
-        isDesktop ? width * 0.490 : (isTablet ? width * 0.7 : width * 0.85);
-    final double navItemSpacing = isLargeDesktop ? 32 : (isDesktop ? 24 : 16);
+    // Calculate dynamic sizes based on screen width - using relative proportions
+    final double logoHeight = isDesktop ? width * 0.08 : (isTablet ? width * 0.09 : width * 0.12);
+    final double logoHeightClamped = logoHeight.clamp(70.0, 110.0); // Prevent logo from getting too large or small
+    
+    final double topBarWidth = isDesktop 
+        ? width * 0.490 
+        : (isTablet ? width * 0.7 : width * 0.85);
+    
+    final double navItemSpacing = isLargeDesktop 
+        ? width * 0.023 
+        : (isDesktop ? width * 0.022 : width * 0.02);
+    final double navItemSpacingClamped = navItemSpacing.clamp(16.0, 32.0);
+
+    // Dynamic heights for containers based on screen width
+    final double topBarHeight = (isDesktop ? width * 0.043 : width * 0.05).clamp(45.0, 60.0);
+    final double navBarHeight = (isDesktop ? width * 0.05 : width * 0.06).clamp(50.0, 70.0);
 
     return Container(
       color: Colors.white,
@@ -109,7 +118,7 @@ class _HeaderState extends State<Header> {
                 color: Colors.white,
                 child: Image.asset(
                   'assets/images/vetassess_logo.png',
-                  height: logoHeight,
+                  height: logoHeightClamped,
                 ),
               ),
             ),
@@ -125,17 +134,18 @@ class _HeaderState extends State<Header> {
                   clipper: TrapezoidClipper(),
                   child: Container(
                     color: const Color(0xFFf0f0f0),
-                    height: isDesktop ? 60 : 50,
+                    height: topBarHeight,
                     width: topBarWidth,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // Left side empty space
-                        const Spacer(),
+                        if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
 
                         // Right side - links and apply button
                         if (isDesktop || isTablet) ...[
                           Row(
-                            mainAxisSize: MainAxisSize.max,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(Icons.language_outlined, size: 18),
                               const SizedBox(width: 6),
@@ -184,7 +194,7 @@ class _HeaderState extends State<Header> {
                                       ),
                                     );
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "Login",
                                     style: TextStyle(
                                       fontSize: 14,
@@ -200,8 +210,10 @@ class _HeaderState extends State<Header> {
 
                           SizedBox(width: isDesktop ? 16 : 12),
                         ],
+                        
+                        // Apply Now Button - now with flexible height
                         Container(
-                          height: isDesktop ? 48 : 40,
+                          height: topBarHeight * 0.8,
                           child: ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
@@ -210,7 +222,7 @@ class _HeaderState extends State<Header> {
                               elevation: 0,
                               padding: EdgeInsets.symmetric(
                                 horizontal: isDesktop ? 14 : 12,
-                                vertical: isDesktop ? 12 : 8,
+                                vertical: 0, // Let the container control the height
                               ),
                               textStyle: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -231,16 +243,15 @@ class _HeaderState extends State<Header> {
                   ),
                 ),
 
-                // Main navigation header - UPDATED to match screenshot with responsive design
+                // Main navigation header - Improved responsive design
                 Container(
                   color: Colors.white,
-                  height: isDesktop ? 70 : 60,
+                  height: navBarHeight,
                   width: width,
-                  padding: EdgeInsets.only(top: isDesktop ? 12 : 8),
-                  child:
-                      isDesktop
-                          ? _buildDesktopNavBar(navItemSpacing, isLargeDesktop)
-                          : _buildMobileNavBar(),
+                  padding: EdgeInsets.only(top: isDesktop ? width * 0.01 : width * 0.015),
+                  child: isDesktop
+                      ? _buildDesktopNavBar(navItemSpacingClamped, isLargeDesktop, width)
+                      : _buildMobileNavBar(),
                 ),
               ],
             ),
@@ -250,12 +261,12 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildDesktopNavBar(double spacing, bool isLargeDesktop) {
-    // Dynamic font size based on screen width
-    final double fontSize = isLargeDesktop ? 17.0 : 15.0;
-    final double iconSize = isLargeDesktop ? 50.0 : 40.0;
-    final double searchIconSize = isLargeDesktop ? 25.0 : 25.0;
-    final double sideMargin = isLargeDesktop ? 20.0 : 12.0;
+  Widget _buildDesktopNavBar(double spacing, bool isLargeDesktop, double screenWidth) {
+    // Dynamic font size based on screen width with min and max values
+    final double fontSize = (isLargeDesktop ? screenWidth * 0.012 : screenWidth * 0.011).clamp(14.0, 17.0);
+    final double iconSize = (isLargeDesktop ? screenWidth * 0.036 : screenWidth * 0.032).clamp(38.0, 50.0);
+    final double searchIconSize = (isLargeDesktop ? 25.0 : 22.0);
+    final double sideMargin = (isLargeDesktop ? screenWidth * 0.014 : screenWidth * 0.012).clamp(12.0, 24.0);
 
     return Container(
       alignment: Alignment.center,
@@ -272,11 +283,10 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment For\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _migrationNavKey,
-                        const SkillsAssessmentDropdownPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _migrationNavKey,
+                    const SkillsAssessmentDropdownPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(
@@ -284,11 +294,10 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment Non\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _nonMigrationNavKey,
-                        const SkillsAssessmentNonMigrationPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _nonMigrationNavKey,
+                    const SkillsAssessmentNonMigrationPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Check my\nOccupation", fontSize: fontSize),
@@ -298,21 +307,20 @@ class _HeaderState extends State<Header> {
                   title: "Business and\nIndustry",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _businessNavKey,
-                        const BusinessIndustryDropdownPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _businessNavKey,
+                    const BusinessIndustryDropdownPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Contact", fontSize: fontSize),
                 SizedBox(width: sideMargin),
-                // Search icon with circular background
+                
+                // Search icon with circle - now with relative sizing
                 Container(
                   width: iconSize,
                   height: iconSize,
                   decoration: const BoxDecoration(
-                    //color: Color(0xFFFFA000),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -322,6 +330,8 @@ class _HeaderState extends State<Header> {
                   ),
                 ),
                 SizedBox(width: spacing),
+                
+                // Start Your Application - now with responsive sizing
                 _NavItem(
                   title: "Start Your\nApplication",
                   isHighlighted: true,
@@ -340,7 +350,7 @@ class _HeaderState extends State<Header> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // Search icon for mobile
+        // Search icon for mobile - now with proportional sizing
         Container(
           width: 40,
           height: 40,
@@ -357,7 +367,6 @@ class _HeaderState extends State<Header> {
           child: IconButton(
             onPressed: () {
               // Show mobile navigation drawer/menu
-              // Implementation would go here
             },
             icon: const Icon(Icons.menu, color: Color(0xFF0D5E63), size: 28),
             padding: EdgeInsets.zero,
@@ -438,7 +447,7 @@ class _NavItemState extends State<_NavItem> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
-          height: 48,
+          height: (isLargeScreen ? width * 0.034 : width * 0.038).clamp(40.0, 48.0),
           alignment: Alignment.center,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -476,7 +485,11 @@ class TrapezoidClipper extends CustomClipper<Path> {
     path.moveTo(0, 0); // Top-left corner
     path.lineTo(size.width, 0); // Top-right corner
     path.lineTo(size.width, size.height); // Bottom-right
-    path.lineTo(size.width * 0.045, size.height); // Bottom-left (inward)
+    
+    // Make the slope proportional to the width to maintain the trapezoid shape
+    // at different screen sizes
+    final double slopeOffset = size.width * 0.045;
+    path.lineTo(slopeOffset, size.height); // Bottom-left (inward)
     path.close(); // back to top-left
     return path;
   }
