@@ -31,6 +31,8 @@ class EligibilityCriteria extends StatelessWidget {
           // Skills assessment information section
           ..._buildProcessSteps(screenWidth, isSmallScreen),
 
+          _announcement(context),
+
           // Document gathering guide section
           _buildGatherDocSection(isSmallScreen),
 
@@ -291,6 +293,142 @@ class EligibilityCriteria extends StatelessWidget {
     );
   }
 
+ Widget _announcement(BuildContext context) {
+  // Get the screen width to adjust layout based on screen size
+  final screenWidth = MediaQuery.of(context).size.width;
+  
+  // Determine if we're on a mobile device (arbitrary breakpoint, adjust as needed)
+  final isMobile = screenWidth < 600;
+  
+  // Add horizontal padding to the whole widget
+  return Padding(
+    padding: EdgeInsets.symmetric(
+      horizontal: isMobile ? 16.0 : 24.0, // Smaller padding on mobile
+      vertical: 8.0
+    ),
+    child: Container(
+      width: double.infinity,
+      child: isMobile ? _buildMobileLayout(context) : _buildDesktopLayout(context),
+    ),
+  );
+}
+
+// Layout for mobile devices (vertical layout)
+Widget _buildMobileLayout(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Yellow horizontal accent line for mobile
+      Container(
+        height: 5,
+        width: double.infinity,
+        color: const Color(0xFFEEAA00), // Yellow accent color
+      ),
+      // Main content
+      Container(
+        color: const Color(0xFFFFF8F0), // Light cream background
+        padding: const EdgeInsets.all(16.0),
+        child: _buildAnnouncementContent(fontSize: 0.9), // Slightly smaller text for mobile
+      ),
+    ],
+  );
+}
+
+// Layout for desktop devices (horizontal layout)
+Widget _buildDesktopLayout(BuildContext context) {
+  return IntrinsicHeight( // Makes the yellow line match content height
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Yellow vertical accent line
+        Container(
+          width: 5,
+          color: const Color(0xFFEEAA00), // Yellow accent color
+        ),
+        // Main content
+        Expanded(
+          child: Container(
+            color: const Color(0xFFFFF8F0), // Light cream background
+            padding: const EdgeInsets.all(24.0),
+            child: _buildAnnouncementContent(fontSize: 1.0),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// Extract content to avoid duplication
+Widget _buildAnnouncementContent({required double fontSize}) {
+  // Base font sizes
+  final headingSize = 28.0 * fontSize;
+  final subheadingSize = 18.0 * fontSize;
+  final bodySize = 16.0 * fontSize;
+  
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Announcements',
+        style: TextStyle(
+          fontSize: headingSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF006064), // Dark teal color for headings
+        ),
+      ),
+      SizedBox(height: 24 * fontSize),
+      Text(
+        'Skills Assessments that are close to expiry',
+        style: TextStyle(
+          fontSize: subheadingSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF006064), // Dark teal color for headings
+        ),
+      ),
+      SizedBox(height: 16 * fontSize),
+      Text(
+        'Applicants with a Skills Assessment that is close to expiring should consider applying for a renewal of their assessment at the same time as they apply for a state or territory migration program – or earlier. Each state and territory has its own criteria for applications and sometimes the timeframes are short. Applicants will be more likely to avoid disappointment if they apply for a renewal early rather than wait for an invitation from a state or territory.',
+        style: TextStyle(
+          fontSize: bodySize,
+          height: 1.5,
+          color: const Color(0xFF006064), // Dark teal color for text
+        ),
+      ),
+      SizedBox(height: 12 * fontSize),
+      InkWell(
+        onTap: () {
+          // Add link functionality here
+        },
+        child: Text(
+          'Find out how to renew your Skills Assessment before it expires here.',
+          style: TextStyle(
+            fontSize: bodySize,
+            color: const Color.fromARGB(255, 5, 124, 128), // Dark teal color for links
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+      SizedBox(height: 20 * fontSize),
+      Text(
+        'Skills assessment documents: professional and general occupations',
+        style: TextStyle(
+          fontSize: subheadingSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF006064), // Dark teal color for headings
+        ),
+      ),
+      SizedBox(height: 16 * fontSize),
+      Text(
+        'Applicants are expected to provide all the documents required at the time they submit their application. We have changed our timeframes for applications that do not have complete documents. We will close incomplete applications that do not meet the deadline and there will be a fee to reopen the application. You can find out more here. It is important to ensure you lodge a complete set of required documents when you apply, and this will avoid delays with your application.',
+        style: TextStyle(
+          fontSize: bodySize,
+          height: 1.5,
+          color: const Color(0xFF006064), // Dark teal color for text
+        ),
+      ),
+    ],
+  );
+}
   // Title and description for document gathering section
   Widget _buildGatherDocTitle() {
     return Column(
@@ -631,4 +769,5 @@ class _SearchBar extends StatelessWidget {
       ),
     );
   }
+  
 }

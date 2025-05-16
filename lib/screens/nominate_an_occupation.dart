@@ -651,8 +651,8 @@ class NominateScreen extends StatelessWidget {
             ),
             Image.asset(
               'assets/images/blog_metropolis.jpg',
-              height: 40,
-              width: 80,
+              height: 400,
+              width: 800,
               fit: BoxFit.fitHeight,
             ),
           ],

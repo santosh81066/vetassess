@@ -960,7 +960,7 @@ Widget _buildPreparingApplSection(
                             width: double.infinity,
                             height: 1,
                             child: CustomPaint(
-                              painter: DottedLinePainterTwo(
+                              painter: DottedLinePainter(
                                 color: Color(0xFFfd7e14),
                               ),
                             ),
