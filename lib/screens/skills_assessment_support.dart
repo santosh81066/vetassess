@@ -3,6 +3,7 @@ import 'package:vetassess/widgets/BasePageLayout.dart';
 
 class SkillsAssessmentSupport extends StatelessWidget {
   const SkillsAssessmentSupport({super.key});
+  static const Color tealColor = Color(0xFF00565B);
 
   @override
   Widget build(BuildContext context) {
@@ -80,12 +81,21 @@ class SkillsAssessmentSupport extends StatelessWidget {
   //hero
   Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
     return Container(
-      child: Row(
+      width: screenWidth,
+      height: screenHeight * 0.45,
+      decoration: const BoxDecoration(color: tealColor),
+      child: Stack(
         children: [
+          Positioned(
+            right: 0,
+            child: Image.asset(
+              'assets/images/internal_page_banner.png',
+              height: screenHeight * 0.45,
+              fit: BoxFit.fitHeight,
+            ),
+          ),
           Container(
-            width: screenWidth * 0.7,
-            height: screenHeight * 0.45,
-            decoration: const BoxDecoration(color: Color(0xFF0d5257)),
+            width: screenWidth * 0.66,
             padding: const EdgeInsets.only(top: 100, left: 170),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -114,12 +124,6 @@ class SkillsAssessmentSupport extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          Image.asset(
-            'assets/images/img_1.png',
-            width: screenWidth * 0.3,
-            height: screenHeight * 0.45,
-            fit: BoxFit.fitHeight,
           ),
         ],
       ),
