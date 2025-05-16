@@ -5,12 +5,31 @@ class ProcessStepsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 900;
+        final isTablet =
+            constraints.maxWidth <= 900 && constraints.maxWidth > 600;
+        final isMobile = constraints.maxWidth <= 600;
 
-    return Column(children: _buildProcessSteps(screenWidth));
+        return Column(
+          children: _buildProcessSteps(
+            constraints.maxWidth,
+            isDesktop: isDesktop,
+            isTablet: isTablet,
+            isMobile: isMobile,
+          ),
+        );
+      },
+    );
   }
 
-  List<Widget> _buildProcessSteps(double screenWidth) {
+  List<Widget> _buildProcessSteps(
+    double screenWidth, {
+    required bool isDesktop,
+    required bool isTablet,
+    required bool isMobile,
+  }) {
     // Define all step data in a list
     final List<Map<String, dynamic>> stepsData = [
       {
@@ -77,81 +96,193 @@ class ProcessStepsSection extends StatelessWidget {
 
     // Generate widgets for each step
     return stepsData.map((stepData) {
-      final Widget stepInfoColumn = Container(
-        width: screenWidth * 0.3,
-        height: 400,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              stepData['step'],
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF006064),
-              ),
-            ),
-            Text(
-              stepData['title'],
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF006064),
-              ),
-            ),
-            Text(
-              stepData['description'],
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.5,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const Text(
-              'Information on the ANZSCO description',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF006064),
-              ),
-            ),
-            Text(
-              stepData['anzscoInfo'],
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.5,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ],
-        ),
-      );
-
-      final Widget imageWidget = Image.asset(
-        stepData['image'],
-        height: 400,
-        width: 600,
-      );
-
-      final List<Widget> rowChildren =
-          stepData['imageOnRight']
-              ? [stepInfoColumn, imageWidget]
-              : [imageWidget, stepInfoColumn];
-
       final int index = stepsData.indexOf(stepData);
 
-      return Container(
-        width: screenWidth,
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.1,
-          vertical: index == 0 ? 0 : 100,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: rowChildren,
-        ),
-      );
+      if (isMobile) {
+        // For mobile screens, stack vertically regardless of imageOnRight
+        return _buildMobileLayout(screenWidth, stepData, index);
+      } else {
+        // For tablet and desktop, use row layout with responsive sizes
+        return _buildHorizontalLayout(
+          screenWidth,
+          stepData,
+          index,
+          isDesktop: isDesktop,
+          isTablet: isTablet,
+        );
+      }
     }).toList();
+  }
+
+  Widget _buildMobileLayout(
+    double screenWidth,
+    Map<String, dynamic> stepData,
+    int index,
+  ) {
+    return Container(
+      width: screenWidth,
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.05,
+        vertical: index == 0 ? 20 : 50,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image always on top for mobile
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              stepData['image'],
+              width: screenWidth * 0.9,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Info below the image
+          Text(
+            stepData['step'],
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            stepData['title'],
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            stepData['description'],
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Information on the ANZSCO description',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            stepData['anzscoInfo'],
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHorizontalLayout(
+    double screenWidth,
+    Map<String, dynamic> stepData,
+    int index, {
+    required bool isDesktop,
+    required bool isTablet,
+  }) {
+    final double horizontalPadding =
+        isDesktop ? screenWidth * 0.1 : screenWidth * 0.05;
+    final double infoColumnWidth =
+        isDesktop ? screenWidth * 0.3 : screenWidth * 0.45;
+    final double imageWidth = isDesktop ? screenWidth * 0.4 : screenWidth * 0.4;
+    final double verticalSpacing =
+        isDesktop ? (index == 0 ? 0 : 100) : (index == 0 ? 0 : 50);
+
+    final Widget stepInfoColumn = Container(
+      width: infoColumnWidth,
+      constraints: BoxConstraints(minHeight: isDesktop ? 400 : 300),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            stepData['step'],
+            style: TextStyle(
+              fontSize: isDesktop ? 24 : 20,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            stepData['title'],
+            style: TextStyle(
+              fontSize: isDesktop ? 20 : 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            stepData['description'],
+            style: TextStyle(
+              fontSize: isDesktop ? 16 : 14,
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Information on the ANZSCO description',
+            style: TextStyle(
+              fontSize: isDesktop ? 20 : 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF006064),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            stepData['anzscoInfo'],
+            style: TextStyle(
+              fontSize: isDesktop ? 16 : 14,
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final Widget imageWidget = ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        stepData['image'],
+        width: imageWidth,
+        fit: BoxFit.cover,
+      ),
+    );
+
+    final List<Widget> rowChildren =
+        stepData['imageOnRight']
+            ? [stepInfoColumn, const Spacer(), imageWidget]
+            : [imageWidget, const Spacer(), stepInfoColumn];
+
+    return Container(
+      width: screenWidth,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalSpacing,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: rowChildren,
+      ),
+    );
   }
 }

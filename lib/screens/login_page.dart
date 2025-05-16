@@ -8,6 +8,8 @@ import 'login.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
+  static const Color tealColor = Color(0xFF00565B);
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -15,48 +17,7 @@ class LoginPage extends StatelessWidget {
     return BasePageLayout(
       child: Column(
         children: [
-          Stack(
-            children: [
-              SvgPicture.asset(
-                'assets/images/internal_banner.svg',
-                width: screenHeight * 0.5,
-                height: screenHeight * 0.4,
-              ),
-              Container(
-                width: double.infinity,
-                height: screenHeight * 0.46,
-                decoration: const BoxDecoration(color: Color(0xFF0d5257)),
-                padding: EdgeInsets.only(top: 100, left: 160),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Log in",
-                        style: TextStyle(
-                          color: Color(0xFFFFA000),
-                          fontSize: 44,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      Text(
-                        "Ready To Start Your Application Process?",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.5,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _buildHeaderBanner(screenHeight, screenWidth),
           Column(
             children: [
               // Breadcrumb Navigation
@@ -186,6 +147,57 @@ class LoginPage extends StatelessWidget {
                 ]),
                 SizedBox(height: screenHeight / 6),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
+    return Container(
+      width: screenWidth,
+      height: screenHeight * 0.45,
+      decoration: const BoxDecoration(color: tealColor),
+      child: Stack(
+        children: [
+          Positioned(
+            right: 0,
+            child: Image.asset(
+              'assets/images/internal_page_banner.png',
+              height: screenHeight * 0.45,
+              fit: BoxFit.fitHeight,
+            ),
+          ),
+          Container(
+            width: screenWidth * 0.66,
+            padding: const EdgeInsets.only(top: 100, left: 170),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Login",
+                    style: TextStyle(
+                      color: Color(0xFFFFA000),
+                      fontSize: 42,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Ready To Start Your Application Process?",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      height: 1.5,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

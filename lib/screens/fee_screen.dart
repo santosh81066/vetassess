@@ -5,6 +5,9 @@ import '../widgets/BasePageLayout.dart';
 class FeeScreen extends StatelessWidget {
   const FeeScreen({super.key});
 
+  static const Color tealColor = Color(0xFF00565B);
+  static const Color dottedLineColor = Color(0xFF008996);
+
   @override
   Widget build(BuildContext context) {
     // Check if screen is small for responsive layout
@@ -289,151 +292,539 @@ class FeeScreen extends StatelessWidget {
 
                   const SizedBox(height: 50),
 
+                  _buildDivider(),
 
-                   _buildDivider(),
+                  _buildStandardSection(context, 'Other Information', [
+                    const Text(
+                      'Withdrawal, Closure and Reopening of an Application ',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    const Text(
+                      'Withdrawal: ',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        children: [
+                          const TextSpan(
+                            text:
+                                'If you request to withdraw an application before the assessment commences, a full refund will be considered, less an administration fee of AUD\$167. Please see our',
+                          ),
+                          TextSpan(
+                            text: 'Refund Policy ',
+                            style: const TextStyle(
+                              color: Color(0xFF0d5257),
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const TextSpan(text: 'for further details.'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    const Text(
+                      'Closure: ',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
 
-                    _buildStandardSection(
-              context,
-              'Other Information',
-              [
-                const Text(
-                  'Withdrawal, Closure and Reopening of an Application ',
-                  style: TextStyle(fontSize: 20,  color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
-                ),
-                SizedBox(height: 30,),
-                const Text(
-                  'Withdrawal: ',
-                  style: TextStyle(fontSize: 20, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
-                ),
-                const SizedBox(height: 20),
-                RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    children: [
-                      const TextSpan(
-                        text: 'If you request to withdraw an application before the assessment commences, a full refund will be considered, less an administration fee of AUD\$167. Please see our',
+                    const SizedBox(height: 20),
+                    RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        children: [
+                          const TextSpan(
+                            text:
+                                'You are expected to provide complete documentation at the time you submit your application.. Please find the list of documents under',
+                          ),
+                          TextSpan(
+                            text: ' Required Documents. ',
+                            style: const TextStyle(
+                              color: Color(0xFF0d5257),
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const TextSpan(
+                            text:
+                                ' If any information or documents are missing from the application, we will provide 15 calendar days to submit them. If the outstanding documents are not submitted within the given timeframe, a final notice will be issued giving seven additional days before the application is closed without further communication. Please note that refunds don'
+                                't apply to closed applications',
+                          ),
+                        ],
                       ),
-                      TextSpan(
-                        text: 'Refund Policy ',
-                        style: const TextStyle(
-                          color: Color(0xFF0d5257),
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Reopening:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
                       ),
-                       const TextSpan(
-                        text: 'for further details.',
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30,),
-                const Text(
-                  'Closure: ',
-                  style: TextStyle(fontSize: 20, color: Color(0xFF0d5257), fontWeight: FontWeight.bold,),
-                ),
-               
-                const SizedBox(height: 20),
-                RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    children: [
-                      const TextSpan(
-                        text: 'You are expected to provide complete documentation at the time you submit your application.. Please find the list of documents under',
-                      ),
-                      TextSpan(
-                        text: ' Required Documents. ',
-                        style: const TextStyle(
-                          color: Color(0xFF0d5257),
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const TextSpan(
-                        text: ' If any information or documents are missing from the application, we will provide 15 calendar days to submit them. If the outstanding documents are not submitted within the given timeframe, a final notice will be issued giving seven additional days before the application is closed without further communication. Please note that refunds don''t apply to closed applications',
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const Text(
-                  'Reopening:',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'You may request to reopen an application after providing all required documents and information within 90 days of closure. A fee of \$167.00 will apply. Requests received after 90 days will not be accepted and you will need to lodge a new application and pay the full assessment fee.',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
-                ),
-                const SizedBox(height: 30),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'You may request to reopen an application after providing all required documents and information within 90 days of closure. A fee of \$167.00 will apply. Requests received after 90 days will not be accepted and you will need to lodge a new application and pay the full assessment fee.',
+                      style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                    ),
+                    const SizedBox(height: 30),
 
-                const SizedBox(height: 20),
-                const Text(
-                  'Making a payment',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
-                ),
-                const SizedBox(height: 20),
-                 const SizedBox(height: 20),
-                const Text(
-                  'We have two payment options available. Payments must be:',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
-                ),
-                const SizedBox(height: 20),
-                _buildBulletPoints(
-                  'Made payable to VETASSESS',
-                ),
-                const SizedBox(height: 10),
-                _buildBulletPoints(
-                  'In Australian dollars ',
-                ),
-                const SizedBox(height: 10),
-                _buildBulletPoints(
-                  'Paid and cleared 7 days prior to your assessment',
-                ),
-                 const SizedBox(height: 20),
-                const Text(
-                  'You will be able to complete payment using any one of the following methods:',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
-                ),
-                 const SizedBox(height: 10),
-                _buildBulletPoints(
-                  'MasterCard',
-                ),
-                const SizedBox(height: 10),
-                _buildBulletPoints(
-                  'VISA',
-                ),
-                 const SizedBox(height: 30),
-                const Text(
-                  'Refunds',
-                  style: TextStyle(fontSize: 16, color: Color(0xFF0d5257),fontWeight: FontWeight.bold,),
-                ),
-                RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    children: [
-                      const TextSpan(
-                        text: 'You can find further information about our refund policy',
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Making a payment',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
                       ),
-                      TextSpan(
-                        text: 'here',
-                        style: const TextStyle(
-                          color: Color(0xFF0d5257),
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'We have two payment options available. Payments must be:',
+                      style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildBulletPoints('Made payable to VETASSESS'),
+                    const SizedBox(height: 10),
+                    _buildBulletPoints('In Australian dollars '),
+                    const SizedBox(height: 10),
+                    _buildBulletPoints(
+                      'Paid and cleared 7 days prior to your assessment',
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'You will be able to complete payment using any one of the following methods:',
+                      style: TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildBulletPoints('MasterCard'),
+                    const SizedBox(height: 10),
+                    _buildBulletPoints('VISA'),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Refunds',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF0d5257),
+                        fontWeight: FontWeight.bold,
                       ),
-                      
-                    ],
-                  ),
-                ),
-              ],
-            ),
-              SizedBox(height: 90,)
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        children: [
+                          const TextSpan(
+                            text:
+                                'You can find further information about our refund policy',
+                          ),
+                          TextSpan(
+                            text: 'here',
+                            style: const TextStyle(
+                              color: Color(0xFF0d5257),
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+                  SizedBox(height: 90),
                 ],
               ),
             ),
+            _buildFaqSection(
+              title: 'Explore FAQs',
+              items: [
+                'How can VETASSESS be sure it can process my application in 10 business days?',
+              ],
+              isExpansionPanel: true,
+            ),
+            _buildApplyBanner(screenWidth, screenHeight),
+            _buildPreparingApplSection(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFaqSection({
+    required String title,
+    required List<String> items,
+    bool isExpansionPanel = false,
+  }) {
+    final Color sectionColor = Color(0xFF0A594C);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 60),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left column - Title and View all button
+          Expanded(
+            flex: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                    color: sectionColor,
+                    height: 1.3,
+                  ),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Text(
+                      "View all",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: sectionColor,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: sectionColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Right column - Expansion panels or links
+          Expanded(
+            flex: 2,
+            child: Container(
+              padding: EdgeInsets.only(top: 6),
+              child: Column(
+                children:
+                    items.map((item) {
+                      if (isExpansionPanel) {
+                        return _buildExpansionItem(item, sectionColor);
+                      } else {
+                        return _buildLinkItem(item, sectionColor);
+                      }
+                    }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCircleIcon(IconData icon, Color color) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 3),
+      ),
+      child: Icon(icon, color: color, size: 18, weight: 700),
+    );
+  }
+
+  Widget _buildExpansionItem(String title, Color color) {
+    return Theme(
+      data: ThemeData(
+        dividerColor: Colors.transparent,
+        colorScheme: ColorScheme.light(
+          surfaceTint: Colors.transparent,
+          primary: color,
+        ),
+      ),
+      child: Column(
+        children: [
+          ExpansionTile(
+            tilePadding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            childrenPadding: EdgeInsets.only(left: 50, bottom: 16, right: 20),
+            leading: _buildCircleIcon(Icons.add, color),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+            trailing: SizedBox.shrink(),
+            children: [
+              Text(
+                'This is the answer to the FAQ question.',
+                style: TextStyle(fontSize: 15, height: 1.5),
+              ),
+            ],
+          ),
+          _buildDottedLine(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkItem(String title, Color color) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+              Icon(Icons.arrow_forward, color: color, size: 22),
+            ],
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          height: 1,
+          child: CustomPaint(
+            painter: DottedLinePainter(color: Color(0xFFfd7e14)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreparingApplSection() {
+    final List<String> links = [
+      'The application process',
+      'Acceptable documents you will need',
+      'Fees & Charges',
+      'Check your occupation',
+      'FAQs',
+      'Reviews, Reassessments, Appeals,\nReissues & Feedback',
+      'Priority Processing & Urgent\nApplications',
+      'Points Test Advice',
+      'Renewals',
+    ];
+
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 150),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left column - Title and description
+          Expanded(
+            flex: 2,
+            child: Container(
+              width: 450,
+              padding: EdgeInsets.only(top: 40, bottom: 40, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Preparing your application",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0A594C),
+                      height: 1.3,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black87,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Right column - Navigation links with dotted lines
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.only(top: 40, bottom: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children:
+                    links.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final String link = entry.value;
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  link,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: Color(0xFF0A594C),
+                                    size: 22,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (index < links.length - 1)
+                            _buildDottedLine(color: Color(0xFFfd7e14)),
+                        ],
+                      );
+                    }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDottedLine({Color? color}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        width: double.infinity,
+        height: 1,
+        child: CustomPaint(
+          painter: DottedLinePainter(color: color ?? dottedLineColor),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String text, double width) {
+    return SizedBox(
+      height: 50,
+      width: width,
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFFA000),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        ),
+        child: Text(text, style: TextStyle(color: Colors.black)),
+      ),
+    );
+  }
+
+  Widget _buildApplyBanner(double screenWidth, double screenHeight) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 100, top: 50),
+        child: Container(
+          width: screenWidth * 0.78,
+          height: screenHeight * 0.6,
+          color: tealColor,
+          child: Row(
+            children: [
+              // Left side with teal background and content
+              Container(
+                padding: EdgeInsets.only(top: 60, left: 110, bottom: 60),
+                width: screenWidth * 0.52,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Apply to get your skills assessed",
+                      style: TextStyle(
+                        color: Color(0xFFFFA000),
+                        fontSize: 36,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    const Text(
+                      "Your application will be processed once payment & required documents are \nreceived. If we require any further documentation in order to proceed with this \napplication you will be notified via email.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        height: 1.5,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      "Find out how this application is progressing by tracking your application online. ",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        height: 1.5,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    _buildActionButton("Apply Online", 150),
+                  ],
+                ),
+              ),
+              // Right side with desert landscape image
+              Image.asset(
+                'assets/images/During_your_application.jpg',
+                width: screenWidth * 0.26,
+                height: 0.6,
+                fit: BoxFit.fitHeight,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -442,12 +833,21 @@ class FeeScreen extends StatelessWidget {
   // HELPER METHODS
   Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
     return Container(
-      child: Row(
+      width: screenWidth,
+      height: screenHeight * 0.5,
+      decoration: const BoxDecoration(color: tealColor),
+      child: Stack(
         children: [
+          Positioned(
+            right: 0,
+            child: Image.asset(
+              'assets/images/internal_page_banner.png',
+              height: screenHeight * 0.5,
+              fit: BoxFit.fitHeight,
+            ),
+          ),
           Container(
-            width: screenWidth * 0.7,
-            height: screenHeight * 0.45,
-            decoration: const BoxDecoration(color: Color(0xFF0d5257)),
+            width: screenWidth * 0.66,
             padding: const EdgeInsets.only(top: 100, left: 170),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -463,7 +863,7 @@ class FeeScreen extends StatelessWidget {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   const Text(
                     "Professional Fees and Payments",
                     style: TextStyle(
@@ -476,12 +876,6 @@ class FeeScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          Image.asset(
-            'assets/images/img_1.png',
-            width: screenWidth * 0.3,
-            height: screenHeight * 0.45,
-            fit: BoxFit.fitHeight,
           ),
         ],
       ),
@@ -639,8 +1033,12 @@ class FeeScreen extends StatelessWidget {
     );
   }
 
-    // Helper method to build standard sections for consistent layout
-  Widget _buildStandardSection(BuildContext context, String title, List<Widget> content) {
+  // Helper method to build standard sections for consistent layout
+  Widget _buildStandardSection(
+    BuildContext context,
+    String title,
+    List<Widget> content,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -663,7 +1061,7 @@ class FeeScreen extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Right column - Content
           Expanded(
             flex: 5,
@@ -677,7 +1075,7 @@ class FeeScreen extends StatelessWidget {
     );
   }
 
-    // Helper method to create consistent dividers
+  // Helper method to create consistent dividers
   Widget _buildDivider() {
     return Column(
       children: [
@@ -692,7 +1090,7 @@ class FeeScreen extends StatelessWidget {
     );
   }
 
-    Widget _buildBulletPoints(String text) {
+  Widget _buildBulletPoints(String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -707,17 +1105,12 @@ class FeeScreen extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFF5A5A5A),
-            ),
+            style: const TextStyle(fontSize: 16, color: Color(0xFF5A5A5A)),
           ),
         ),
       ],
     );
   }
-
-
 
   // Build standard footnote text
   Widget _buildFootnoteText(BuildContext context, String text) {
@@ -1229,4 +1622,32 @@ Widget _buildSectionTitle(BuildContext context, String title) {
       const SizedBox(height: 20),
     ],
   );
+}
+
+// Custom painter for dotted line
+class DottedLinePainter extends CustomPainter {
+  final Color color;
+
+  DottedLinePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1
+          ..strokeCap = StrokeCap.round;
+
+    const double dashWidth = 3;
+    const double dashSpace = 3;
+    double startX = 0;
+
+    while (startX < size.width) {
+      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
