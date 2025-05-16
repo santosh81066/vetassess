@@ -1274,7 +1274,7 @@ class FeeScreen extends StatelessWidget {
           // Header Row
           TableRow(
             decoration: BoxDecoration(
-              color: const Color(0xFF005F73), // Dark teal header
+              color:const Color(0xFF0d5257), // Dark teal header
             ),
             children: [
               _buildTableHeaderCell('Occupation Group'),
