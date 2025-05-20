@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/screens/applioptions.dart';
+
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 class Login extends StatefulWidget {
@@ -229,7 +231,14 @@ class LoginState extends State<Login> {
                             width: double.infinity,
                             height: 38,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                 Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AppliOptions(),
+                                      ),
+                                    );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00897B),
                                 shape: RoundedRectangleBorder(
