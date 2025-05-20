@@ -6,14 +6,17 @@ class LoginFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       children: [
         Container(height: 2, color: Colors.teal[700]),
-
         Container(
-          padding: EdgeInsets.only(top: 10, bottom: 10, left: 170),
+          padding: EdgeInsets.only(
+            top: 10,
+            bottom: 10,
+            left:
+                screenWidth * 0.43, // Approx 170 on 393px width (common mobile)
+          ),
           width: screenWidth,
           color: Colors.white,
           child: Row(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/application_forms/appli_personal_details.dart';
+
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
 

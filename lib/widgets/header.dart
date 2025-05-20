@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/login.dart';
 import 'package:vetassess/screens/login_page.dart';
 
+import '../screens/application_forms/appli_occupation.dart';
+import '../screens/application_forms/appli_personal_details.dart';
 import '../screens/home_screen.dart';
 import 'BusinessIndustryDropdownPanel.dart';
 import 'SkillsAssessmentDropdownPanel.dart';
@@ -34,19 +36,20 @@ class _HeaderState extends State<Header> {
 
     final overlay = Overlay.of(context);
     _dropdownOverlay = OverlayEntry(
-      builder: (context) => Positioned(
-        top: offset.dy + size.height,
-        left: 0,
-        right: 0,
-        child: MouseRegion(
-          onExit: (_) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _hideDropdown();
-            });
-          },
-          child: panel,
-        ),
-      ),
+      builder:
+          (context) => Positioned(
+            top: offset.dy + size.height,
+            left: 0,
+            right: 0,
+            child: MouseRegion(
+              onExit: (_) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _hideDropdown();
+                });
+              },
+              child: panel,
+            ),
+          ),
     );
 
     overlay.insert(_dropdownOverlay!);
@@ -71,7 +74,7 @@ class _HeaderState extends State<Header> {
     // Get the current screen size
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final double width = mediaQuery.size.width;
-    
+
     // Define responsive breakpoints
     final bool isLargeDesktop = width >= 1400;
     final bool isDesktop = width >= 1024;
@@ -80,21 +83,29 @@ class _HeaderState extends State<Header> {
     final bool isMobile = width < 600;
 
     // Calculate dynamic sizes based on screen width - using relative proportions
-    final double logoHeight = isDesktop ? width * 0.08 : (isTablet ? width * 0.09 : width * 0.12);
-    final double logoHeightClamped = logoHeight.clamp(70.0, 110.0); // Prevent logo from getting too large or small
-    
-    final double topBarWidth = isDesktop 
-        ? width * 0.490 
-        : (isTablet ? width * 0.7 : width * 0.85);
-    
-    final double navItemSpacing = isLargeDesktop 
-        ? width * 0.023 
-        : (isDesktop ? width * 0.022 : width * 0.02);
+    final double logoHeight =
+        isDesktop ? width * 0.08 : (isTablet ? width * 0.09 : width * 0.12);
+    final double logoHeightClamped = logoHeight.clamp(
+      70.0,
+      110.0,
+    ); // Prevent logo from getting too large or small
+
+    final double topBarWidth =
+        isDesktop ? width * 0.490 : (isTablet ? width * 0.7 : width * 0.85);
+
+    final double navItemSpacing =
+        isLargeDesktop
+            ? width * 0.023
+            : (isDesktop ? width * 0.022 : width * 0.02);
     final double navItemSpacingClamped = navItemSpacing.clamp(16.0, 32.0);
 
     // Dynamic heights for containers based on screen width
-    final double topBarHeight = (isDesktop ? width * 0.043 : width * 0.05).clamp(45.0, 60.0);
-    final double navBarHeight = (isDesktop ? width * 0.05 : width * 0.06).clamp(50.0, 70.0);
+    final double topBarHeight = (isDesktop ? width * 0.043 : width * 0.05)
+        .clamp(45.0, 60.0);
+    final double navBarHeight = (isDesktop ? width * 0.05 : width * 0.06).clamp(
+      50.0,
+      70.0,
+    );
 
     return Container(
       color: Colors.white,
@@ -140,7 +151,8 @@ class _HeaderState extends State<Header> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // Left side empty space
-                        if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
+                        if (isDesktop || isTablet)
+                          Expanded(flex: 2, child: Container()),
 
                         // Right side - links and apply button
                         if (isDesktop || isTablet) ...[
@@ -210,19 +222,27 @@ class _HeaderState extends State<Header> {
 
                           SizedBox(width: isDesktop ? 16 : 12),
                         ],
-                        
+
                         // Apply Now Button - now with flexible height
                         Container(
                           height: topBarHeight * 0.8,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PersonalDetailsForm(),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFFA000),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: EdgeInsets.symmetric(
                                 horizontal: isDesktop ? 14 : 12,
-                                vertical: 0, // Let the container control the height
+                                vertical:
+                                    0, // Let the container control the height
                               ),
                               textStyle: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -248,10 +268,17 @@ class _HeaderState extends State<Header> {
                   color: Colors.white,
                   height: navBarHeight,
                   width: width,
-                  padding: EdgeInsets.only(top: isDesktop ? width * 0.01 : width * 0.015),
-                  child: isDesktop
-                      ? _buildDesktopNavBar(navItemSpacingClamped, isLargeDesktop, width)
-                      : _buildMobileNavBar(),
+                  padding: EdgeInsets.only(
+                    top: isDesktop ? width * 0.01 : width * 0.015,
+                  ),
+                  child:
+                      isDesktop
+                          ? _buildDesktopNavBar(
+                            navItemSpacingClamped,
+                            isLargeDesktop,
+                            width,
+                          )
+                          : _buildMobileNavBar(),
                 ),
               ],
             ),
@@ -261,12 +288,25 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildDesktopNavBar(double spacing, bool isLargeDesktop, double screenWidth) {
+  Widget _buildDesktopNavBar(
+    double spacing,
+    bool isLargeDesktop,
+    double screenWidth,
+  ) {
     // Dynamic font size based on screen width with min and max values
-    final double fontSize = (isLargeDesktop ? screenWidth * 0.012 : screenWidth * 0.011).clamp(14.0, 17.0);
-    final double iconSize = (isLargeDesktop ? screenWidth * 0.036 : screenWidth * 0.032).clamp(38.0, 50.0);
+    final double fontSize = (isLargeDesktop
+            ? screenWidth * 0.012
+            : screenWidth * 0.011)
+        .clamp(14.0, 17.0);
+    final double iconSize = (isLargeDesktop
+            ? screenWidth * 0.036
+            : screenWidth * 0.032)
+        .clamp(38.0, 50.0);
     final double searchIconSize = (isLargeDesktop ? 25.0 : 22.0);
-    final double sideMargin = (isLargeDesktop ? screenWidth * 0.014 : screenWidth * 0.012).clamp(12.0, 24.0);
+    final double sideMargin = (isLargeDesktop
+            ? screenWidth * 0.014
+            : screenWidth * 0.012)
+        .clamp(12.0, 24.0);
 
     return Container(
       alignment: Alignment.center,
@@ -283,10 +323,11 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment For\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _migrationNavKey,
-                    const SkillsAssessmentDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _migrationNavKey,
+                        const SkillsAssessmentDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(
@@ -294,10 +335,11 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment Non\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _nonMigrationNavKey,
-                    const SkillsAssessmentNonMigrationPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _nonMigrationNavKey,
+                        const SkillsAssessmentNonMigrationPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Check my\nOccupation", fontSize: fontSize),
@@ -307,22 +349,21 @@ class _HeaderState extends State<Header> {
                   title: "Business and\nIndustry",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _businessNavKey,
-                    const BusinessIndustryDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _businessNavKey,
+                        const BusinessIndustryDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Contact", fontSize: fontSize),
                 SizedBox(width: sideMargin),
-                
+
                 // Search icon with circle - now with relative sizing
                 Container(
                   width: iconSize,
                   height: iconSize,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: Icon(
                     Icons.search,
                     color: Color(0xFFFFA000),
@@ -330,7 +371,7 @@ class _HeaderState extends State<Header> {
                   ),
                 ),
                 SizedBox(width: spacing),
-                
+
                 // Start Your Application - now with responsive sizing
                 _NavItem(
                   title: "Start Your\nApplication",
@@ -447,7 +488,10 @@ class _NavItemState extends State<_NavItem> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
-          height: (isLargeScreen ? width * 0.034 : width * 0.038).clamp(40.0, 48.0),
+          height: (isLargeScreen ? width * 0.034 : width * 0.038).clamp(
+            40.0,
+            48.0,
+          ),
           alignment: Alignment.center,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -485,7 +529,7 @@ class TrapezoidClipper extends CustomClipper<Path> {
     path.moveTo(0, 0); // Top-left corner
     path.lineTo(size.width, 0); // Top-right corner
     path.lineTo(size.width, size.height); // Bottom-right
-    
+
     // Make the slope proportional to the width to maintain the trapezoid shape
     // at different screen sizes
     final double slopeOffset = size.width * 0.045;
