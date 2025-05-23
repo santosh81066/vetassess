@@ -7,49 +7,235 @@ import 'footer.dart';
 
 class SkillsAssessmentPage extends StatelessWidget {
   const SkillsAssessmentPage({super.key});
+  bool isMobile(double width) => width < 600;
+bool isTablet(double width) => width >= 600 && width < 1024;
+bool isDesktop(double width) => width >= 1024;
+static const Color tealColor = Color(0xFF00565B);
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    
 
     return BasePageLayout(
       child: Column(
         children: [
-          const SizedBox(height: 50),
-          _buildPreparingAppSection(),
-          const SizedBox(height: 50),
-          _occupationTypeSections(context),
-          const SizedBox(height: 50),
-          _buildOccupationSearchSection(context),
-          const SizedBox(height: 50),
-          _buildHowToApply(context),
-          const SizedBox(height: 50),
-          _exploreMigrationOptionsSection(context),
-          const SizedBox(height: 50),
-          ..._buildInfoSection(
-            'Pioneering global skills training initiatives', 
-            'We''re passionate about assessing the skills and experience of skilled migrants looking to enter the Australian workforce, which is why we have assessment centres all around the world.',
-            'But what you might not know is that we''re also pioneering innovative education and training programs on a global scale.',
-            'assets/images/blog_metropolis.jpg',
-            true,
-            screenWidth,
-            screenHeight
-          ),
-          const SizedBox(height: 50),
-          ..._buildInfoSection(
-            'For Employers and Businesses', 
-            'Are you finding it challenging to address skills shortages within your business? Or perhaps your staff need upskilling and you''d like to assess their current skills and experience?',
-            'VETASSESS offers a wide range of services specifically for businesses and industry to develop employees and boost their career progression.',
-            'assets/images/blog_metropolis.jpg',
-            false,
-            screenWidth,
-            screenHeight
+           _buildHeaderBanner(),
+          _buildBreadcrumbs(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 35),
+            child: Column(
+              children: [
+                const SizedBox(height: 50),
+                _buildPreparingAppSection(),
+                const SizedBox(height: 50),
+                _occupationTypeSections(context),
+                const SizedBox(height: 50),
+                _buildOccupationSearchSection(context),
+                const SizedBox(height: 50),
+                _buildHowToApply(context),
+                const SizedBox(height: 50),
+                _exploreMigrationOptionsSection(context),
+                const SizedBox(height: 50),
+                ..._buildInfoSection(
+                  'Pioneering global skills training initiatives', 
+                  'We''re passionate about assessing the skills and experience of skilled migrants looking to enter the Australian workforce, which is why we have assessment centres all around the world.',
+                  'But what you might not know is that we''re also pioneering innovative education and training programs on a global scale.',
+                  'assets/images/blog_metropolis.jpg',
+                  true,
+                  screenWidth,
+                  screenHeight
+                ),
+                const SizedBox(height: 50),
+                ..._buildInfoSection(
+                  'For Employers and Businesses', 
+                  'Are you finding it challenging to address skills shortages within your business? Or perhaps your staff need upskilling and you''d like to assess their current skills and experience?',
+                  'VETASSESS offers a wide range of services specifically for businesses and industry to develop employees and boost their career progression.',
+                  'assets/images/blog_metropolis.jpg',
+                  false,
+                  screenWidth,
+                  screenHeight
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+
+  
+Widget _buildHeaderBanner() {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      double screenWidth = constraints.maxWidth;
+      double screenHeight = MediaQuery.of(context).size.height;
+      
+      // Responsive height based on screen size
+      double bannerHeight = isMobile(screenWidth) 
+          ? screenHeight * 0.5 
+          : isTablet(screenWidth) 
+              ? screenHeight * 0.55
+              : screenHeight * 0.60;
+      
+      return Container(
+        width: screenWidth,
+        height: bannerHeight,
+        decoration: const BoxDecoration(color: tealColor),
+        child: Stack(
+          children: [
+            // Background image - hide on mobile if needed
+            if (!isMobile(screenWidth))
+              Positioned(
+                right: 0,
+                child: Image.asset(
+                  'assets/images/internal_page_banner.png',
+                  height: bannerHeight,
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
+            
+            // Content container
+            Container(
+              width: isMobile(screenWidth) 
+                  ? screenWidth * 0.9 
+                  : isTablet(screenWidth)
+                      ? screenWidth * 0.75
+                      : screenWidth * 0.66,
+              padding: EdgeInsets.only(
+                top: isMobile(screenWidth) ? 60 : 100,
+                left: isMobile(screenWidth) ? 20 : 50,
+                right: isMobile(screenWidth) ? 20 : 0,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: isMobile(screenWidth) 
+                      ? MainAxisAlignment.center 
+                      : MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Skills Assessment for Migration",
+                      style: TextStyle(
+                        color: const Color(0xFFFFA000),
+                        fontSize: isMobile(screenWidth) 
+                            ? 24
+                            : isTablet(screenWidth)
+                                ? 32
+                                : 45,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        height: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: isMobile(screenWidth) ? 20 : 30),
+                    Text(
+                      "Get your professional and trade skills assessed by VETASSESS.",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: isMobile(screenWidth) 
+                            ? 14
+                            : isTablet(screenWidth)
+                                ? 15
+                                : 16,
+                        height: 1.5,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildBreadcrumbs() {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      double screenWidth = constraints.maxWidth;
+      
+      const TextStyle linkStyle = TextStyle(
+        fontSize: 14,
+        color: tealColor,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.underline,
+      );
+
+      // Mobile layout - stack vertically or use smaller text
+      if (isMobile(screenWidth)) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('Home', style: linkStyle),
+                  ),
+                  const Text(' / ', style: TextStyle(color: Colors.grey)),
+                  Expanded(
+                    child: Text(
+                      'Skills Assessment For Migration',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Tablet and Desktop layout
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          vertical: 12, 
+          horizontal: isMobile(screenWidth) ? 20 : 50,
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: Text('Home', 
+                    style: linkStyle.copyWith(
+                      fontSize: isTablet(screenWidth) ? 13 : 14,
+                    ),
+                  ),
+                ),
+                const Text(' / ', style: TextStyle(color: Colors.grey)),
+                Text(
+                  'Skills Assessment For Migration',
+                  style: TextStyle(
+                    color: Colors.grey[600], 
+                    fontSize: isTablet(screenWidth) ? 13 : 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   // Unified method for both info sections (reducing duplicate code)
   List<Widget> _buildInfoSection(String title, String description, String additionalText, 

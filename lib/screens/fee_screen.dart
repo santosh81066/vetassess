@@ -456,7 +456,7 @@ class FeeScreen extends StatelessWidget {
               ],
               isExpansionPanel: true,
             ),
-            _buildApplyBanner(screenWidth, screenHeight),
+            _buildApplyBanner(),
             _buildPreparingApplSection(),
           ],
         ),
@@ -642,7 +642,7 @@ class FeeScreen extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -764,72 +764,131 @@ class FeeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildApplyBanner(double screenWidth, double screenHeight) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 100, top: 50),
+ Widget _buildApplyBanner() {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 100, top: 50),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = constraints.maxWidth;
+          final isMobile = screenWidth < 768;
+          final isTablet = screenWidth >= 768 && screenWidth < 1024;
+          final isDesktop = screenWidth >= 1024;
+          
+          return Container(
+            width: screenWidth * (isMobile ? 0.95 : 0.78),
+            constraints: BoxConstraints(
+              maxWidth: 1200, // Maximum width for very large screens
+              minHeight: isMobile ? 300 : 400,
+            ),
+            color: tealColor,
+            child: isMobile 
+                ? _buildMobileLayouts(screenWidth)
+                : _buildDesktopLayouts(screenWidth, isTablet),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+Widget _buildMobileLayouts(double screenWidth) {
+  return Column(
+    children: [
+      // Content section
+      Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Apply to get your skills assessed",
+              style: TextStyle(
+                color: const Color(0xFFFFA000),
+                fontSize: screenWidth * 0.06, // Responsive font size
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Start the application process and if you have any questions, you can contact our customer support team at any stage.",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildActionButton("Apply Online", double.infinity),
+          ],
+        ),
+      ),
+      // Image section
+      ClipRRect(
+        child: Image.asset(
+          'assets/images/During_your_application.jpg',
+          width: double.infinity,
+          height: 200,
+          fit: BoxFit.cover,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildDesktopLayouts(double screenWidth, bool isTablet) {
+  return Row(
+    children: [
+      // Left side with teal background and content
+      Flexible(
+        flex: isTablet ? 6 : 7,
         child: Container(
-          width: screenWidth * 0.78,
-          height: screenHeight * 0.6,
-          color: tealColor,
-          child: Row(
+          padding: EdgeInsets.all(isTablet ? 40 : 60),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left side with teal background and content
-              Container(
-                padding: EdgeInsets.only(top: 60, left: 110, bottom: 60),
-                width: screenWidth * 0.52,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Apply to get your skills assessed",
-                      style: TextStyle(
-                        color: Color(0xFFFFA000),
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    const Text(
-                      "Your application will be processed once payment & required documents are \nreceived. If we require any further documentation in order to proceed with this \napplication you will be notified via email.",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        height: 1.5,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    const Text(
-                      "Find out how this application is progressing by tracking your application online. ",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        height: 1.5,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    _buildActionButton("Apply Online", 150),
-                  ],
+              Text(
+                "Apply to get your skills assessed",
+                style: TextStyle(
+                  color: const Color(0xFFFFA000),
+                  fontSize: isTablet ? 28 : 36,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
               ),
-              // Right side with desert landscape image
-              Image.asset(
-                'assets/images/During_your_application.jpg',
-                width: screenWidth * 0.26,
-                height: 0.6,
-                fit: BoxFit.fitHeight,
+              const SizedBox(height: 30),
+              Text(
+                "Start the application process and if you have any questions, you can contact ${isTablet ? '' : '\n'}our customer support team at any stage.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isTablet ? 14 : 16,
+                  height: 1.5,
+                  letterSpacing: 0.3,
+                ),
               ),
+              _buildActionButton("Apply Online", isTablet ? 140 : 150),
             ],
           ),
         ),
       ),
-    );
-  }
-
+      // Right side with desert landscape image
+      Flexible(
+        flex: isTablet ? 4 : 3,
+        child: ClipRRect(
+          child: Image.asset(
+            'assets/images/During_your_application.jpg',
+            width: double.infinity,
+            height: isTablet ? 300 : 340,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    ],
+  );
+}
   // HELPER METHODS
   Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
     return Container(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
-import 'package:vetassess/widgets/skills_assessment_page.dart';
+import 'package:vetassess/screens/profissional_viewall.dart';
+import 'package:vetassess/widgets/skills_assessment_Viewallpage.dart';
 
 import '../screens/application_process.dart';
 import '../screens/eligibility_criteria.dart';
@@ -371,7 +372,7 @@ class _LinkBlock extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SkillsAssessmentPage(),
+                    builder: (context) => const ProfessionalViewall(),
                   ),
                 );
               },

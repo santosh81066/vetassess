@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-import 'package:vetassess/screens/login.dart';
+import 'package:vetassess/screens/apply_screen.dart';
 import 'package:vetassess/screens/login_page.dart';
-
-import '../screens/application_forms/appli_occupation.dart';
-import '../screens/application_forms/appli_personal_details.dart';
 import '../screens/home_screen.dart';
 import 'BusinessIndustryDropdownPanel.dart';
 import 'SkillsAssessmentDropdownPanel.dart';
 import 'SkillsAssessmentNonMigrationDropdownPanel.dart';
+
+// Responsive utility class to maintain consistency across the app
+class ResponsiveUtils {
+  static bool isSmallMobile(BuildContext context) => MediaQuery.of(context).size.width < 480;
+  static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width < 768;
+  static bool isTablet(BuildContext context) => MediaQuery.of(context).size.width >= 768 && MediaQuery.of(context).size.width < 1024;
+  static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width >= 1024;
+  static bool isLargeDesktop(BuildContext context) => MediaQuery.of(context).size.width >= 1400;
+  
+  static double getResponsiveValue({
+    required BuildContext context,
+    required double mobile,
+    required double tablet,
+    required double desktop,
+    double? largeDesktop,
+  }) {
+    if (isLargeDesktop(context)) return largeDesktop ?? desktop;
+    if (isDesktop(context)) return desktop;
+    if (isTablet(context)) return tablet;
+    return mobile;
+  }
+}
 
 class Header extends StatefulWidget {
   const Header({super.key});
@@ -29,27 +46,25 @@ class _HeaderState extends State<Header> {
     if (_isDropdownOpen) return;
     if (key.currentContext == null) return;
 
-    final RenderBox renderBox =
-        key.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Size size = renderBox.size;
 
     final overlay = Overlay.of(context);
     _dropdownOverlay = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            top: offset.dy + size.height,
-            left: 0,
-            right: 0,
-            child: MouseRegion(
-              onExit: (_) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _hideDropdown();
-                });
-              },
-              child: panel,
-            ),
-          ),
+      builder: (context) => Positioned(
+        top: offset.dy + size.height,
+        left: 0,
+        right: 0,
+        child: MouseRegion(
+          onExit: (_) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _hideDropdown();
+            });
+          },
+          child: panel,
+        ),
+      ),
     );
 
     overlay.insert(_dropdownOverlay!);
@@ -71,216 +86,304 @@ class _HeaderState extends State<Header> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the current screen size
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final double width = mediaQuery.size.width;
+    
+    // Enhanced responsive breakpoints
+    final bool isSmallMobile = ResponsiveUtils.isSmallMobile(context);
+    final bool isMobile = ResponsiveUtils.isMobile(context);
+    final bool isTablet = ResponsiveUtils.isTablet(context);
+    final bool isDesktop = ResponsiveUtils.isDesktop(context);
+    final bool isLargeDesktop = ResponsiveUtils.isLargeDesktop(context);
 
-    // Define responsive breakpoints
-    final bool isLargeDesktop = width >= 1400;
-    final bool isDesktop = width >= 1024;
-    final bool isTablet = width >= 768 && width < 1024;
-    final bool isSmallTablet = width >= 600 && width < 768;
-    final bool isMobile = width < 600;
+    // Responsive logo sizing with better scaling
+    final double logoHeight = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: isSmallMobile ? width * 0.14 : width * 0.12,
+      tablet: width * 0.09,
+      desktop: width * 0.08,
+      largeDesktop: width * 0.07,
+    ).clamp(60.0, 120.0);
 
-    // Calculate dynamic sizes based on screen width - using relative proportions
-    final double logoHeight =
-        isDesktop ? width * 0.08 : (isTablet ? width * 0.09 : width * 0.12);
-    final double logoHeightClamped = logoHeight.clamp(
-      70.0,
-      110.0,
-    ); // Prevent logo from getting too large or small
-
-    final double topBarWidth =
-        isDesktop ? width * 0.490 : (isTablet ? width * 0.7 : width * 0.85);
-
-    final double navItemSpacing =
-        isLargeDesktop
-            ? width * 0.023
-            : (isDesktop ? width * 0.022 : width * 0.02);
-    final double navItemSpacingClamped = navItemSpacing.clamp(16.0, 32.0);
-
-    // Dynamic heights for containers based on screen width
-    final double topBarHeight = (isDesktop ? width * 0.043 : width * 0.05)
-        .clamp(45.0, 60.0);
-    final double navBarHeight = (isDesktop ? width * 0.05 : width * 0.06).clamp(
-      50.0,
-      70.0,
+    // Responsive top bar width
+    final double topBarWidth = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: width * 0.9,
+      tablet: width * 0.75,
+      desktop: width * 0.52,
+      largeDesktop: width * 0.48,
     );
 
-    return Container(
-      color: Colors.white,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Logo Section (Left side) - responsive sizing
-          Padding(
-            padding: EdgeInsets.only(
-              top: isDesktop ? 12.0 : 8.0,
-              left: isDesktop ? 0 : 8.0,
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
-              },
-              child: Container(
-                color: Colors.white,
-                child: Image.asset(
-                  'assets/images/vetassess_logo.png',
-                  height: logoHeightClamped,
+    // Responsive spacing
+    final double navItemSpacing = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: width * 0.015,
+      tablet: width * 0.018,
+      desktop: width * 0.022,
+      largeDesktop: width * 0.023,
+    ).clamp(12.0, 35.0);
+
+    // Responsive container heights
+    final double topBarHeight = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: width * 0.06,
+      tablet: width * 0.055,
+      desktop: width * 0.045,
+      largeDesktop: width * 0.042,
+    ).clamp(40.0, 65.0);
+
+    final double navBarHeight = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: width * 0.07,
+      tablet: width * 0.065,
+      desktop: width * 0.052,
+      largeDesktop: width * 0.048,
+    ).clamp(45.0, 75.0);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          color: Colors.white,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Logo Section with enhanced responsive padding
+              Padding(
+                padding: EdgeInsets.only(
+                  top: ResponsiveUtils.getResponsiveValue(
+                    context: context,
+                    mobile: 6.0,
+                    tablet: 8.0,
+                    desktop: 12.0,
+                  ),
+                  left: ResponsiveUtils.getResponsiveValue(
+                    context: context,
+                    mobile: 8.0,
+                    tablet: 4.0,
+                    desktop: 0.0,
+                  ),
                 ),
-              ),
-            ),
-          ),
-
-          // Right side with two rows
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Top header with language, about, resources, etc.
-                ClipPath(
-                  clipper: TrapezoidClipper(),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+                  },
                   child: Container(
-                    color: const Color(0xFFf0f0f0),
-                    height: topBarHeight,
-                    width: topBarWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Left side empty space
-                        if (isDesktop || isTablet)
-                          Expanded(flex: 2, child: Container()),
-
-                        // Right side - links and apply button
-                        if (isDesktop || isTablet) ...[
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.language_outlined, size: 18),
-                              const SizedBox(width: 6),
-                              const Text(
-                                "English",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black54,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 14,
-                                color: Colors.black54,
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: isDesktop ? 24 : 16),
-
-                          if (isDesktop) ...[
-                            const _TopLink(text: "About"),
-                            const SizedBox(width: 24),
-                            const _TopLink(text: "Resources"),
-                            const SizedBox(width: 24),
-                            const _TopLink(text: "News & Updates"),
-                            const SizedBox(width: 24),
-                          ],
-
-                          InkWell(
-                            onTap: () {},
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.person_outline,
-                                  size: 18,
-                                  color: Colors.black54,
-                                ),
-                                const SizedBox(width: 6),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => LoginPage(),
-                                      ),
-                                    );
-                                  },
-                                  child: const Text(
-                                    "Login",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black54,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.2, // Better vertical alignment
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(width: isDesktop ? 16 : 12),
-                        ],
-
-                        // Apply Now Button - now with flexible height
-                        Container(
-                          height: topBarHeight * 0.8,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PersonalDetailsForm(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFA000),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isDesktop ? 14 : 12,
-                                vertical:
-                                    0, // Let the container control the height
-                              ),
-                              textStyle: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: isDesktop ? 14 : 12,
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero,
-                              ),
-                            ),
-                            child: const Text(
-                              "Apply Now",
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ],
+                    color: Colors.white,
+                    child: Image.asset(
+                      'assets/images/vetassess_logo.png',
+                      height: logoHeight,
+                      fit: BoxFit.contain, // Ensures proper scaling
                     ),
                   ),
                 ),
+              ),
 
-                // Main navigation header - Improved responsive design
-                Container(
-                  color: Colors.white,
-                  height: navBarHeight,
-                  width: width,
-                  padding: EdgeInsets.only(
-                    top: isDesktop ? width * 0.01 : width * 0.015,
-                  ),
-                  child:
-                      isDesktop
-                          ? _buildDesktopNavBar(
-                            navItemSpacingClamped,
-                            isLargeDesktop,
-                            width,
-                          )
-                          : _buildMobileNavBar(),
+              // Main content area
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Top header with enhanced responsive design
+                    ClipPath(
+                      clipper: TrapezoidClipper(),
+                      child: Container(
+                        color: const Color(0xFFf0f0f0),
+                        height: topBarHeight,
+                        width: topBarWidth,
+                        child: _buildTopHeader(isDesktop, isTablet, isMobile, topBarHeight),
+                      ),
+                    ),
+
+                    // Main navigation with improved responsive handling
+                    Container(
+                      color: Colors.white,
+                      height: navBarHeight,
+                      width: width,
+                      padding: EdgeInsets.only(
+                        top: ResponsiveUtils.getResponsiveValue(
+                          context: context,
+                          mobile: width * 0.02,
+                          tablet: width * 0.018,
+                          desktop: width * 0.012,
+                          largeDesktop: width * 0.01,
+                        ),
+                      ),
+                      child: isDesktop
+                          ? _buildDesktopNavBar(navItemSpacing, isLargeDesktop, width)
+                          : _buildMobileNavBar(isMobile, isSmallMobile),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTopHeader(bool isDesktop, bool isTablet, bool isMobile, double topBarHeight) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        // Flexible spacer
+        if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
+
+        // Top navigation items with responsive sizing
+        if (isDesktop || isTablet) ...[
+          _buildLanguageSelector(),
+          SizedBox(width: ResponsiveUtils.getResponsiveValue(
+            context: context,
+            mobile: 12.0,
+            tablet: 16.0,
+            desktop: 24.0,
+          )),
+
+          // Desktop-only links
+          if (isDesktop) ...[
+            const _TopLink(text: "About"),
+            const SizedBox(width: 24),
+            const _TopLink(text: "Resources"),
+            const SizedBox(width: 24),
+            const _TopLink(text: "News & Updates"),
+            const SizedBox(width: 24),
+          ],
+
+          _buildLoginSection(),
+          SizedBox(width: ResponsiveUtils.getResponsiveValue(
+            context: context,
+            mobile: 8.0,
+            tablet: 12.0,
+            desktop: 16.0,
+          )),
+        ],
+
+        // Apply Now Button with responsive sizing
+        Container(
+          height: topBarHeight * 0.8,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ApplyScreen()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFA000),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: EdgeInsets.symmetric(
+                horizontal: ResponsiveUtils.getResponsiveValue(
+                  context: context,
+                  mobile: 10.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+                vertical: 0,
+              ),
+              textStyle: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: ResponsiveUtils.getResponsiveValue(
+                  context: context,
+                  mobile: 11.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+              ),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            child: const Text(
+              "Apply Now",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLanguageSelector() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.language_outlined,
+          size: ResponsiveUtils.getResponsiveValue(
+            context: context,
+            mobile: 16.0,
+            tablet: 17.0,
+            desktop: 18.0,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          "English",
+          style: TextStyle(
+            fontSize: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 12.0,
+              tablet: 12.5,
+              desktop: 13.0,
+            ),
+            color: Colors.black54,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Icon(
+          Icons.keyboard_arrow_down,
+          size: ResponsiveUtils.getResponsiveValue(
+            context: context,
+            mobile: 13.0,
+            tablet: 13.5,
+            desktop: 14.0,
+          ),
+          color: Colors.black54,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginSection() {
+    return InkWell(
+      onTap: () {},
+      child: Row(
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 16.0,
+              tablet: 17.0,
+              desktop: 18.0,
+            ),
+            color: Colors.black54,
+          ),
+          const SizedBox(width: 6),
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+            child: Text(
+              "Login",
+              style: TextStyle(
+                fontSize: ResponsiveUtils.getResponsiveValue(
+                  context: context,
+                  mobile: 13.0,
+                  tablet: 13.5,
+                  desktop: 14.0,
+                ),
+                color: Colors.black54,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
+              ),
             ),
           ),
         ],
@@ -288,25 +391,38 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildDesktopNavBar(
-    double spacing,
-    bool isLargeDesktop,
-    double screenWidth,
-  ) {
-    // Dynamic font size based on screen width with min and max values
-    final double fontSize = (isLargeDesktop
-            ? screenWidth * 0.012
-            : screenWidth * 0.011)
-        .clamp(14.0, 17.0);
-    final double iconSize = (isLargeDesktop
-            ? screenWidth * 0.036
-            : screenWidth * 0.032)
-        .clamp(38.0, 50.0);
-    final double searchIconSize = (isLargeDesktop ? 25.0 : 22.0);
-    final double sideMargin = (isLargeDesktop
-            ? screenWidth * 0.014
-            : screenWidth * 0.012)
-        .clamp(12.0, 24.0);
+  Widget _buildDesktopNavBar(double spacing, bool isLargeDesktop, double screenWidth) {
+    final double fontSize = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 13.0,
+      tablet: 14.0,
+      desktop: screenWidth * 0.011,
+      largeDesktop: screenWidth * 0.012,
+    ).clamp(13.0, 18.0);
+
+    final double iconSize = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 35.0,
+      tablet: 38.0,
+      desktop: screenWidth * 0.032,
+      largeDesktop: screenWidth * 0.036,
+    ).clamp(35.0, 52.0);
+
+    final double searchIconSize = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 20.0,
+      tablet: 22.0,
+      desktop: 22.0,
+      largeDesktop: 25.0,
+    );
+
+    final double sideMargin = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 8.0,
+      tablet: 10.0,
+      desktop: screenWidth * 0.012,
+      largeDesktop: screenWidth * 0.014,
+    ).clamp(8.0, 26.0);
 
     return Container(
       alignment: Alignment.center,
@@ -323,11 +439,10 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment For\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _migrationNavKey,
-                        const SkillsAssessmentDropdownPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _migrationNavKey,
+                    const SkillsAssessmentDropdownPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(
@@ -335,11 +450,10 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment Non\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _nonMigrationNavKey,
-                        const SkillsAssessmentNonMigrationPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _nonMigrationNavKey,
+                    const SkillsAssessmentNonMigrationPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Check my\nOccupation", fontSize: fontSize),
@@ -349,17 +463,16 @@ class _HeaderState extends State<Header> {
                   title: "Business and\nIndustry",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap:
-                      () => _showDropdown(
-                        _businessNavKey,
-                        const BusinessIndustryDropdownPanel(),
-                      ),
+                  onTap: () => _showDropdown(
+                    _businessNavKey,
+                    const BusinessIndustryDropdownPanel(),
+                  ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Contact", fontSize: fontSize),
                 SizedBox(width: sideMargin),
 
-                // Search icon with circle - now with relative sizing
+                // Search icon with enhanced responsive sizing
                 Container(
                   width: iconSize,
                   height: iconSize,
@@ -372,7 +485,7 @@ class _HeaderState extends State<Header> {
                 ),
                 SizedBox(width: spacing),
 
-                // Start Your Application - now with responsive sizing
+                // Start Your Application with responsive sizing
                 _NavItem(
                   title: "Start Your\nApplication",
                   isHighlighted: true,
@@ -387,33 +500,119 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildMobileNavBar() {
+  Widget _buildMobileNavBar(bool isMobile, bool isSmallMobile) {
+    final double searchIconSize = isSmallMobile ? 18.0 : 20.0;
+    final double containerSize = isSmallMobile ? 36.0 : 40.0;
+    final double menuIconSize = isSmallMobile ? 24.0 : 28.0;
+    final double marginRight = isSmallMobile ? 12.0 : 16.0;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        // Search icon for mobile - now with proportional sizing
+        // Search icon for mobile with responsive sizing
         Container(
-          width: 40,
-          height: 40,
+          width: containerSize,
+          height: containerSize,
           margin: const EdgeInsets.only(right: 8),
           decoration: const BoxDecoration(
             color: Color(0xFFFFA000),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.search, color: Colors.white, size: 20),
+          child: Icon(
+            Icons.search,
+            color: Colors.white,
+            size: searchIconSize,
+          ),
         ),
-        // Menu icon for mobile navigation
+        // Menu icon with responsive sizing
         Container(
-          margin: const EdgeInsets.only(right: 16),
+          margin: EdgeInsets.only(right: marginRight),
           child: IconButton(
             onPressed: () {
               // Show mobile navigation drawer/menu
+              _showMobileMenu();
             },
-            icon: const Icon(Icons.menu, color: Color(0xFF0D5E63), size: 28),
+            icon: Icon(
+              Icons.menu,
+              color: Color(0xFF0D5E63),
+              size: menuIconSize,
+            ),
             padding: EdgeInsets.zero,
           ),
         ),
       ],
+    );
+  }
+
+  void _showMobileMenu() {
+    // Enhanced mobile menu implementation
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildMobileMenuSheet(),
+    );
+  }
+
+  Widget _buildMobileMenuSheet() {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Mobile menu items
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildMobileMenuItem("Skills Assessment For Migration"),
+                _buildMobileMenuItem("Skills Assessment Non Migration"),
+                _buildMobileMenuItem("Check my Occupation"),
+                _buildMobileMenuItem("Business and Industry"),
+                _buildMobileMenuItem("Contact"),
+                const Divider(),
+                _buildMobileMenuItem("About"),
+                _buildMobileMenuItem("Resources"),
+                _buildMobileMenuItem("News & Updates"),
+                _buildMobileMenuItem("Login"),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileMenuItem(String title) {
+    return ListTile(
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF0D5E63),
+        ),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        // Handle navigation based on title
+      },
     );
   }
 }
@@ -427,8 +626,13 @@ class _TopLink extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 13,
+      style: TextStyle(
+        fontSize: ResponsiveUtils.getResponsiveValue(
+          context: context,
+          mobile: 12.0,
+          tablet: 12.5,
+          desktop: 13.0,
+        ),
         color: Colors.black54,
         fontWeight: FontWeight.w500,
       ),
@@ -461,26 +665,40 @@ class _NavItemState extends State<_NavItem> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen width for responsive adjustments
     final double width = MediaQuery.of(context).size.width;
     final bool isLargeScreen = width >= 1200;
 
-    // Colors based on highlighted state
-    final Color defaultColor =
-        widget.isHighlighted
-            ? const Color(0xFF0D5E63)
-            : const Color(0xFF0D5E63);
+    final Color defaultColor = widget.isHighlighted
+        ? const Color(0xFF0D5E63)
+        : const Color(0xFF0D5E63);
 
-    final Color hoverColor =
-        widget.isHighlighted
-            ? const Color(0xFF0D5E63)
-            : const Color(0xFFFFA000);
+    final Color hoverColor = widget.isHighlighted
+        ? const Color(0xFF0D5E63)
+        : const Color(0xFFFFA000);
 
-    // Responsive icon size
-    final double iconSize = isLargeScreen ? 16.0 : 14.0;
+    final double iconSize = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 13.0,
+      tablet: 14.0,
+      desktop: 14.0,
+      largeDesktop: 16.0,
+    );
 
-    // Responsive letter spacing
-    final double letterSpacing = isLargeScreen ? 0.3 : 0.2;
+    final double letterSpacing = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: 0.1,
+      tablet: 0.2,
+      desktop: 0.2,
+      largeDesktop: 0.3,
+    );
+
+    final double containerHeight = ResponsiveUtils.getResponsiveValue(
+      context: context,
+      mobile: width * 0.04,
+      tablet: width * 0.038,
+      desktop: width * 0.034,
+      largeDesktop: width * 0.034,
+    ).clamp(35.0, 50.0);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
@@ -488,10 +706,7 @@ class _NavItemState extends State<_NavItem> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
-          height: (isLargeScreen ? width * 0.034 : width * 0.038).clamp(
-            40.0,
-            48.0,
-          ),
+          height: containerHeight,
           alignment: Alignment.center,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -526,15 +741,14 @@ class TrapezoidClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(0, 0); // Top-left corner
-    path.lineTo(size.width, 0); // Top-right corner
-    path.lineTo(size.width, size.height); // Bottom-right
-
-    // Make the slope proportional to the width to maintain the trapezoid shape
-    // at different screen sizes
+    path.moveTo(0, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    
+    // Enhanced responsive slope calculation
     final double slopeOffset = size.width * 0.045;
-    path.lineTo(slopeOffset, size.height); // Bottom-left (inward)
-    path.close(); // back to top-left
+    path.lineTo(slopeOffset, size.height);
+    path.close();
     return path;
   }
 

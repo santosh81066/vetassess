@@ -7,78 +7,69 @@ class HelpSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if the layout should be responsive
-    final width = MediaQuery.of(context).size.width;
-    final bool isDesktop = width >= 768;
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+    
+    // Better responsive breakpoints
+    final bool isMobile = width < 600;
+    final bool isTablet = width >= 600 && width < 1024;
+    final bool isDesktop = width >= 1024;
     
     return Container(
-      color: const Color(0xFF0F5D60), // Teal background color matching screenshot
+      color: const Color(0xFF0F5D60),
       child: Stack(
         children: [
-             
-    // Background image 2 - top right (block-bg.svg)
-    Positioned(
-      right: 0.95,
-      bottom: 0,
-      child: SvgPicture.asset(
-        'assets/images/block-bg.svg',
-        width: MediaQuery.of(context).size.width * 1.0, // Responsive width
-        fit: BoxFit.fitHeight,
-      ),
-    ),
-            // Background image
-     Positioned(
-      left: 0,
-      bottom: 0,
-      child: Image.asset(
-        'assets/images/Vector1.png',
-        width: MediaQuery.of(context).size.width * 0.80, // Responsive width
-        fit: BoxFit.contain,
-      ),
-    ),
-
-          // Content
-          Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 100,
-              horizontal: 50, // More padding on desktop
+          // Background image 2 - top right (block-bg.svg)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: SvgPicture.asset(
+              'assets/images/block-bg.svg',
+              width: width * (isMobile ? 0.8 : 1.0),
+              fit: BoxFit.fitHeight,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  "We're here to help",
-                  textAlign: TextAlign.left, // Left aligned as in screenshot
-                  style: TextStyle(
-                    fontSize: 30, // Larger font size matching screenshot
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+          ),
+          
+          // Background image - left bottom
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Image.asset(
+              'assets/images/Vector1.png',
+              width: width * (isMobile ? 0.6 : 0.8),
+              fit: BoxFit.contain,
+            ),
+          ),
+
+          // Content with proper responsive layout
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: isMobile ? 40 : (isTablet ? 60 : 80),
+                horizontal: isMobile ? 16 : (isTablet ? 32 : 50),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "We're here to help",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: isMobile ? 24 : (isTablet ? 28 : 32),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(height: isDesktop ? 60 : 40),
-                
-                // Cards layout - horizontal on desktop, vertical on mobile
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (isDesktop) {
-                      // Desktop: Horizontal layout
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildHelpCards(constraints.maxWidth / 3 - 16),
-                      );
-                    } else {
-                      // Mobile: Vertical layout
-                      return Column(
-                        children: _buildHelpCards(width - 32)
-                            .expand((card) => [card, const SizedBox(height: 16)])
-                            .toList()
-                            ..removeLast(), // Remove the last spacer
-                      );
-                    }
-                  },
-                ),
-              ],
+                  SizedBox(height: isMobile ? 30 : (isTablet ? 40 : 50)),
+                  
+                  // Responsive cards layout
+                  _buildResponsiveCardsLayout(context, width, isMobile, isTablet, isDesktop),
+                  
+                  // Add bottom padding to prevent overflow
+                  SizedBox(height: isMobile ? 40 : 60),
+                ],
+              ),
             ),
           ),
         ],
@@ -86,7 +77,58 @@ class HelpSection extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildHelpCards(double width) {
+  Widget _buildResponsiveCardsLayout(BuildContext context, double width, bool isMobile, bool isTablet, bool isDesktop) {
+    if (isMobile) {
+      // Mobile: Single column layout
+      return Column(
+        children: _buildHelpCards(width - 32, isMobile, isTablet)
+            .map((card) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: card,
+                ))
+            .toList(),
+      );
+    } else if (isTablet) {
+      // Tablet: Two columns layout
+      final cards = _buildHelpCards((width - 64) / 2 - 8, isMobile, isTablet);
+      return Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: cards[0]),
+              const SizedBox(width: 16),
+              Expanded(child: cards[1]),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: cards[2]),
+              const Expanded(child: SizedBox()), // Empty space to center the third card
+            ],
+          ),
+        ],
+      );
+    } else {
+      // Desktop: Three columns layout
+      final cards = _buildHelpCards((width - 100) / 3 - 16, isMobile, isTablet);
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: cards[0]),
+            const SizedBox(width: 24),
+            Expanded(child: cards[1]),
+            const SizedBox(width: 24),
+            Expanded(child: cards[2]),
+          ],
+        ),
+      );
+    }
+  }
+
+  List<Widget> _buildHelpCards(double width, bool isMobile, bool isTablet) {
     return [
       _HelpCard(
         width: width,
@@ -94,6 +136,8 @@ class HelpSection extends StatelessWidget {
         title: 'Contact us',
         description: 'Ask a question or find more information.',
         buttonText: 'Send Enquiry',
+        isMobile: isMobile,
+        isTablet: isTablet,
         onPressed: () {
           // Navigation action
         },
@@ -104,6 +148,8 @@ class HelpSection extends StatelessWidget {
         title: 'Call our office',
         description: 'Speak to our friendly customer support team.',
         buttonText: 'Call 1300 838 277',
+        isMobile: isMobile,
+        isTablet: isTablet,
         onPressed: () {
           // Call action
         },
@@ -114,6 +160,8 @@ class HelpSection extends StatelessWidget {
         title: 'Email us',
         description: 'Send us your question or ask for more information.',
         buttonText: 'Email Us',
+        isMobile: isMobile,
+        isTablet: isTablet,
         onPressed: () {
           // Email action
         },
@@ -129,6 +177,8 @@ class _HelpCard extends StatelessWidget {
   final String description;
   final String buttonText;
   final VoidCallback onPressed;
+  final bool isMobile;
+  final bool isTablet;
 
   const _HelpCard({
     required this.width,
@@ -137,74 +187,83 @@ class _HelpCard extends StatelessWidget {
     required this.description,
     required this.buttonText,
     required this.onPressed,
+    required this.isMobile,
+    required this.isTablet,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
-      margin: EdgeInsets.zero,
-      child: SizedBox(
-        height: 300,
-        child: Card(
-          elevation: 1,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0), // Square corners as in screenshot
-          ),
-          margin: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SvgPicture.asset(
-                  iconAsset,
-                  height: 36,
-                  width: 36,
+      width: isMobile ? double.infinity : width,
+      child: Card(
+        elevation: 1,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.all(isMobile ? 16 : 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // Important: Let the card size itself
+            children: [
+              SvgPicture.asset(
+                iconAsset,
+                height: isMobile ? 28 : 36,
+                width: isMobile ? 28 : 36,
+              ),
+              SizedBox(height: isMobile ? 12 : 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: isMobile ? 20 : (isTablet ? 22 : 25),
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF0F5D60),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F5D60), // Teal color for the title
-                  ),
+              ),
+              SizedBox(height: isMobile ? 12 : 16),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: isMobile ? 14 : 16,
+                  color: Colors.black87,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                ),
-               SizedBox(height: title == 'Contact us' ? 60 : 40),
-                SizedBox(
-                  width: 160,
-                  height: 50,
-                  child: ElevatedButton(
-                    
-                    onPressed: onPressed,
-                    style: ElevatedButton.styleFrom(
-                      
-                      backgroundColor: const Color(0xFFFFA000), // Amber button color
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0), // Square button
-                      ),
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+              ),
+              SizedBox(
+                height: title == 'Contact us' 
+                    ? (isMobile ? 20 : (isTablet ? 40 : 60))
+                    : (isMobile ? 16 : (isTablet ? 24 : 40)),
+              ),
+              SizedBox(
+                width: isMobile ? double.infinity : 160,
+                height: isMobile ? 45 : 50,
+                child: ElevatedButton(
+                  onPressed: onPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFA000),
+                    foregroundColor: Colors.black,
+                    padding: EdgeInsets.symmetric(
+                      vertical: isMobile ? 8 : 10,
+                      horizontal: isMobile ? 8 : 12,
                     ),
-                    child: Text(buttonText),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0),
+                    ),
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: isMobile ? 14 : 16,
+                    ),
+                  ),
+                  child: Text(
+                    buttonText,
+                    textAlign: TextAlign.center,
+                    maxLines: isMobile ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

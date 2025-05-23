@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import '../widgets/BasePageLayout.dart';
 import '../widgets/Everything you need to know.dart';
-import '../widgets/HelpSection.dart';
 import '../widgets/HowToPreparePage.dart';
 import '../widgets/NewsSection.dart';
 import '../widgets/SkillsMatchSection.dart';
 import '../widgets/SupportSection.dart';
 import '../widgets/WhyChooseVetassessSection.dart';
-import '../widgets/call_to_action_section.dart';
-import '../widgets/featured_section.dart';
 import '../widgets/hero_slider.dart';
-import '../widgets/services_section.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

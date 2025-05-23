@@ -22,7 +22,7 @@ class ApplicationProcess extends StatelessWidget {
         children: [
           _buildHeaderBanner(screenHeight, screenWidth),
           _buildBreadcrumbs(),
-          _buildMainContent(screenWidth, screenHeight),
+          _buildMainContent(screenWidth, screenHeight,context),
           ProcessStepsSection(),
           _buildKeyTermsSection(
             'Key terms for Qualifications\nAssessment Criteria',
@@ -60,106 +60,191 @@ class ApplicationProcess extends StatelessWidget {
             isExpansionPanel: true,
           ),
           _buildPreparingApplSection(),
-          _buildApplyBanner(screenWidth),
+          _buildApplyBanner(),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
-    return Container(
-      width: screenWidth,
-      height: screenHeight * 0.64,
-      decoration: const BoxDecoration(color: tealColor),
-      child: Stack(
-        children: [
-          Positioned(
-            right: 0,
-            child: Image.asset(
-              'assets/images/internal_page_banner.png',
-              height: screenHeight * 0.64,
-              fit: BoxFit.fitHeight,
+Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
+  final isMobile = ResponsiveHelper.isMobile(screenWidth);
+  final isTablet = ResponsiveHelper.isTablet(screenWidth);
+  
+  return Container(
+    width: screenWidth,
+    height: isMobile ? screenHeight * 0.60 : screenHeight * 0.70,
+    decoration: const BoxDecoration(color: tealColor),
+    child: Stack(
+      children: [
+        // Background image - adjust positioning for mobile
+        Positioned(
+          right: isMobile ? -50 : 0,
+          child: Image.asset(
+            'assets/images/internal_page_banner.png',
+            height: isMobile ? screenHeight * 0.60 : screenHeight * 0.70,
+            fit: BoxFit.fitHeight,
+          ),
+        ),
+        Container(
+          width: isMobile ? screenWidth * 0.95 : (isTablet ? screenWidth * 0.80 : screenWidth * 0.66),
+          padding: EdgeInsets.only(
+            top: ResponsiveHelper.getResponsivePadding(100, screenWidth),
+            left: ResponsiveHelper.getResponsivePadding(35, screenWidth),
+            right: isMobile ? ResponsiveHelper.getResponsivePadding(20, screenWidth) : 0,
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+              children: [
+                Text(
+                  isMobile 
+                    ? "Application process for a professional or general skills application"
+                    : "Application process for a \nprofessional or general \nskills application",
+                  style: TextStyle(
+                    color: const Color(0xFFFFA000),
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(42, screenWidth),
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    height: isMobile ? 1.2 : null,
+                  ),
+                ),
+                SizedBox(
+                  height: ResponsiveHelper.getResponsivePadding(30, screenWidth),
+                ),
+                Text(
+                  isMobile
+                    ? "Start your migration journey by applying for a skills assessment for your professional occupation."
+                    : "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(16, screenWidth),
+                    height: 1.5,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
             ),
           ),
-          Container(
-            width: screenWidth * 0.66,
-            padding: const EdgeInsets.only(top: 100, left: 170),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Application process for a \nprofessional or general \nskills application",
-                    style: TextStyle(
-                      color: Color(0xFFFFA000),
-                      fontSize: 42,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      height: 1.5,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildBreadcrumbs() {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = constraints.maxWidth;
+      final isMobile = ResponsiveHelper.isMobile(screenWidth);
+      
+      const TextStyle linkStyle = TextStyle(
+        fontSize: 14,
+        color: tealColor,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.underline,
+      );
+      
+      final TextStyle responsiveLinkStyle = TextStyle(
+        fontSize: ResponsiveHelper.getResponsiveFontSize(14, screenWidth),
+        color: tealColor,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.underline,
+      );
+      
+      final TextStyle responsiveGreyStyle = TextStyle(
+        color: Colors.grey,
+        fontSize: ResponsiveHelper.getResponsiveFontSize(14, screenWidth),
+      );
+
+      if (isMobile) {
+        // Mobile: Stack breadcrumbs vertically or wrap them
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: ResponsiveHelper.getResponsivePadding(10, screenWidth),
+            horizontal: ResponsiveHelper.getResponsivePadding(20, screenWidth),
+          ),
+          child: Wrap(
+            children: [
+              TextButton(
+                onPressed: () {},
+                child: Text('Home', style: responsiveLinkStyle),
               ),
-            ),
+              Text(' / ', style: responsiveGreyStyle),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Skills Assessment',
+                  style: responsiveLinkStyle,
+                ),
+              ),
+              Text(' / ', style: responsiveGreyStyle),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Professional occupations',
+                  style: responsiveLinkStyle,
+                ),
+              ),
+              Text(' / ', style: responsiveGreyStyle),
+              Text(
+                'Application process',
+                style: TextStyle(
+                  color: Colors.grey[600], 
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(14, screenWidth),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        );
+      }
 
-  Widget _buildBreadcrumbs() {
-    const TextStyle linkStyle = TextStyle(
-      fontSize: 14,
-      color: tealColor,
-      fontWeight: FontWeight.bold,
-      decoration: TextDecoration.underline,
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 150),
-      child: Row(
-        children: [
-          TextButton(
-            onPressed: () {},
-            child: const Text('Home', style: linkStyle),
+      // Desktop/Tablet: Keep original horizontal layout
+      return Container(
+        padding: EdgeInsets.symmetric(
+          vertical: ResponsiveHelper.getResponsivePadding(10, screenWidth),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              TextButton(
+                onPressed: () {},
+                child: Text('Home', style: responsiveLinkStyle),
+              ),
+              Text(' / ', style: responsiveGreyStyle),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Skills Assessment For Migration',
+                  style: responsiveLinkStyle,
+                ),
+              ),
+              Text(' / ', style: responsiveGreyStyle),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Skills Assessment for professional occupations',
+                  style: responsiveLinkStyle,
+                ),
+              ),
+              Text(' / ', style: responsiveGreyStyle),
+              Text(
+                'Application process for a professional or general skills application',
+                style: TextStyle(
+                  color: Colors.grey[600], 
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(14, screenWidth),
+                ),
+              ),
+            ],
           ),
-          const Text(' / ', style: TextStyle(color: Colors.grey)),
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skills Assessment For Migration',
-              style: linkStyle,
-            ),
-          ),
-          const Text(' / ', style: TextStyle(color: Colors.grey)),
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skills Assessment for professional occupations',
-              style: linkStyle,
-            ),
-          ),
-          const Text(' / ', style: TextStyle(color: Colors.grey)),
-          Text(
-            'Application process for a professional or general skills application',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainContent(double screenWidth, double screenHeight) {
+        ),
+      );
+    },
+  );
+}
+  Widget _buildMainContent(double screenWidth, double screenHeight, BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(
         top: 50,
@@ -214,50 +299,136 @@ class ApplicationProcess extends StatelessWidget {
               ],
             ),
           ),
-          _buildTradesBanner(screenHeight),
+          _buildTradesBanner(context),
         ],
       ),
     );
   }
+Widget _buildTradesBanner(BuildContext context) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = constraints.maxWidth;
+      final screenHeight = MediaQuery.of(context).size.height;
+      
+      // Responsive breakpoints
+      final isTablet = screenWidth >= 768;
+      final isDesktop = screenWidth >= 1024;
+      final isMobile = screenWidth < 768;
+      
+      // Responsive dimensions
+      final bannerHeight = isDesktop 
+          ? screenHeight * 0.3 
+          : isTablet 
+              ? screenHeight * 0.28 
+              : screenHeight * 0.25;
+              
+      final svgSize = isDesktop 
+          ? screenHeight * 0.18 
+          : isTablet 
+              ? screenHeight * 0.16 
+              : screenHeight * 0.15;
+              
+      final horizontalPadding = isDesktop 
+          ? 120.0 
+          : isTablet 
+              ? 80.0 
+              : 20.0;
+              
+      final fontSize = isDesktop 
+          ? 32.0 
+          : isTablet 
+              ? 28.0 
+              : isMobile && screenWidth < 400 
+                  ? 20.0 
+                  : 26.0;
+                  
+      final buttonWidth = isDesktop 
+          ? 150.0 
+          : isTablet 
+              ? 135.0 
+              : 125.0;
 
-  Widget _buildTradesBanner(double screenHeight) {
-    return Container(
-      width: double.infinity,
-      height: screenHeight * 0.25,
-      decoration: const BoxDecoration(color: tealColor),
-      child: Stack(
-        children: [
-          SvgPicture.asset(
-            'assets/images/vet.svg',
-            width: screenHeight * 0.15,
-            height: screenHeight * 0.26,
-            fit: BoxFit.fitHeight,
-          ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 100),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Looking for the trades assessment process?',
-                    style: TextStyle(
-                      color: Color(0xFFFFA000),
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  _buildActionButton("Go Here", 125),
-                ],
+      return Container(
+        width: double.infinity,
+        height: bannerHeight,
+        decoration: const BoxDecoration(color: tealColor),
+        child: Stack(
+          children: [
+            // Background SVG
+            Positioned(
+              left: 0,
+              top: 0,
+              child: SvgPicture.asset(
+                'assets/images/vet.svg',
+                width: svgSize,
+                height: bannerHeight * 1.04,
+                fit: BoxFit.fitHeight,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            
+            // Content
+            Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: isMobile && screenWidth < 600
+                    ? _buildMobileLayout(fontSize, buttonWidth)
+                    : _buildDesktopLayout(fontSize, buttonWidth),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
+// Layout for mobile devices (stacked vertically)
+Widget _buildMobileLayout(double fontSize, double buttonWidth) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Text(
+        'Looking for the trades assessment process?',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: const Color(0xFFFFA000),
+          fontSize: fontSize,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+          height: 1.2,
+        ),
+      ),
+      const SizedBox(height: 20),
+      _buildActionButton("Go Here", buttonWidth),
+    ],
+  );
+}
+
+// Layout for tablet and desktop (horizontal)
+Widget _buildDesktopLayout(double fontSize, double buttonWidth) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Expanded(
+        flex: 3,
+        child: Text(
+          'Looking for the trades assessment process?',
+          style: TextStyle(
+            color: const Color(0xFFFFA000),
+            fontSize: fontSize,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+            height: 1.2,
+          ),
+        ),
+      ),
+      const SizedBox(width: 20),
+      _buildActionButton("Go Here", buttonWidth),
+    ],
+  );
+}
   Widget _buildKeyTermsSection(
     String sectionTitle,
     List<String> expandableTitles,
@@ -504,7 +675,7 @@ class ApplicationProcess extends StatelessWidget {
 
   Widget _buildOptionCard(String title, String description) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.grey.shade200, width: 1),
@@ -739,7 +910,7 @@ class ApplicationProcess extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 150),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -829,60 +1000,131 @@ class ApplicationProcess extends StatelessWidget {
     );
   }
 
-  Widget _buildApplyBanner(double screenWidth) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 100, top: 50),
+ Widget _buildApplyBanner() {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 100, top: 50),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = constraints.maxWidth;
+          final isMobile = screenWidth < 768;
+          final isTablet = screenWidth >= 768 && screenWidth < 1024;
+          final isDesktop = screenWidth >= 1024;
+          
+          return Container(
+            width: screenWidth * (isMobile ? 0.95 : 0.78),
+            constraints: BoxConstraints(
+              maxWidth: 1200, // Maximum width for very large screens
+              minHeight: isMobile ? 300 : 400,
+            ),
+            color: tealColor,
+            child: isMobile 
+                ? _buildMobileLayouts(screenWidth)
+                : _buildDesktopLayouts(screenWidth, isTablet),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+Widget _buildMobileLayouts(double screenWidth) {
+  return Column(
+    children: [
+      // Content section
+      Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Apply to get your skills assessed",
+              style: TextStyle(
+                color: const Color(0xFFFFA000),
+                fontSize: screenWidth * 0.06, // Responsive font size
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Start the application process and if you have any questions, you can contact our customer support team at any stage.",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildActionButton("Apply Online", double.infinity),
+          ],
+        ),
+      ),
+      // Image section
+      ClipRRect(
+        child: Image.asset(
+          'assets/images/During_your_application.jpg',
+          width: double.infinity,
+          height: 200,
+          fit: BoxFit.cover,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildDesktopLayouts(double screenWidth, bool isTablet) {
+  return Row(
+    children: [
+      // Left side with teal background and content
+      Flexible(
+        flex: isTablet ? 6 : 7,
         child: Container(
-          width: screenWidth * 0.78,
-          height: 340,
-          color: tealColor,
-          child: Row(
+          padding: EdgeInsets.all(isTablet ? 40 : 60),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left side with teal background and content
-              Container(
-                padding: EdgeInsets.only(top: 60, left: 110, bottom: 60),
-                width: screenWidth * 0.52,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Apply to get your skills assessed",
-                      style: TextStyle(
-                        color: Color(0xFFFFA000),
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    const Text(
-                      "Start the application process and if you have any questions, you can contact \nour customer support team at any stage.",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        height: 1.5,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    _buildActionButton("Apply Online", 150),
-                  ],
+              Text(
+                "Apply to get your skills assessed",
+                style: TextStyle(
+                  color: const Color(0xFFFFA000),
+                  fontSize: isTablet ? 28 : 36,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
               ),
-              // Right side with desert landscape image
-              Image.asset(
-                'assets/images/During_your_application.jpg',
-                width: screenWidth * 0.26,
-                height: 340,
-                fit: BoxFit.cover,
+              const SizedBox(height: 30),
+              Text(
+                "Start the application process and if you have any questions, you can contact ${isTablet ? '' : '\n'}our customer support team at any stage.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isTablet ? 14 : 16,
+                  height: 1.5,
+                  letterSpacing: 0.3,
+                ),
               ),
+              _buildActionButton("Apply Online", isTablet ? 140 : 150),
             ],
           ),
         ),
       ),
-    );
-  }
+      // Right side with desert landscape image
+      Flexible(
+        flex: isTablet ? 4 : 3,
+        child: ClipRRect(
+          child: Image.asset(
+            'assets/images/During_your_application.jpg',
+            width: double.infinity,
+            height: isTablet ? 300 : 340,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
   // Helper methods for common UI components
   Widget _buildCircleIcon(IconData icon, Color color) {
@@ -910,25 +1152,76 @@ class ApplicationProcess extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String text, double width) {
-    return SizedBox(
-      height: 50,
-      width: width,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFFA000),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+Widget _buildActionButton(String text, double width) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      
+      // Responsive button styling
+      final buttonHeight = screenWidth >= 1024 ? 55.0 : 50.0;
+      final fontSize = screenWidth >= 1024 ? 16.0 : 14.0;
+      final horizontalPadding = screenWidth >= 768 ? 28.0 : 24.0;
+      
+      return SizedBox(
+        height: buttonHeight,
+        width: width,
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFFA000),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            textStyle: TextStyle(
+              fontWeight: FontWeight.w600, 
+              fontSize: fontSize,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              text, 
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
-        child: Text(text, style: TextStyle(color: Colors.black)),
-      ),
-    );
+      );
+    },
+  );
+}
+}
+  // Add these responsive helper methods at the top of your class
+class ResponsiveHelper {
+  static bool isMobile(double width) => width < 768;
+  static bool isTablet(double width) => width >= 768 && width < 1024;
+  static bool isDesktop(double width) => width >= 1024;
+  
+  static double getResponsiveFontSize(double baseSize, double screenWidth) {
+    if (isMobile(screenWidth)) {
+      return baseSize * 0.7;
+    } else if (isTablet(screenWidth)) {
+      return baseSize * 0.85;
+    }
+    return baseSize;
+  }
+  
+  static double getResponsivePadding(double basePadding, double screenWidth) {
+    if (isMobile(screenWidth)) {
+      return basePadding * 0.5;
+    } else if (isTablet(screenWidth)) {
+      return basePadding * 0.75;
+    }
+    return basePadding;
   }
 }
+
 
 // Custom painter for dotted line
 class DottedLinePainter extends CustomPainter {

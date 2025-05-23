@@ -5,57 +5,64 @@ class HowToPreparePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 768 && screenWidth < 1024;
+    final isDesktop = screenWidth >= 1024;
+    final isMobile = screenWidth < 768;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 150),
+      padding: EdgeInsets.symmetric(
+        vertical: isMobile ? 20 : 40,
+        horizontal: _getHorizontalPadding(screenWidth),
+      ),
       decoration: const BoxDecoration(color: Colors.white),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Title
-          const Text(
+          Text(
             'How to prepare your application',
             style: TextStyle(
-              fontSize: 36,
+              fontSize: isMobile ? 24 : (isTablet ? 30 : 36),
               fontWeight: FontWeight.w700,
               color: Color(0xFF00695C),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: isMobile ? 24 : 48),
           // Tabs
           DefaultTabController(
             length: 2,
             child: Column(
               children: [
-                const TabBar(
+                TabBar(
                   labelColor: Color(0xFF00695C),
                   unselectedLabelColor: Colors.black45,
                   indicatorColor: Color(0xFFFFA000),
                   indicatorWeight: 4,
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelStyle: TextStyle(
-                    fontSize: 20,
+                    fontSize: isMobile ? 16 : 20,
                     fontWeight: FontWeight.w600,
                   ),
                   unselectedLabelStyle: TextStyle(
-                    fontSize: 20,
+                    fontSize: isMobile ? 16 : 20,
                     fontWeight: FontWeight.w500,
                   ),
-                  tabs: [
+                  tabs: const [
                     Tab(text: 'Professional Occupations'),
                     Tab(text: 'Trade Occupations'),
                   ],
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: isMobile ? 24 : 48),
                 // Tab content
                 SizedBox(
-                  height: 400, // Slightly taller to accommodate larger boxes
+                  height: isMobile ? 600 : (isTablet ? 500 : 400),
                   child: TabBarView(
                     children: [
                       // Professional Occupations Tab
                       _ProfessionalOccupationsContent(),
-
                       // Trade Occupations Tab
                       _TradeOccupationsContent(),
                     ],
@@ -68,73 +75,71 @@ class HowToPreparePage extends StatelessWidget {
       ),
     );
   }
+
+  double _getHorizontalPadding(double screenWidth) {
+    if (screenWidth < 768) {
+      return 16; // Mobile
+    } else if (screenWidth < 1024) {
+      return 40; // Tablet
+    } else if (screenWidth < 1440) {
+      return 80; // Small desktop
+    } else {
+      return 150; // Large desktop
+    }
+  }
 }
 
 class _ProfessionalOccupationsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Description text
-        Text(
-          "If you're a professional choosing to migrate to Australia, chances are you're likely to be "
-          "assessed by us. We assess 361 different professional occupations, assessing your skills, "
-          "experience and qualifications.",
-          style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
-        ),
-        const SizedBox(height: 60), // Increased spacing to match image
-        // Steps with connected lines - using Row with mainAxisAlignment
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment:
-              CrossAxisAlignment.center, // Changed to center to align the dots
-          children: [
-            // Step 1
-            _StepColumn(
-              number: "1",
-              title: "Find",
-              description:
-                  "Find the VETASSESS occupation that most closely fits your skills and experience.",
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Description text
+          Text(
+            "If you're a professional choosing to migrate to Australia, chances are you're likely to be "
+            "assessed by us. We assess 361 different professional occupations, assessing your skills, "
+            "experience and qualifications.",
+            style: TextStyle(
+              fontSize: isMobile ? 14 : 16,
+              color: Colors.black87,
+              height: 1.5,
             ),
-
-            // Dotted line 1
-            _DottedLine(),
-
-            // Step 2
-            _StepColumn(
-              number: "2",
-              title: "Match",
-              description:
-                  "Match your skills and experience to your chosen occupation.",
-            ),
-
-            // Dotted line 2
-            _DottedLine(),
-
-            // Step 3
-            _StepColumn(
-              number: "3",
-              title: "Prepare",
-              description:
-                  "Get ready to apply by preparing all the information and documents you need.",
-            ),
-
-            // Dotted line 3
-            _DottedLine(),
-
-            // Step 4
-            _StepColumn(
-              number: "4",
-              title: "Apply",
-              description:
-                  "Apply online when you're ready. If you're still unsure,",
-              linkText: "skills assessment support",
-              linkDescription: "is available when you need it.",
-            ),
-          ],
-        ),
-      ],
+          ),
+          SizedBox(height: isMobile ? 30 : 60),
+          // Steps - responsive layout
+          _ResponsiveStepsLayout(
+            steps: [
+              _StepData(
+                number: "1",
+                title: "Find",
+                description: "Find the VETASSESS occupation that most closely fits your skills and experience.",
+              ),
+              _StepData(
+                number: "2",
+                title: "Match",
+                description: "Match your skills and experience to your chosen occupation.",
+              ),
+              _StepData(
+                number: "3",
+                title: "Prepare",
+                description: "Get ready to apply by preparing all the information and documents you need.",
+              ),
+              _StepData(
+                number: "4",
+                title: "Apply",
+                description: "Apply online when you're ready. If you're still unsure,",
+                linkText: "skills assessment support",
+                linkDescription: "is available when you need it.",
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -142,67 +147,128 @@ class _ProfessionalOccupationsContent extends StatelessWidget {
 class _TradeOccupationsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Content for Trade Occupations tab
-        Text(
-          "If you're a tradesperson, your skills and experience will be assessed by someone who has worked in your trade and understands your skills and qualifications. VETASSESS is Australia's leading assessment body for trades and we can assess 27 different trade occupations.",
-          style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
-        ),
-        const SizedBox(height: 60), // Increased spacing to match image
-        // Steps with connected lines - similar structure
-        Row(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Content for Trade Occupations tab
+          Text(
+            "If you're a tradesperson, your skills and experience will be assessed by someone who has worked in your trade and understands your skills and qualifications. VETASSESS is Australia's leading assessment body for trades and we can assess 27 different trade occupations.",
+            style: TextStyle(
+              fontSize: isMobile ? 14 : 16,
+              color: Colors.black87,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: isMobile ? 30 : 60),
+          // Steps - responsive layout
+          _ResponsiveStepsLayout(
+            steps: [
+              _StepData(
+                number: "1",
+                title: "Find",
+                description: "Find the VETASSESS occupation that most closely fits your skills and experience.",
+              ),
+              _StepData(
+                number: "2",
+                title: "Match",
+                description: "Match your skills and experience to your chosen occupation.",
+              ),
+              _StepData(
+                number: "3",
+                title: "Prepare",
+                description: "Get ready to apply by preparing all the information and documents you need.",
+              ),
+              _StepData(
+                number: "4",
+                title: "Apply",
+                description: "Apply online when you're ready. If you're still unsure,",
+                linkText: "skills assessment support",
+                linkDescription: "is available when you need it.",
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepData {
+  final String number;
+  final String title;
+  final String description;
+  final String? linkText;
+  final String? linkDescription;
+
+  _StepData({
+    required this.number,
+    required this.title,
+    required this.description,
+    this.linkText,
+    this.linkDescription,
+  });
+}
+
+class _ResponsiveStepsLayout extends StatelessWidget {
+  final List<_StepData> steps;
+
+  const _ResponsiveStepsLayout({required this.steps});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+    final isTablet = screenWidth >= 768 && screenWidth < 1024;
+
+    if (isMobile) {
+      // Mobile: Vertical layout
+      return Column(
+        children: [
+          for (int i = 0; i < steps.length; i++) ...[
+            _StepColumn(
+              number: steps[i].number,
+              title: steps[i].title,
+              description: steps[i].description,
+              linkText: steps[i].linkText,
+              linkDescription: steps[i].linkDescription,
+              isMobile: true,
+            ),
+            if (i < steps.length - 1) ...[
+              const SizedBox(height: 20),
+              _VerticalDottedLine(),
+              const SizedBox(height: 20),
+            ],
+          ],
+        ],
+      );
+    } else {
+      // Tablet and Desktop: Horizontal layout
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment:
-              CrossAxisAlignment.center, // Changed to center to align the dots
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Step 1
-            _StepColumn(
-              number: "1",
-              title: "Find",
-              description:
-                  "Find the VETASSESS occupation that most closely fits your skills and experience.",
-            ),
-
-            // Dotted line 1
-            _DottedLine(),
-
-            // Step 2
-            _StepColumn(
-              number: "2",
-              title: "Match",
-              description:
-                  "Match your skills and experience to your chosen occupation.",
-            ),
-
-            // Dotted line 2
-            _DottedLine(),
-
-            // Step 3
-            _StepColumn(
-              number: "3",
-              title: "Prepare",
-              description:
-                  "Get ready to apply by preparing all the information and documents you need.",
-            ),
-
-            // Dotted line 3
-            _DottedLine(),
-
-            // Step 4
-            _StepColumn(
-              number: "4",
-              title: "Apply",
-              description:
-                  "Apply online when you're ready. If you're still unsure,",
-              linkText: "skills assessment support",
-              linkDescription: "is available when you need it.",
-            ),
+            for (int i = 0; i < steps.length; i++) ...[
+              _StepColumn(
+                number: steps[i].number,
+                title: steps[i].title,
+                description: steps[i].description,
+                linkText: steps[i].linkText,
+                linkDescription: steps[i].linkDescription,
+                isMobile: false,
+                isTablet: isTablet,
+              ),
+              if (i < steps.length - 1) _DottedLine(),
+            ],
           ],
         ),
-      ],
-    );
+      );
+    }
   }
 }
 
@@ -212,6 +278,8 @@ class _StepColumn extends StatelessWidget {
   final String description;
   final String? linkText;
   final String? linkDescription;
+  final bool isMobile;
+  final bool isTablet;
 
   const _StepColumn({
     required this.number,
@@ -219,19 +287,27 @@ class _StepColumn extends StatelessWidget {
     required this.description,
     this.linkText,
     this.linkDescription,
+    this.isMobile = false,
+    this.isTablet = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final boxSize = isMobile ? 60.0 : (isTablet ? 65.0 : 70.0);
+    final numberFontSize = isMobile ? 32.0 : (isTablet ? 35.0 : 38.0);
+    final titleFontSize = isMobile ? 18.0 : (isTablet ? 19.0 : 20.0);
+    final descriptionFontSize = isMobile ? 13.0 : 14.0;
+    final columnWidth = isMobile ? double.infinity : (isTablet ? 160.0 : 180.0);
+
     return SizedBox(
-      width: 180, // Fixed width to match spacing in image
+      width: columnWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Number box - LARGER SIZE
+          // Number box
           Container(
-            width: 70, // Increased from 50
-            height: 70, // Increased from 50
+            width: boxSize,
+            height: boxSize,
             decoration: BoxDecoration(
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(4),
@@ -247,7 +323,7 @@ class _StepColumn extends StatelessWidget {
             child: Text(
               number,
               style: TextStyle(
-                fontSize: 38, // Increased from 32
+                fontSize: numberFontSize,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF00695C),
               ),
@@ -259,7 +335,7 @@ class _StepColumn extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 20, // Increased from 18
+              fontSize: titleFontSize,
               fontWeight: FontWeight.w700,
               color: Color(0xFF00695C),
             ),
@@ -269,7 +345,11 @@ class _StepColumn extends StatelessWidget {
           // Description
           Text(
             description,
-            style: TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+            style: TextStyle(
+              fontSize: descriptionFontSize,
+              color: Colors.black87,
+              height: 1.4,
+            ),
             textAlign: TextAlign.center,
           ),
 
@@ -284,7 +364,7 @@ class _StepColumn extends StatelessWidget {
                     TextSpan(
                       text: linkText,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: descriptionFontSize,
                         color: Color(0xFF0288D1),
                         decoration: TextDecoration.underline,
                         height: 1.4,
@@ -294,7 +374,7 @@ class _StepColumn extends StatelessWidget {
                       TextSpan(
                         text: " $linkDescription",
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: descriptionFontSize,
                           color: Colors.black87,
                           height: 1.4,
                         ),
@@ -321,18 +401,28 @@ class _DottedLine extends StatelessWidget {
   }
 }
 
+class _VerticalDottedLine extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 30,
+      child: Center(
+        child: CustomPaint(painter: _VerticalDottedLinePainter(), size: Size(2, 30)),
+      ),
+    );
+  }
+}
+
 class _DottedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Color(0xFFFFA000)
-          ..strokeWidth =
-              3 // Slightly thicker to match image
-          ..strokeCap = StrokeCap.round;
+    final paint = Paint()
+      ..color = Color(0xFFFFA000)
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
 
-    final dashWidth = 4.0; // Longer dashes to match image
-    final dashSpace = 6.0; // More space between dashes
+    final dashWidth = 4.0;
+    final dashSpace = 6.0;
     double startX = 0;
 
     while (startX < size.width) {
@@ -342,6 +432,32 @@ class _DottedLinePainter extends CustomPainter {
         paint,
       );
       startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _VerticalDottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Color(0xFFFFA000)
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    final dashHeight = 4.0;
+    final dashSpace = 6.0;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(size.width / 2, startY),
+        Offset(size.width / 2, startY + dashHeight),
+        paint,
+      );
+      startY += dashHeight + dashSpace;
     }
   }
 
