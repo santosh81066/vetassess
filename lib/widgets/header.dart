@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/apply_screen.dart';
 import 'package:vetassess/screens/login_page.dart';
 import '../screens/home_screen.dart';
@@ -8,12 +9,18 @@ import 'SkillsAssessmentNonMigrationDropdownPanel.dart';
 
 // Responsive utility class to maintain consistency across the app
 class ResponsiveUtils {
-  static bool isSmallMobile(BuildContext context) => MediaQuery.of(context).size.width < 480;
-  static bool isMobile(BuildContext context) => MediaQuery.of(context).size.width < 768;
-  static bool isTablet(BuildContext context) => MediaQuery.of(context).size.width >= 768 && MediaQuery.of(context).size.width < 1024;
-  static bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width >= 1024;
-  static bool isLargeDesktop(BuildContext context) => MediaQuery.of(context).size.width >= 1400;
-  
+  static bool isSmallMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < 480;
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width < 768;
+  static bool isTablet(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 768 &&
+      MediaQuery.of(context).size.width < 1024;
+  static bool isDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 1024;
+  static bool isLargeDesktop(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 1400;
+
   static double getResponsiveValue({
     required BuildContext context,
     required double mobile,
@@ -46,25 +53,27 @@ class _HeaderState extends State<Header> {
     if (_isDropdownOpen) return;
     if (key.currentContext == null) return;
 
-    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox =
+        key.currentContext!.findRenderObject() as RenderBox;
     final Offset offset = renderBox.localToGlobal(Offset.zero);
     final Size size = renderBox.size;
 
     final overlay = Overlay.of(context);
     _dropdownOverlay = OverlayEntry(
-      builder: (context) => Positioned(
-        top: offset.dy + size.height,
-        left: 0,
-        right: 0,
-        child: MouseRegion(
-          onExit: (_) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _hideDropdown();
-            });
-          },
-          child: panel,
-        ),
-      ),
+      builder:
+          (context) => Positioned(
+            top: offset.dy + size.height,
+            left: 0,
+            right: 0,
+            child: MouseRegion(
+              onExit: (_) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _hideDropdown();
+                });
+              },
+              child: panel,
+            ),
+          ),
     );
 
     overlay.insert(_dropdownOverlay!);
@@ -88,7 +97,7 @@ class _HeaderState extends State<Header> {
   Widget build(BuildContext context) {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final double width = mediaQuery.size.width;
-    
+
     // Enhanced responsive breakpoints
     final bool isSmallMobile = ResponsiveUtils.isSmallMobile(context);
     final bool isMobile = ResponsiveUtils.isMobile(context);
@@ -193,7 +202,12 @@ class _HeaderState extends State<Header> {
                         color: const Color(0xFFf0f0f0),
                         height: topBarHeight,
                         width: topBarWidth,
-                        child: _buildTopHeader(isDesktop, isTablet, isMobile, topBarHeight),
+                        child: _buildTopHeader(
+                          isDesktop,
+                          isTablet,
+                          isMobile,
+                          topBarHeight,
+                        ),
                       ),
                     ),
 
@@ -211,9 +225,14 @@ class _HeaderState extends State<Header> {
                           largeDesktop: width * 0.01,
                         ),
                       ),
-                      child: isDesktop
-                          ? _buildDesktopNavBar(navItemSpacing, isLargeDesktop, width)
-                          : _buildMobileNavBar(isMobile, isSmallMobile),
+                      child:
+                          isDesktop
+                              ? _buildDesktopNavBar(
+                                navItemSpacing,
+                                isLargeDesktop,
+                                width,
+                              )
+                              : _buildMobileNavBar(isMobile, isSmallMobile),
                     ),
                   ],
                 ),
@@ -225,7 +244,12 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildTopHeader(bool isDesktop, bool isTablet, bool isMobile, double topBarHeight) {
+  Widget _buildTopHeader(
+    bool isDesktop,
+    bool isTablet,
+    bool isMobile,
+    double topBarHeight,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -235,12 +259,14 @@ class _HeaderState extends State<Header> {
         // Top navigation items with responsive sizing
         if (isDesktop || isTablet) ...[
           _buildLanguageSelector(),
-          SizedBox(width: ResponsiveUtils.getResponsiveValue(
-            context: context,
-            mobile: 12.0,
-            tablet: 16.0,
-            desktop: 24.0,
-          )),
+          SizedBox(
+            width: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 12.0,
+              tablet: 16.0,
+              desktop: 24.0,
+            ),
+          ),
 
           // Desktop-only links
           if (isDesktop) ...[
@@ -253,12 +279,14 @@ class _HeaderState extends State<Header> {
           ],
 
           _buildLoginSection(),
-          SizedBox(width: ResponsiveUtils.getResponsiveValue(
-            context: context,
-            mobile: 8.0,
-            tablet: 12.0,
-            desktop: 16.0,
-          )),
+          SizedBox(
+            width: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 8.0,
+              tablet: 12.0,
+              desktop: 16.0,
+            ),
+          ),
         ],
 
         // Apply Now Button with responsive sizing
@@ -266,10 +294,7 @@ class _HeaderState extends State<Header> {
           height: topBarHeight * 0.8,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ApplyScreen()),
-              );
+              context.go('/apply_now');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFA000),
@@ -365,12 +390,7 @@ class _HeaderState extends State<Header> {
           ),
           const SizedBox(width: 6),
           TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
-            },
+            onPressed: () => context.go('/login_page'),
             child: Text(
               "Login",
               style: TextStyle(
@@ -391,7 +411,11 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildDesktopNavBar(double spacing, bool isLargeDesktop, double screenWidth) {
+  Widget _buildDesktopNavBar(
+    double spacing,
+    bool isLargeDesktop,
+    double screenWidth,
+  ) {
     final double fontSize = ResponsiveUtils.getResponsiveValue(
       context: context,
       mobile: 13.0,
@@ -439,10 +463,11 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment For\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _migrationNavKey,
-                    const SkillsAssessmentDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _migrationNavKey,
+                        const SkillsAssessmentDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(
@@ -450,23 +475,29 @@ class _HeaderState extends State<Header> {
                   title: "Skills Assessment Non\nMigration",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _nonMigrationNavKey,
-                    const SkillsAssessmentNonMigrationPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _nonMigrationNavKey,
+                        const SkillsAssessmentNonMigrationPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
-                _NavItem(title: "Check my\nOccupation", fontSize: fontSize),
+                _NavItem(
+                  title: "Check my\nOccupation",
+                  fontSize: fontSize,
+                  onTap: () => context.go('/maintenance'),
+                ),
                 SizedBox(width: spacing),
                 _NavItem(
                   key: _businessNavKey,
                   title: "Business and\nIndustry",
                   hasDropdown: true,
                   fontSize: fontSize,
-                  onTap: () => _showDropdown(
-                    _businessNavKey,
-                    const BusinessIndustryDropdownPanel(),
-                  ),
+                  onTap:
+                      () => _showDropdown(
+                        _businessNavKey,
+                        const BusinessIndustryDropdownPanel(),
+                      ),
                 ),
                 SizedBox(width: spacing),
                 _NavItem(title: "Contact", fontSize: fontSize),
@@ -490,6 +521,7 @@ class _HeaderState extends State<Header> {
                   title: "Start Your\nApplication",
                   isHighlighted: true,
                   fontSize: fontSize,
+                  onTap: () => context.go('/apply_now'),
                 ),
                 SizedBox(width: sideMargin),
               ],
@@ -518,11 +550,7 @@ class _HeaderState extends State<Header> {
             color: Color(0xFFFFA000),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.search,
-            color: Colors.white,
-            size: searchIconSize,
-          ),
+          child: Icon(Icons.search, color: Colors.white, size: searchIconSize),
         ),
         // Menu icon with responsive sizing
         Container(
@@ -668,13 +696,15 @@ class _NavItemState extends State<_NavItem> {
     final double width = MediaQuery.of(context).size.width;
     final bool isLargeScreen = width >= 1200;
 
-    final Color defaultColor = widget.isHighlighted
-        ? const Color(0xFF0D5E63)
-        : const Color(0xFF0D5E63);
+    final Color defaultColor =
+        widget.isHighlighted
+            ? const Color(0xFF0D5E63)
+            : const Color(0xFF0D5E63);
 
-    final Color hoverColor = widget.isHighlighted
-        ? const Color(0xFF0D5E63)
-        : const Color(0xFFFFA000);
+    final Color hoverColor =
+        widget.isHighlighted
+            ? const Color(0xFF0D5E63)
+            : const Color(0xFFFFA000);
 
     final double iconSize = ResponsiveUtils.getResponsiveValue(
       context: context,
@@ -744,7 +774,7 @@ class TrapezoidClipper extends CustomClipper<Path> {
     path.moveTo(0, 0);
     path.lineTo(size.width, 0);
     path.lineTo(size.width, size.height);
-    
+
     // Enhanced responsive slope calculation
     final double slopeOffset = size.width * 0.045;
     path.lineTo(slopeOffset, size.height);

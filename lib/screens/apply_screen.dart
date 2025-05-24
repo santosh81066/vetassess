@@ -3,8 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:vetassess/theme.dart';
 import '../widgets/BasePageLayout.dart';
 
-class ApplyScreen extends StatelessWidget {
-  const ApplyScreen({super.key});
+class ApplyNowScreen extends StatelessWidget {
+  const ApplyNowScreen({super.key});
   static const tealColor = Color(0xFF00565B);
 
   @override

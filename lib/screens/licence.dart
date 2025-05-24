@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../widgets/application_nav.dart';
@@ -180,14 +181,7 @@ class _LicenceFormState extends State<LicenceForm> {
                                       height: 36,
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) =>
-                                                      ApplicationPriorityProcessing(),
-                                            ),
-                                          );
+                                          context.go('/app_priority_form');
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.teal,

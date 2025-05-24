@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vetassess/screens/nominate_an_occupation.dart';
-import 'package:vetassess/screens/priorityprocessing.dart';
-import 'package:vetassess/screens/profissional_viewall.dart';
-import 'package:vetassess/widgets/skills_assessment_Viewallpage.dart';
-import 'package:vetassess/widgets/under_maintenance.dart';
-import '../screens/application_process.dart';
-import '../screens/eligibility_criteria.dart';
-import '../screens/fee_screen.dart';
-import '../screens/skills_assessment_support.dart';
+import 'package:go_router/go_router.dart';
 
 class SkillsAssessmentDropdownPanel extends StatelessWidget {
   const SkillsAssessmentDropdownPanel({super.key});
@@ -84,50 +76,22 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               width: blockWidth,
               onLinkTap: (String link) {
                 if (link == "Application Process") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ApplicationProcess(),
-                    ),
-                  );
+                  context.go('/application_process');
                 }
                 if (link == "Fees") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FeeScreen()),
-                  );
+                  context.go('/fee_screen');
                 }
                 if (link == "Skills Assessment Support") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SkillsAssessmentSupport(),
-                    ),
-                  );
+                  context.go('/skills_assess_support');
                 }
                 if (link == "Nominate an Occupation") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NominateScreen(),
-                    ),
-                  );
+                  context.go('/nominate_screen');
                 }
                 if (link == "Eligibility Criteria") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EligibilityCriteria(),
-                    ),
-                  );
+                  context.go('/eligibility_criteria');
                 }
                 if (link == "Priority Processing") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PriorityProcessing(),
-                    ),
-                  );
+                  context.go('/priority_processing');
                 }
               },
             ),
@@ -140,12 +104,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: true,
               width: blockWidth,
               onLinkTap: (String link) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MaintenancePage(),
-                  ),
-                );
+                context.go('/maintenance');
               },
             ),
             SizedBox(width: spacing),
@@ -163,12 +122,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: false,
               width: blockWidth,
               onLinkTap: (String link) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MaintenancePage(),
-                  ),
-                );
+                context.go('/maintenance');
               },
             ),
           ],
@@ -209,12 +163,22 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               width: double.infinity,
               onLinkTap: (String link) {
                 if (link == "Application Process") {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ApplicationProcess(),
-                    ),
-                  );
+                  context.go('/application_process');
+                }
+                if (link == "Fees") {
+                  context.go('/fee_screen');
+                }
+                if (link == "Skills Assessment Support") {
+                  context.go('/skills_assess_support');
+                }
+                if (link == "Nominate an Occupation") {
+                  context.go('/nominate_screen');
+                }
+                if (link == "Eligibility Criteria") {
+                  context.go('/eligibility_criteria');
+                }
+                if (link == "Priority Processing") {
+                  context.go('/priority_processing');
                 }
               },
             ),
@@ -227,12 +191,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: true,
               width: double.infinity,
               onLinkTap: (String link) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MaintenancePage(),
-                  ),
-                );
+                context.go('/maintenance');
               },
             ),
             const SizedBox(height: 32),
@@ -250,12 +209,7 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: false,
               width: double.infinity,
               onLinkTap: (String link) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MaintenancePage(),
-                  ),
-                );
+                context.go('/maintenance');
               },
             ),
           ],
@@ -304,12 +258,7 @@ class _CategoryBlock extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SkillsAssessmentPage(),
-                ),
-              );
+              context.go('/skill_assess_viewall');
             },
             child: const Text("View All"),
           ),
@@ -379,12 +328,7 @@ class _LinkBlock extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfessionalViewall(),
-                  ),
-                );
+                context.go('/professionals_viewall');
               },
               child: Text(
                 "View All",

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../widgets/application_nav.dart';
@@ -379,12 +380,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                       foregroundColor: Colors.white,
                                     ),
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LicenceForm(),
-                                        ),
-                                      );
+                                      context.go('/licence_form');
                                     },
                                     child: const Text('Save & Continue'),
                                   ),

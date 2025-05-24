@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/application_forms/appli_priority.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
@@ -237,16 +238,10 @@ class _EducationFormState extends State<EducationForm> {
                                     SizedBox(
                                       height: 36,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) =>
-                                                      TertiaryEducationForm(),
+                                        onPressed:
+                                            () => context.go(
+                                              '/tertiary_education_form',
                                             ),
-                                          );
-                                        },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.teal,
                                           shape: RoundedRectangleBorder(

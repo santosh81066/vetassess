@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/applioptions.dart';
 
 import 'package:vetassess/widgets/login_page_layout.dart';
@@ -231,14 +232,7 @@ class LoginState extends State<Login> {
                             width: double.infinity,
                             height: 38,
                             child: ElevatedButton(
-                              onPressed: () {
-                                 Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AppliOptions(),
-                                      ),
-                                    );
-                              },
+                              onPressed: () => context.go('/appli_opt'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00897B),
                                 shape: RoundedRectangleBorder(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../widgets/application_nav.dart';
@@ -184,12 +185,12 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                         const SizedBox(height: 16),
 
                         buildLabelledField(
-                          'What was the normal entry requirement for the course?',
+                          'What was the normal entry requirement for\nthe course?',
                           buildTextField(250),
                           isRequired: true,
                         ),
                         buildLabelledField(
-                          'If different, what was the basis of your entry into the course?',
+                          'If different, what was the basis of your entry into\nthe course?',
                           buildTextField(250),
                         ),
 
@@ -360,12 +361,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EmploymentForm(),
-                                  ),
-                                );
+                                context.go('/employment_form');
                               },
                               child: const Text('Save & Continue'),
                             ),

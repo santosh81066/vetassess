@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../../widgets/application_nav.dart';
@@ -371,14 +372,8 @@ class _OccupationFormState extends State<OccupationForm> {
                                   ),
                                   const SizedBox(width: 15),
                                   ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EducationForm(),
-                                        ),
-                                      );
-                                    },
+                                    onPressed:
+                                        () => context.go('/education_form'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,
                                       foregroundColor: Colors.white,

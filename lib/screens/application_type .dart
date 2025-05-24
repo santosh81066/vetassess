@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import 'application_forms/appli_personal_details.dart';
@@ -194,11 +195,8 @@ class _ApplicationTypeSelectionScreenState
       switch (selectedApplicationType) {
         case 'skills_assessment':
           // Navigate to Skills Assessment screen
+          context.go('/personal_form');
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PersonalDetailsForm()),
-          );
           break;
         case 'points_test_advice':
           // Add navigation for other options if needed

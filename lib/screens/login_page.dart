@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/BasePageLayout.dart';
 import '../widgets/HelpSection.dart';
@@ -14,7 +15,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return BasePageLayout(
       child: Column(
         children: [
@@ -52,7 +53,11 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, double screenWidth, double screenHeight) {
+  Widget _buildMainContent(
+    BuildContext context,
+    double screenWidth,
+    double screenHeight,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
@@ -80,7 +85,8 @@ class LoginPage extends StatelessWidget {
             _buildAssessmentRow(
               context: context,
               screenWidth: screenWidth,
-              title: 'Skills assessment for \nprofessional and general \noccupations',
+              title:
+                  'Skills assessment for \nprofessional and general \noccupations',
               links: [
                 LinkItem(text: 'Check your occupation', hasArrow: true),
                 LinkItem(text: 'Fees', hasArrow: true),
@@ -104,7 +110,8 @@ class LoginPage extends StatelessWidget {
             _buildAssessmentRow(
               context: context,
               screenWidth: screenWidth,
-              title: 'Skill assessment support (for \nprofessional and general \noccupations)',
+              title:
+                  'Skill assessment support (for \nprofessional and general \noccupations)',
               links: [LinkItem(text: 'How to apply', hasArrow: true)],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -129,7 +136,9 @@ class LoginPage extends StatelessWidget {
               hasLoginButton: false,
             ),
           ]),
-          SizedBox(height: _getResponsiveSpacing(screenHeight, screenHeight / 6)),
+          SizedBox(
+            height: _getResponsiveSpacing(screenHeight, screenHeight / 6),
+          ),
           _buildSectionHeader(
             'Qualifications and skills recognition (non migration assessment)',
             screenWidth,
@@ -149,7 +158,8 @@ class LoginPage extends StatelessWidget {
             _buildAssessmentRow(
               context: context,
               screenWidth: screenWidth,
-              title: 'Financial Adviser Standards and Ethics Authority qualifications comparison to the AQF',
+              title:
+                  'Financial Adviser Standards and Ethics Authority qualifications comparison to the AQF',
               links: [
                 LinkItem(text: 'Fees', hasArrow: true),
                 LinkItem(text: 'Supporting documents', hasArrow: true),
@@ -158,7 +168,9 @@ class LoginPage extends StatelessWidget {
               hasLoginButton: true,
             ),
           ]),
-          SizedBox(height: _getResponsiveSpacing(screenHeight, screenHeight / 6)),
+          SizedBox(
+            height: _getResponsiveSpacing(screenHeight, screenHeight / 6),
+          ),
         ],
       ),
     );
@@ -167,7 +179,7 @@ class LoginPage extends StatelessWidget {
   Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
     final isTablet = screenWidth >= 768 && screenWidth < 1024;
     final isMobile = screenWidth < 768;
-    
+
     return Container(
       width: screenWidth,
       height: screenHeight * (isMobile ? 0.35 : 0.45),
@@ -192,9 +204,10 @@ class LoginPage extends StatelessWidget {
             child: Align(
               alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Column(
-                crossAxisAlignment: isMobile 
-                    ? CrossAxisAlignment.center 
-                    : CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Login",
@@ -245,7 +258,8 @@ class LoginPage extends StatelessWidget {
   }
 
   bool _isMobile(double screenWidth) => screenWidth < 768;
-  bool _isTablet(double screenWidth) => screenWidth >= 768 && screenWidth < 1024;
+  bool _isTablet(double screenWidth) =>
+      screenWidth >= 768 && screenWidth < 1024;
 }
 
 Widget _buildSectionHeader(String text, double screenWidth) {
@@ -298,11 +312,24 @@ Widget _buildAssessmentRow({
     decoration: BoxDecoration(
       border: Border(top: BorderSide(color: Colors.grey.shade300)),
     ),
-    child: isMobile 
-        ? _buildMobileLayout(
-            context, title, links, hasReadyButton, hasLoginButton, screenWidth)
-        : _buildDesktopLayout(
-            context, title, links, hasReadyButton, hasLoginButton, screenWidth),
+    child:
+        isMobile
+            ? _buildMobileLayout(
+              context,
+              title,
+              links,
+              hasReadyButton,
+              hasLoginButton,
+              screenWidth,
+            )
+            : _buildDesktopLayout(
+              context,
+              title,
+              links,
+              hasReadyButton,
+              hasLoginButton,
+              screenWidth,
+            ),
   );
 }
 
@@ -329,7 +356,7 @@ Widget _buildMobileLayout(
           ),
         ),
         SizedBox(height: 16),
-        
+
         // Links
         if (links.isNotEmpty) ...[
           Column(
@@ -338,7 +365,7 @@ Widget _buildMobileLayout(
           ),
           SizedBox(height: 16),
         ],
-        
+
         // Buttons
         Column(
           children: [
@@ -346,14 +373,7 @@ Widget _buildMobileLayout(
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Login(),
-                      ),
-                    );
-                  },
+                  onPressed: () => context.go('/login'),
                   label: Flexible(
                     child: Text(
                       "I'm ready to apply",
@@ -419,7 +439,7 @@ Widget _buildDesktopLayout(
   double screenWidth,
 ) {
   final isTablet = screenWidth >= 768 && screenWidth < 1024;
-  
+
   return IntrinsicHeight(
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -472,32 +492,86 @@ Widget _buildDesktopLayout(
               right: 16,
               bottom: 8,
             ),
-            child: isTablet
-                ? Column(
-                    children: [
-                      if (hasReadyButton)
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Login(),
+            child:
+                isTablet
+                    ? Column(
+                      children: [
+                        if (hasReadyButton)
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () => context.go('/login'),
+                              label: Text(
+                                "I'm ready to apply",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                              );
-                            },
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFFF5A623),
+                                foregroundColor: Colors.black,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                                elevation: 0,
+                              ),
+                              icon: Icon(Icons.edit, color: Colors.black),
+                            ),
+                          ),
+                        if (hasReadyButton && hasLoginButton)
+                          SizedBox(height: 12),
+                        if (hasLoginButton)
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () {},
+                              label: Text(
+                                'Agent login',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Color(0xFF0A5A5A),
+                                side: BorderSide(
+                                  color: Color(0xFF0A5A5A),
+                                  width: 2,
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                              ),
+                              icon: Icon(Icons.login, color: Color(0xFF0A5A5A)),
+                            ),
+                          ),
+                      ],
+                    )
+                    : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (hasReadyButton)
+                          ElevatedButton.icon(
+                            onPressed: () => context.go('/login'),
                             label: Text(
                               "I'm ready to apply",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFFF5A623),
                               foregroundColor: Colors.black,
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
+                              minimumSize: Size(190, 66),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.zero,
                               ),
@@ -505,96 +579,36 @@ Widget _buildDesktopLayout(
                             ),
                             icon: Icon(Icons.edit, color: Colors.black),
                           ),
-                        ),
-                      if (hasReadyButton && hasLoginButton) SizedBox(height: 12),
-                      if (hasLoginButton)
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
+                        SizedBox(width: 12),
+                        if (hasLoginButton)
+                          OutlinedButton.icon(
                             onPressed: () {},
                             label: Text(
                               'Agent login',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Color(0xFF0A5A5A),
-                              side: BorderSide(color: Color(0xFF0A5A5A), width: 2),
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              side: BorderSide(
+                                color: Color(0xFF0A5A5A),
+                                width: 4,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
+                              ),
+                              minimumSize: Size(190, 66),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.zero,
                               ),
                             ),
                             icon: Icon(Icons.login, color: Color(0xFF0A5A5A)),
                           ),
-                        ),
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (hasReadyButton)
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Login(),
-                              ),
-                            );
-                          },
-                          label: Text(
-                            "I'm ready to apply",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFF5A623),
-                            foregroundColor: Colors.black,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            minimumSize: Size(190, 66),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
-                            elevation: 0,
-                          ),
-                          icon: Icon(Icons.edit, color: Colors.black),
-                        ),
-                      SizedBox(width: 12),
-                      if (hasLoginButton)
-                        OutlinedButton.icon(
-                          onPressed: () {},
-                          label: Text(
-                            'Agent login',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Color(0xFF0A5A5A),
-                            side: BorderSide(color: Color(0xFF0A5A5A), width: 4),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            minimumSize: Size(190, 66),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
-                          ),
-                          icon: Icon(Icons.login, color: Color(0xFF0A5A5A)),
-                        ),
-                    ],
-                  ),
+                      ],
+                    ),
           ),
         ),
       ],

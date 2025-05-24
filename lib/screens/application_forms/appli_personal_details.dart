@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../../widgets/application_nav.dart';
@@ -555,12 +556,7 @@ class PersonalDetailsFormState extends State<PersonalDetailsForm> {
               ),
               SizedBox(height: 12),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => OccupationForm()),
-                  );
-                },
+                onPressed: () => context.go('/occupation_form'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   padding: EdgeInsets.symmetric(vertical: 12),
@@ -591,12 +587,7 @@ class PersonalDetailsFormState extends State<PersonalDetailsForm> {
             ),
             SizedBox(width: 16),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => OccupationForm()),
-                );
-              },
+              onPressed: () => context.go('/occupation_form'),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),

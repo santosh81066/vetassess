@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../../widgets/application_nav.dart';
@@ -360,14 +361,7 @@ class _ApplicationPriorityProcessingState
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  DocumentUploadScreen(),
-                                        ),
-                                      );
+                                      context.go('/doc_upload');
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,

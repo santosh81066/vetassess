@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vetassess/widgets/under_maintenance.dart';
 
 class SkillsAssessmentNonMigrationPanel extends StatelessWidget {
   const SkillsAssessmentNonMigrationPanel({super.key});
@@ -49,7 +51,9 @@ class SkillsAssessmentNonMigrationPanel extends StatelessWidget {
                             height: 50,
                             width: 120,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                context.go('/maintenance');
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFFA000),
                                 foregroundColor: Colors.black,
@@ -102,11 +106,20 @@ class SkillsAssessmentNonMigrationPanel extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildLinkText('Australian Technical Competencies Statement Assessment'),
+                                    _buildLinkText(
+                                      context,
+                                      'Australian Technical Competencies Statement Assessment',
+                                    ),
                                     const SizedBox(height: 24),
-                                    _buildLinkText('Post Gap Assessment'),
+                                    _buildLinkText(
+                                      context,
+                                      'Post Gap Assessment',
+                                    ),
                                     const SizedBox(height: 24),
-                                    _buildLinkText('Complementary Health Therapies Assessment'),
+                                    _buildLinkText(
+                                      context,
+                                      'Complementary Health Therapies Assessment',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -118,11 +131,20 @@ class SkillsAssessmentNonMigrationPanel extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildLinkText('Psychotherapy and Counselling Qualifications Assessment'),
+                                    _buildLinkText(
+                                      context,
+                                      'Psychotherapy and Counselling Qualifications Assessment',
+                                    ),
                                     const SizedBox(height: 24),
-                                    _buildLinkText('Financial Adviser Licensing Qualifications Comparison to the AQF'),
+                                    _buildLinkText(
+                                      context,
+                                      'Financial Adviser Licensing Qualifications Comparison to the AQF',
+                                    ),
                                     const SizedBox(height: 24),
-                                    _buildLinkText('Marketing Credentials'),
+                                    _buildLinkText(
+                                      context,
+                                      'Marketing Credentials',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -141,11 +163,13 @@ class SkillsAssessmentNonMigrationPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildLinkText(String text) {
+  Widget _buildLinkText(BuildContext context, String text) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          context.go('/maintenance');
+        },
         child: Text(
           text,
           style: const TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BusinessIndustryDropdownPanel extends StatelessWidget {
   const BusinessIndustryDropdownPanel({super.key});
@@ -48,13 +49,20 @@ class BusinessIndustryDropdownPanel extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFFA000),
                               foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 15),
-                              textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 15,
+                              ),
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () => context.go('/maintenance'),
+
                             child: const Text("View All"),
                           ),
                         ],
@@ -78,13 +86,22 @@ class BusinessIndustryDropdownPanel extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          _buildLink("Assessment Peer Review"),
+                          _buildLink(context, "Assessment Peer Review"),
                           const SizedBox(height: 12),
-                          _buildLink("Education and consultancy services"),
+                          _buildLink(
+                            context,
+                            "Education and consultancy services",
+                          ),
                           const SizedBox(height: 12),
-                          _buildLink("Online Learning & Content Development"),
+                          _buildLink(
+                            context,
+                            "Online Learning & Content Development",
+                          ),
                           const SizedBox(height: 12),
-                          _buildLink("Recognition of Prior Learning for business"),
+                          _buildLink(
+                            context,
+                            "Recognition of Prior Learning for business",
+                          ),
                         ],
                       ),
                     ),
@@ -106,11 +123,17 @@ class BusinessIndustryDropdownPanel extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          _buildLink("Mapping overseas qualifications to Australian standards"),
+                          _buildLink(
+                            context,
+                            "Mapping overseas qualifications to Australian standards",
+                          ),
                           const SizedBox(height: 12),
-                          _buildLink("International Qualifications Assessment Service"),
+                          _buildLink(
+                            context,
+                            "International Qualifications Assessment Service",
+                          ),
                           const SizedBox(height: 12),
-                          _buildLink("Pioneering global initiatives"),
+                          _buildLink(context, "Pioneering global initiatives"),
                         ],
                       ),
                     ),
@@ -124,11 +147,11 @@ class BusinessIndustryDropdownPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildLink(String text) {
+  Widget _buildLink(BuildContext context, String text) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => context.go('/maintenance'),
         child: Text(
           text,
           style: const TextStyle(
