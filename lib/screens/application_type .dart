@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import 'application_forms/appli_personal_details.dart';
+
 class ApplicationTypeSelectionScreen extends StatefulWidget {
-  const ApplicationTypeSelectionScreen({Key? key}) : super(key: key);
+  const ApplicationTypeSelectionScreen({super.key});
 
   @override
-  State<ApplicationTypeSelectionScreen> createState() => _ApplicationTypeSelectionScreenState();
+  State<ApplicationTypeSelectionScreen> createState() =>
+      _ApplicationTypeSelectionScreenState();
 }
 
-class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectionScreen> {
+class _ApplicationTypeSelectionScreenState
+    extends State<ApplicationTypeSelectionScreen> {
   String? selectedApplicationType;
   bool isMigrationExpanded = false;
   bool isNonMigrationExpanded = false;
@@ -63,11 +67,13 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                           content: Column(
                             children: [
                               _buildRadioOption(
-                                title: 'Skills Assessment (GSM, ENS, SESR, 485, SID)',
+                                title:
+                                    'Skills Assessment (GSM, ENS, SESR, 485, SID)',
                                 value: 'skills_assessment',
                               ),
                               _buildRadioOption(
-                                title: 'Points Test Advice Only (Skills Assessment with another Assessment Authority)',
+                                title:
+                                    'Points Test Advice Only (Skills Assessment with another Assessment Authority)',
                                 value: 'points_test_advice',
                               ),
                               _buildRadioOption(
@@ -75,7 +81,8 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                                 value: 'industry_labour_agreement',
                               ),
                               _buildRadioOption(
-                                title: 'Designated Area Migration Agreement (DAMA)',
+                                title:
+                                    'Designated Area Migration Agreement (DAMA)',
                                 value: 'designated_area_migration',
                                 hasInfoIcon: true,
                               ),
@@ -94,21 +101,25 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                           content: Column(
                             children: [
                               _buildRadioOption(
-                                title: 'Qualification Assessment for Financial Adviser Standards and Ethics Authority (FASEA)',
+                                title:
+                                    'Qualification Assessment for Financial Adviser Standards and Ethics Authority (FASEA)',
                                 value: 'qualification_fasea',
                                 hasInfoIcon: true,
                               ),
                               _buildRadioOption(
-                                title: 'Qualification Assessment for Psychotherapy and Counselling Federation of Australia (PACFA)',
+                                title:
+                                    'Qualification Assessment for Psychotherapy and Counselling Federation of Australia (PACFA)',
                                 value: 'qualification_pacfa',
                                 hasInfoIcon: true,
                               ),
                               _buildRadioOption(
-                                title: 'Chinese Qualifications Verification Only',
+                                title:
+                                    'Chinese Qualifications Verification Only',
                                 value: 'chinese_qualifications',
                               ),
                               _buildRadioOption(
-                                title: 'Australian Institute of Health & Safety (AIHS)',
+                                title:
+                                    'Australian Institute of Health & Safety (AIHS)',
                                 value: 'aihs',
                                 hasInfoIcon: true,
                               ),
@@ -119,7 +130,11 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                     ),
                   ),
                   // Add buttons within the container with a divider
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Color(0xFFEEEEEE),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -127,12 +142,16 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // Handle cancel action
+                            // Handle cancel action - navigate back
+                            Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
@@ -142,21 +161,15 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
                         const SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () {
-                            // Handle submit action
-                            if (selectedApplicationType != null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Selected: $selectedApplicationType')),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Please select an application type')),
-                              );
-                            }
+                            _handleSubmit(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
@@ -173,6 +186,52 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
         ),
       ),
     );
+  }
+
+  void _handleSubmit(BuildContext context) {
+    if (selectedApplicationType != null) {
+      // Handle navigation based on selected application type
+      switch (selectedApplicationType) {
+        case 'skills_assessment':
+          // Navigate to Skills Assessment screen
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PersonalDetailsForm()),
+          );
+          break;
+        case 'points_test_advice':
+          // Add navigation for other options if needed
+          Navigator.pushNamed(context, '/points-test-advice');
+          break;
+        case 'industry_labour_agreement':
+          Navigator.pushNamed(context, '/industry-labour-agreement');
+          break;
+        case 'designated_area_migration':
+          Navigator.pushNamed(context, '/designated-area-migration');
+          break;
+        case 'qualification_fasea':
+          Navigator.pushNamed(context, '/qualification-fasea');
+          break;
+        case 'qualification_pacfa':
+          Navigator.pushNamed(context, '/qualification-pacfa');
+          break;
+        case 'chinese_qualifications':
+          Navigator.pushNamed(context, '/chinese-qualifications');
+          break;
+        case 'aihs':
+          Navigator.pushNamed(context, '/aihs');
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Selected: $selectedApplicationType')),
+          );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an application type')),
+      );
+    }
   }
 
   Widget _buildSectionContainer({
@@ -274,20 +333,14 @@ class _ApplicationTypeSelectionScreenState extends State<ApplicationTypeSelectio
               padding: const EdgeInsets.only(top: 3.0),
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Color(0xFF4A4A4A),
-                ),
+                style: const TextStyle(color: Color(0xFF4A4A4A)),
               ),
             ),
           ),
           if (hasInfoIcon)
             Padding(
               padding: const EdgeInsets.only(top: 3.0),
-              child: Icon(
-                Icons.info_outline,
-                color: Colors.orange,
-                size: 18,
-              ),
+              child: Icon(Icons.info_outline, color: Colors.orange, size: 18),
             ),
         ],
       ),

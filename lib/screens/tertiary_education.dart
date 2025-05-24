@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../widgets/application_nav.dart';
+import 'empoyment.dart';
+
 class TertiaryEducationForm extends StatefulWidget {
-  const TertiaryEducationForm({Key? key}) : super(key: key);
+  const TertiaryEducationForm({super.key});
 
   @override
   State<TertiaryEducationForm> createState() => _TertiaryEducationFormState();
@@ -12,16 +15,19 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return LoginPageLayout(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Space for left container, to be added in the future
           Container(
-            width: screenWidth * 0.3,
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: ApplicationNav(),
+            ),
           ),
-          
+
           // Main content container
           Expanded(
             child: Container(
@@ -71,7 +77,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           style: TextStyle(fontSize: 14),
                         ),
                         const SizedBox(height: 24),
-                        
+
                         // Qualification Details Section
                         const Text(
                           'Qualification Details',
@@ -82,7 +88,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         buildLabelledField(
                           'Student registration number',
                           buildTextField(200),
@@ -98,11 +104,15 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           buildTextField(350),
                           isRequired: true,
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Color(0xFFEEEEEE),
+                        ),
                         const SizedBox(height: 16),
-                        
+
                         // Awarding Body Details Section
                         const Text(
                           'Awarding Body Details',
@@ -113,7 +123,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         buildLabelledField(
                           'Name of awarding body',
                           buildTextField(350),
@@ -146,24 +156,22 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           buildTextField(180),
                           isRequired: true,
                         ),
-                        buildLabelledField(
-                          'State',
-                          buildTextField(180),
-                        ),
-                        buildLabelledField(
-                          'Post code',
-                          buildTextField(180),
-                        ),
+                        buildLabelledField('State', buildTextField(180)),
+                        buildLabelledField('Post code', buildTextField(180)),
                         buildLabelledField(
                           'Campus/Institution Country',
                           buildDropdown(350),
                           isRequired: true,
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Color(0xFFEEEEEE),
+                        ),
                         const SizedBox(height: 16),
-                        
+
                         // Course Details Section
                         const Text(
                           'Course Details',
@@ -174,7 +182,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         buildLabelledField(
                           'What was the normal entry requirement for the course?',
                           buildTextField(250),
@@ -184,7 +192,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           'If different, what was the basis of your entry into the course?',
                           buildTextField(250),
                         ),
-                        
+
                         // Course length row
                         buildFormRow(
                           'Normal length of full-time course',
@@ -197,14 +205,22 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                                   decoration: InputDecoration(
                                     isDense: true,
                                     border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 12,
+                                    ),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Text('OR', style: TextStyle(fontWeight: FontWeight.bold)),
+                              const Text(
+                                'OR',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               const SizedBox(width: 12),
                               SizedBox(
                                 width: 60,
@@ -212,9 +228,14 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                                   decoration: InputDecoration(
                                     isDense: true,
                                     border: OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.grey.shade300),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 12,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -222,7 +243,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           ),
                           isRequired: true,
                         ),
-                        
+
                         // Years/Semesters row
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
@@ -231,20 +252,28 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                               const Spacer(flex: 12),
                               Container(
                                 width: 60,
-                                child: const Text('Years', textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+                                child: const Text(
+                                  'Years',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ),
                               const SizedBox(width: 12),
                               const Text('  '),
                               const SizedBox(width: 12),
                               Container(
                                 width: 60,
-                                child: const Text('Semesters', textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+                                child: const Text(
+                                  'Semesters',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 12),
+                                ),
                               ),
                               const Spacer(),
                             ],
                           ),
                         ),
-                        
+
                         buildLabelledField(
                           'Date course commenced',
                           buildDateField(),
@@ -269,11 +298,15 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           buildTextField(180),
                           isRequired: true,
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                        const Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Color(0xFFEEEEEE),
+                        ),
                         const SizedBox(height: 16),
-                        
+
                         // Additional Course Requirements Section
                         const Text(
                           'Additional Course Requirements',
@@ -284,22 +317,24 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         const Text(
                           'Were you required to complete any of the following before receiving the qualification?',
                           style: TextStyle(fontSize: 14),
                         ),
                         const SizedBox(height: 16),
-                        
+
                         // Checkboxes for requirements
-                        buildCheckboxRow('An internship, supervised practical training or work placement'),
+                        buildCheckboxRow(
+                          'An internship, supervised practical training or work placement',
+                        ),
                         const SizedBox(height: 8),
                         buildCheckboxRow('A thesis'),
                         const SizedBox(height: 8),
                         buildCheckboxRow('A major project'),
-                        
+
                         const SizedBox(height: 32),
-                        
+
                         // Buttons row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -308,7 +343,9 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(color: Colors.teal),
                                 foregroundColor: Colors.teal,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                               ),
                               onPressed: () {},
                               child: const Text('Cancel'),
@@ -318,9 +355,18 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.teal,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EmploymentForm(),
+                                  ),
+                                );
+                              },
                               child: const Text('Save & Continue'),
                             ),
                           ],
@@ -336,7 +382,7 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
       ),
     );
   }
-  
+
   Widget buildFormRow(String label, Widget field, {bool isRequired = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -350,24 +396,21 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    label,
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                  Text(label, style: const TextStyle(fontSize: 14)),
                   if (isRequired)
                     const Text(
                       ' *',
-                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 16),
-          Expanded(
-            flex: 20,
-            child: field,
-          ),
+          Expanded(flex: 20, child: field),
         ],
       ),
     );
@@ -391,14 +434,14 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    label,
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                  Text(label, style: const TextStyle(fontSize: 14)),
                   if (isRequired)
                     const Text(
                       ' *',
-                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                 ],
               ),
@@ -433,7 +476,10 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
       height: 34,
       child: TextField(
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 10,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -451,7 +497,10 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 10,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -463,14 +512,17 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
       ),
     );
   }
-  
+
   Widget buildDateField() {
     return SizedBox(
       width: 180,
       height: 34,
       child: TextField(
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 10,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -481,23 +533,17 @@ class _TertiaryEducationFormState extends State<TertiaryEducationForm> {
       ),
     );
   }
-  
+
   Widget buildCheckboxRow(String label) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14)),
         const SizedBox(width: 16),
         SizedBox(
           width: 24,
           height: 24,
-          child: Checkbox(
-            value: false,
-            onChanged: (value) {},
-          ),
+          child: Checkbox(value: false, onChanged: (value) {}),
         ),
       ],
     );

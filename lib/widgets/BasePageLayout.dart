@@ -10,13 +10,8 @@ class BasePageLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          const Header(),
-          child,
-          const Footer(),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      body: ListView(children: [const Header(), child, const Footer()]),
     );
   }
 }

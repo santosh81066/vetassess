@@ -78,45 +78,80 @@ class SkillsAssessmentSupport extends StatelessWidget {
     );
   }
 
-  //hero
+  //hero - Made fully responsive
   Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
+    final bool isSmallScreen = screenWidth < 600;
+    final bool isMediumScreen = screenWidth >= 600 && screenWidth < 960;
+
     return Container(
       width: screenWidth,
-      height: screenHeight * 0.45,
+      height: isSmallScreen ? screenHeight * 0.35 : screenHeight * 0.45,
       decoration: const BoxDecoration(color: tealColor),
       child: Stack(
         children: [
-          Positioned(
-            right: 0,
-            child: Image.asset(
-              'assets/images/internal_page_banner.png',
-              height: screenHeight * 0.45,
-              fit: BoxFit.fitHeight,
+          // Background image - responsive positioning
+          if (!isSmallScreen)
+            Positioned(
+              right: 0,
+              child: Image.asset(
+                'assets/images/internal_page_banner.png',
+                height:
+                    isSmallScreen ? screenHeight * 0.35 : screenHeight * 0.45,
+                fit: BoxFit.fitHeight,
+              ),
             ),
-          ),
+          // Content container - responsive layout
           Container(
-            width: screenWidth * 0.66,
-            padding: const EdgeInsets.only(top: 100, left: 170),
+            width: isSmallScreen ? screenWidth : screenWidth * 0.66,
+            padding: EdgeInsets.only(
+              top:
+                  isSmallScreen
+                      ? 40
+                      : isMediumScreen
+                      ? 60
+                      : 100,
+              left:
+                  isSmallScreen
+                      ? 20
+                      : isMediumScreen
+                      ? 40
+                      : 170,
+              right: isSmallScreen ? 20 : 0,
+            ),
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment:
+                  isSmallScreen ? Alignment.center : Alignment.centerLeft,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    isSmallScreen
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Skills Assessment Support",
+                    textAlign:
+                        isSmallScreen ? TextAlign.center : TextAlign.left,
                     style: TextStyle(
                       color: Color(0xFFFFA000),
-                      fontSize: 42,
+                      fontSize:
+                          isSmallScreen
+                              ? 28
+                              : isMediumScreen
+                              ? 36
+                              : 42,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 30),
-                  const Text(
+                  SizedBox(height: isSmallScreen ? 20 : 30),
+                  Text(
                     "Skills Assessment Support for Professional and General Occupations",
+                    textAlign:
+                        isSmallScreen ? TextAlign.center : TextAlign.left,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: isSmallScreen ? 14 : 16,
                       height: 1.5,
                       letterSpacing: 0.3,
                     ),
@@ -131,45 +166,108 @@ class SkillsAssessmentSupport extends StatelessWidget {
   }
 
   Widget _buildBreadcrumbs() {
-    const TextStyle linkStyle = TextStyle(
-      fontSize: 14,
-      color: Color(0xFF0d5257),
-      fontWeight: FontWeight.bold,
-      decoration: TextDecoration.underline,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isSmallScreen = constraints.maxWidth < 600;
+        final bool isMediumScreen =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 960;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 150),
-      child: Row(
-        children: [
-          TextButton(
-            onPressed: () {},
-            child: const Text('Home', style: linkStyle),
+        const TextStyle linkStyle = TextStyle(
+          fontSize: 14,
+          color: Color(0xFF0d5257),
+          fontWeight: FontWeight.bold,
+          decoration: TextDecoration.underline,
+        );
+
+        final TextStyle smallLinkStyle = TextStyle(
+          fontSize: isSmallScreen ? 12 : 14,
+          color: Color(0xFF0d5257),
+          fontWeight: FontWeight.bold,
+          decoration: TextDecoration.underline,
+        );
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal:
+                isSmallScreen
+                    ? 20
+                    : isMediumScreen
+                    ? 40
+                    : 150,
           ),
-          const Text(' / ', style: TextStyle(color: Colors.grey)),
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'Skills Assessment For Migration',
-              style: linkStyle,
-            ),
-          ),
-          const Text(' / ', style: TextStyle(color: Colors.grey)),
-          Text(
-            'Skills Assessment Support',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
-        ],
-      ),
+          child:
+              isSmallScreen
+                  ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {},
+                            child: Text('Home', style: smallLinkStyle),
+                          ),
+                          Text(
+                            ' / ',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Skills Assessment For Migration',
+                              style: smallLinkStyle,
+                            ),
+                          ),
+                          Text(
+                            ' / ',
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Skills Assessment Support',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
+                  )
+                  : Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {},
+                        child: Text('Home', style: linkStyle),
+                      ),
+                      const Text(' / ', style: TextStyle(color: Colors.grey)),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Skills Assessment For Migration',
+                          style: linkStyle,
+                        ),
+                      ),
+                      const Text(' / ', style: TextStyle(color: Colors.grey)),
+                      Text(
+                        'Skills Assessment Support',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      ),
+                    ],
+                  ),
+        );
+      },
     );
   }
 
   List<Widget> _buildProcessSteps(double screenWidth) {
+    final bool isSmallScreen = screenWidth < 600;
+    final bool isMediumScreen = screenWidth >= 600 && screenWidth < 960;
+
     // Define all step data in a list
     final List<Map<String, dynamic>> stepsData = [
       {
         'step': 'Skills Assessment Support',
-        //'title': 'Choose a professional occupation',
         'description':
             'Skills Assessment Support (SAS) services are for migration agents, legal practitioners and prospective applicants who are yet to submit their Skills Assessment application for a general or professional occupation.',
         'anzscoInfo':
@@ -185,43 +283,38 @@ class SkillsAssessmentSupport extends StatelessWidget {
       final Map<String, dynamic> stepData = entry.value;
 
       final Widget stepInfoColumn = Container(
-        width: screenWidth * 0.3,
-        height: 400,
+        width: isSmallScreen ? double.infinity : null,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               stepData['step'],
-              style: const TextStyle(
-                fontSize: 28,
+              style: TextStyle(
+                fontSize:
+                    isSmallScreen
+                        ? 24
+                        : isMediumScreen
+                        ? 26
+                        : 28,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF006064),
               ),
             ),
-            SizedBox(height: 40),
-
+            SizedBox(height: isSmallScreen ? 20 : 40),
             Text(
               stepData['description'],
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
                 height: 1.5,
                 letterSpacing: 0.3,
               ),
             ),
-            SizedBox(height: 20),
-            // const Text(
-            //   'Information on the ANZSCO description',
-            //   style: TextStyle(
-            //     fontSize: 20,
-            //     fontWeight: FontWeight.bold,
-            //     color: Color(0xFF006064),
-            //   ),
-            // ),
+            SizedBox(height: isSmallScreen ? 15 : 20),
             Text(
               stepData['anzscoInfo'],
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: isSmallScreen ? 14 : 16,
                 height: 1.5,
                 letterSpacing: 0.3,
               ),
@@ -230,28 +323,48 @@ class SkillsAssessmentSupport extends StatelessWidget {
         ),
       );
 
-      final Widget imageWidget = Image.asset(
-        stepData['image'],
-        height: 450,
-        width: 600,
+      final Widget imageWidget = Container(
+        width: isSmallScreen ? double.infinity : null,
+        child: Image.asset(
+          stepData['image'],
+          height:
+              isSmallScreen
+                  ? 250
+                  : isMediumScreen
+                  ? 350
+                  : 450,
+          width:
+              isSmallScreen
+                  ? double.infinity
+                  : isMediumScreen
+                  ? 400
+                  : 600,
+          fit: BoxFit.cover,
+        ),
       );
-
-      final List<Widget> rowChildren =
-          stepData['imageOnRight']
-              ? [stepInfoColumn, imageWidget]
-              : [imageWidget, stepInfoColumn];
 
       return Container(
         color: Colors.white,
         width: screenWidth,
         padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.1,
-          vertical: screenWidth * 0.07,
+          horizontal: isSmallScreen ? screenWidth * 0.05 : screenWidth * 0.1,
+          vertical: isSmallScreen ? screenWidth * 0.05 : screenWidth * 0.07,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: rowChildren,
-        ),
+        child:
+            isSmallScreen
+                ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [imageWidget, SizedBox(height: 30), stepInfoColumn],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(flex: 3, child: imageWidget),
+                    SizedBox(width: 20),
+                    Flexible(flex: 2, child: stepInfoColumn),
+                  ],
+                ),
       );
     }).toList();
   }

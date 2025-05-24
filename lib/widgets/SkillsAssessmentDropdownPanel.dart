@@ -3,7 +3,7 @@ import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
 import 'package:vetassess/screens/profissional_viewall.dart';
 import 'package:vetassess/widgets/skills_assessment_Viewallpage.dart';
-
+import 'package:vetassess/widgets/under_maintenance.dart';
 import '../screens/application_process.dart';
 import '../screens/eligibility_criteria.dart';
 import '../screens/fee_screen.dart';
@@ -140,14 +140,12 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: true,
               width: blockWidth,
               onLinkTap: (String link) {
-                if (link == "Application Process") {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const SkillsAssessmentPage(),
-                  //   ),
-                  // );
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MaintenancePage(),
+                  ),
+                );
               },
             ),
             SizedBox(width: spacing),
@@ -164,7 +162,14 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: false,
               width: blockWidth,
-              onLinkTap: (String link) {},
+              onLinkTap: (String link) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MaintenancePage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -222,14 +227,12 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               showButton: true,
               width: double.infinity,
               onLinkTap: (String link) {
-                if (link == "Application Process") {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const ApplicationProcess(),
-                  //   ),
-                  // );
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MaintenancePage(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 32),
@@ -246,7 +249,14 @@ class SkillsAssessmentDropdownPanel extends StatelessWidget {
               buttonBorderColor: const Color(0xFF004D40),
               showButton: false,
               width: double.infinity,
-              onLinkTap: (String link) {},
+              onLinkTap: (String link) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MaintenancePage(),
+                  ),
+                );
+              },
             ),
           ],
         ),

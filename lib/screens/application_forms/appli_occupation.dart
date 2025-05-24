@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../../widgets/application_nav.dart';
 import 'appli_general_edu.dart';
 
 class OccupationForm extends StatefulWidget {
-  const OccupationForm({Key? key}) : super(key: key);
+  const OccupationForm({super.key});
 
   @override
   State<OccupationForm> createState() => _OccupationFormState();
@@ -22,14 +23,15 @@ class _OccupationFormState extends State<OccupationForm> {
 
     return LoginPageLayout(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Responsive left spacer
-          if (!isSmallScreen)
-            Container(
-              width:
-                  MediaQuery.of(context).size.width *
-                  (isSmallScreen ? 0.1 : 0.3),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: ApplicationNav(),
             ),
+          ),
 
           // Main content container with responsive padding and width
           Expanded(

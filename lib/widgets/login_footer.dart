@@ -15,7 +15,7 @@ class LoginFooter extends StatelessWidget {
             top: 10,
             bottom: 10,
             left:
-                screenWidth * 0.43, // Approx 170 on 393px width (common mobile)
+                screenWidth * 0.1, // Approx 170 on 393px width (common mobile)
           ),
           width: screenWidth,
           color: Colors.white,

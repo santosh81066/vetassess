@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../../widgets/application_nav.dart';
 import 'appli_occupation.dart';
 
 class PersonalDetailsForm extends StatefulWidget {
@@ -27,8 +28,16 @@ class PersonalDetailsFormState extends State<PersonalDetailsForm> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(width: MediaQuery.of(context).size.width * 0.3),
+              Container(
+                margin: EdgeInsets.only(top: 16),
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: ApplicationNav(),
+                ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

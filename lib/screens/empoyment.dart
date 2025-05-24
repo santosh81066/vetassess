@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../widgets/application_nav.dart';
+import 'licence.dart';
+
 class EmploymentForm extends StatefulWidget {
-  const EmploymentForm({Key? key}) : super(key: key);
+  const EmploymentForm({super.key});
 
   @override
   State<EmploymentForm> createState() => _EmploymentFormState();
@@ -20,11 +23,14 @@ class _EmploymentFormState extends State<EmploymentForm> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Space for left container, to be added in the future
           Container(
-            width: screenWidth * 0.3,
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: ApplicationNav(),
+            ),
           ),
-          
+
           // Main content container
           Expanded(
             child: Container(
@@ -50,7 +56,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // Form Container
                       Container(
                         decoration: BoxDecoration(
@@ -80,7 +86,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              
+
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -95,14 +101,19 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                     padding: const EdgeInsets.all(2),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.grey.shade700),
+                                      border: Border.all(
+                                        color: Colors.grey.shade700,
+                                      ),
                                     ),
-                                    child: const Icon(Icons.question_mark, size: 12),
+                                    child: const Icon(
+                                      Icons.question_mark,
+                                      size: 12,
+                                    ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 24),
-                              
+
                               // Employment Details Section
                               const Text(
                                 'Employment Details',
@@ -113,7 +124,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               buildLabelledField(
                                 'Business name',
                                 buildTextField(width: 250),
@@ -123,9 +134,9 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 'Alternate/Former name(s) of the business',
                                 buildTextField(width: 250),
                               ),
-                              
+
                               const SizedBox(height: 24),
-                              
+
                               // Employment Address Section
                               const Text(
                                 'Employment Address',
@@ -136,7 +147,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               buildLabelledField(
                                 'Street address',
                                 buildTextField(width: 250),
@@ -151,13 +162,18 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                       child: TextField(
                                         maxLines: 3,
                                         decoration: InputDecoration(
-                                          contentPadding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 8,
-                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 8,
+                                              ),
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(4),
-                                            borderSide: BorderSide(color: Colors.grey.shade300),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey.shade300,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -183,9 +199,9 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 buildDropdownField(width: 250),
                                 isRequired: true,
                               ),
-                              
+
                               const SizedBox(height: 24),
-                              
+
                               // Employer Contact Details Section
                               const Text(
                                 'Employer Contact Details',
@@ -196,7 +212,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               buildLabelledField(
                                 'Name of employer/supervisor/manager',
                                 buildTextField(width: 250),
@@ -224,9 +240,9 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 'Web address',
                                 buildTextField(width: 250),
                               ),
-                              
+
                               const SizedBox(height: 24),
-                              
+
                               // Employment Details Section (second)
                               const Text(
                                 'Employment Details',
@@ -237,7 +253,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               buildLabelledField(
                                 'Position/Job title',
                                 buildTextField(width: 250),
@@ -248,35 +264,35 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 buildDateField(),
                                 isRequired: true,
                               ),
-                              
+
                               // Current employment radio buttons
                               buildLabelledField(
                                 'Is applicant currently employed in this position?',
                                 buildRadioButtons(),
                                 isRequired: true,
                               ),
-                              
+
                               buildLabelledField(
                                 'Date employment ended',
                                 buildDateField(),
                                 isRequired: true,
                               ),
-                              
+
                               // Unpaid leave row
                               buildLabelledField(
                                 'Total length of unpaid leave',
                                 buildNumberWithLabel('day(s)'),
                               ),
-                              
+
                               // Working hours row
                               buildLabelledField(
                                 'Normal required working hours',
                                 buildNumberWithLabel('hours per week'),
                                 isRequired: true,
                               ),
-                              
+
                               const SizedBox(height: 24),
-                              
+
                               // Applicant's main tasks/duties Section
                               const Text(
                                 'Applicant\'s main tasks/ duties/ responsibilities in this position',
@@ -287,18 +303,23 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               // Warning info box
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.amber.shade50,
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: Colors.amber.shade300),
+                                  border: Border.all(
+                                    color: Colors.amber.shade300,
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.info_outline, color: Colors.amber.shade800),
+                                    Icon(
+                                      Icons.info_outline,
+                                      color: Colors.amber.shade800,
+                                    ),
                                     const SizedBox(width: 8),
                                     const Expanded(
                                       child: Text(
@@ -310,7 +331,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              
+
                               // Tasks table
                               Column(
                                 children: [
@@ -321,7 +342,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                   buildTaskRow(5),
                                 ],
                               ),
-                              
+
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -336,9 +357,9 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                   ),
                                 ],
                               ),
-                              
+
                               const SizedBox(height: 32),
-                              
+
                               // Buttons row
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -357,7 +378,14 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                       backgroundColor: Colors.teal,
                                       foregroundColor: Colors.white,
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => LicenceForm(),
+                                        ),
+                                      );
+                                    },
                                     child: const Text('Save & Continue'),
                                   ),
                                 ],
@@ -376,7 +404,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ),
     );
   }
-  
+
   Widget buildLabelledField(
     String label,
     Widget field, {
@@ -466,7 +494,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ),
     );
   }
-  
+
   Widget buildDateField() {
     return SizedBox(
       width: 150,
@@ -487,7 +515,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ),
     );
   }
-  
+
   Widget buildDropdownField({required double width}) {
     return SizedBox(
       width: width,
@@ -515,7 +543,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ),
     );
   }
-  
+
   Widget buildRadioButtons() {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -544,7 +572,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ],
     );
   }
-  
+
   Widget buildNumberWithLabel(String label) {
     return Row(
       children: [
@@ -570,13 +598,11 @@ class _EmploymentFormState extends State<EmploymentForm> {
       ],
     );
   }
-  
+
   Widget buildTaskRow(int number) {
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade300),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -607,10 +633,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                 child: const Icon(Icons.add, color: Colors.white, size: 16),
               ),
               onPressed: () {},
-              constraints: const BoxConstraints(
-                minWidth: 24,
-                minHeight: 24,
-              ),
+              constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
               padding: EdgeInsets.zero,
               iconSize: 24,
             ),

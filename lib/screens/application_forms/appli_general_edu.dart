@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/screens/application_forms/appli_priority.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../../widgets/application_nav.dart';
+import '../tertiary_education.dart';
+
 class EducationForm extends StatefulWidget {
-  const EducationForm({Key? key}) : super(key: key);
+  const EducationForm({super.key});
 
   @override
   State<EducationForm> createState() => _EducationFormState();
@@ -16,8 +20,15 @@ class _EducationFormState extends State<EducationForm> {
 
     return LoginPageLayout(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: screenWidth * 0.3),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: ApplicationNav(),
+            ),
+          ),
           Expanded(
             child: Container(
               margin: EdgeInsets.only(
@@ -226,7 +237,16 @@ class _EducationFormState extends State<EducationForm> {
                                     SizedBox(
                                       height: 36,
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      TertiaryEducationForm(),
+                                            ),
+                                          );
+                                        },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.teal,
                                           shape: RoundedRectangleBorder(

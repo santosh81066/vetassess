@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
+import '../widgets/application_nav.dart';
+import 'application_forms/appli_priority.dart';
+
 class LicenceForm extends StatefulWidget {
-  const LicenceForm({Key? key}) : super(key: key);
+  const LicenceForm({super.key});
 
   @override
   State<LicenceForm> createState() => _LicenceFormState();
@@ -16,8 +19,15 @@ class _LicenceFormState extends State<LicenceForm> {
 
     return LoginPageLayout(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: screenWidth * 0.3),
+          Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: ApplicationNav(),
+            ),
+          ),
           Expanded(
             child: Container(
               margin: EdgeInsets.only(
@@ -169,7 +179,16 @@ class _LicenceFormState extends State<LicenceForm> {
                                     SizedBox(
                                       height: 36,
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      ApplicationPriorityProcessing(),
+                                            ),
+                                          );
+                                        },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.teal,
                                           shape: RoundedRectangleBorder(

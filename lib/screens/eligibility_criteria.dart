@@ -14,7 +14,6 @@ class EligibilityCriteria extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions for responsive layout
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenWidth < 768;
@@ -22,31 +21,18 @@ class EligibilityCriteria extends StatelessWidget {
     return BasePageLayout(
       child: Column(
         children: [
-          // Main header banner section - kept exactly as original
           _buildHeaderBanner(screenHeight, screenWidth, isSmallScreen),
-
-          // Breadcrumbs navigation
           _buildBreadcrumbs(isSmallScreen),
-
-          // Skills assessment information section
           ..._buildProcessSteps(screenWidth, isSmallScreen),
-
-          _announcement(context),
-
-          // Document gathering guide section
+          _buildAnnouncement(context),
           _buildGatherDocSection(isSmallScreen),
-
-          // Occupation search section
           _buildSearchSection(screenHeight, screenWidth, isSmallScreen),
-
-          // FAQ section
           _buildFaqSection(isSmallScreen),
         ],
       ),
     );
   }
 
-  // Header banner with text and image - keeping this exactly as in the original code
   Widget _buildHeaderBanner(
     double screenHeight,
     double screenWidth,
@@ -67,34 +53,40 @@ class EligibilityCriteria extends StatelessWidget {
             ),
           ),
           Container(
-            width: screenWidth * 0.66,
-            padding: const EdgeInsets.only(top: 100, left: 170),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Application process for a \nprofessional or general \nskills application",
-                    style: TextStyle(
-                      color: Color(0xFFFFA000),
-                      fontSize: 42,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
+            width: isSmallScreen ? screenWidth * 0.9 : screenWidth * 0.66,
+            padding: EdgeInsets.only(
+              top: isSmallScreen ? 60 : 100,
+              left: isSmallScreen ? 20 : 170,
+              right: isSmallScreen ? 20 : 0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isSmallScreen
+                      ? "Application process for a professional or general skills application"
+                      : "Application process for a \nprofessional or general \nskills application",
+                  style: TextStyle(
+                    color: const Color(0xFFFFA000),
+                    fontSize: isSmallScreen ? 28 : 42,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                    height: isSmallScreen ? 1.2 : 1.0,
                   ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      height: 1.5,
-                      letterSpacing: 0.3,
-                    ),
+                ),
+                SizedBox(height: isSmallScreen ? 20 : 30),
+                Text(
+                  isSmallScreen
+                      ? "Start your migration journey by applying for a skills assessment for your professional occupation."
+                      : "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isSmallScreen ? 14 : 16,
+                    height: 1.5,
+                    letterSpacing: 0.3,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -102,17 +94,15 @@ class EligibilityCriteria extends StatelessWidget {
     );
   }
 
-  // Breadcrumbs navigation links
   Widget _buildBreadcrumbs(bool isSmallScreen) {
-    const TextStyle linkStyle = TextStyle(
+    const linkStyle = TextStyle(
       fontSize: 14,
       color: Color(0xFF0d5257),
       fontWeight: FontWeight.bold,
       decoration: TextDecoration.underline,
     );
 
-    // List of breadcrumb items with their respective link text
-    final List<Map<String, String>> breadcrumbs = [
+    final breadcrumbs = [
       {'text': 'Home', 'isActive': 'false'},
       {'text': 'Skills Assessment For Migration', 'isActive': 'false'},
       {
@@ -137,16 +127,14 @@ class EligibilityCriteria extends StatelessWidget {
     );
   }
 
-  // Generate breadcrumb item widgets
   List<Widget> _buildBreadcrumbItems(
     List<Map<String, String>> items,
     TextStyle linkStyle,
   ) {
     List<Widget> widgets = [];
-
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
-      final bool isActive = item['isActive'] == 'true';
+      final isActive = item['isActive'] == 'true';
 
       widgets.add(
         isActive
@@ -164,45 +152,37 @@ class EligibilityCriteria extends StatelessWidget {
             ),
       );
 
-      // Add separator except after the last item
       if (i < items.length - 1) {
         widgets.add(const Text(' / ', style: TextStyle(color: Colors.grey)));
       }
     }
-
     return widgets;
   }
 
-  // Professional occupation information section
   List<Widget> _buildProcessSteps(double screenWidth, bool isSmallScreen) {
-    // Define step data
-    final Map<String, dynamic> stepData = {
-      'step':
-          'We provide skills assessments \nfor the largest range of \noccupations in Australia.',
-      'description':
-          "The Australian Government has authorised us to provide skills assessments for 341 professional and other non-trade occupations. If you're a professional needing a skills assessment to migrate to Australia, we can offer you a service that understands and can assess your experience and qualifications.",
-      'image': 'assets/images/skiil_assesment_support.jpg',
-      'imageOnRight': true,
-    };
+    const stepText =
+        'We provide skills assessments \nfor the largest range of \noccupations in Australia.';
+    const description =
+        "The Australian Government has authorised us to provide skills assessments for 341 professional and other non-trade occupations. If you're a professional needing a skills assessment to migrate to Australia, we can offer you a service that understands and can assess your experience and qualifications.";
 
-    final Widget stepInfoColumn = Container(
+    final stepInfoColumn = Container(
       width: isSmallScreen ? screenWidth * 0.9 : screenWidth * 0.4,
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            stepData['step'],
+            stepText,
             style: TextStyle(
               fontSize: isSmallScreen ? 24 : 32,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF006064),
+              color: const Color(0xFF006064),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
-            stepData['description'],
+            description,
             style: TextStyle(
               fontSize: isSmallScreen ? 14 : 16,
               height: 1.5,
@@ -213,14 +193,13 @@ class EligibilityCriteria extends StatelessWidget {
       ),
     );
 
-    final Widget imageWidget = Image.asset(
-      stepData['image'],
+    final imageWidget = Image.asset(
+      'assets/images/skiil_assesment_support.jpg',
       height: isSmallScreen ? 300 : 450,
       width: isSmallScreen ? screenWidth * 0.9 : 600,
       fit: BoxFit.cover,
     );
 
-    // Layout differently based on screen size
     return [
       Container(
         color: Colors.white,
@@ -232,23 +211,135 @@ class EligibilityCriteria extends StatelessWidget {
         child:
             isSmallScreen
                 ? Column(
-                  children: [stepInfoColumn, SizedBox(height: 20), imageWidget],
+                  children: [
+                    stepInfoColumn,
+                    const SizedBox(height: 20),
+                    imageWidget,
+                  ],
                 )
                 : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:
-                      stepData['imageOnRight']
-                          ? [stepInfoColumn, imageWidget]
-                          : [imageWidget, stepInfoColumn],
+                  children: [stepInfoColumn, imageWidget],
                 ),
       ),
     ];
   }
 
-  // Document gathering section with expandable items
+  Widget _buildAnnouncement(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16.0 : 24.0,
+        vertical: 8.0,
+      ),
+      child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 5,
+          width: double.infinity,
+          color: const Color(0xFFEEAA00),
+        ),
+        Container(
+          color: const Color(0xFFFFF8F0),
+          padding: const EdgeInsets.all(16.0),
+          child: _buildAnnouncementContent(fontSize: 0.9),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(width: 5, color: const Color(0xFFEEAA00)),
+          Expanded(
+            child: Container(
+              color: const Color(0xFFFFF8F0),
+              padding: const EdgeInsets.all(24.0),
+              child: _buildAnnouncementContent(fontSize: 1.0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnnouncementContent({required double fontSize}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Announcements',
+          style: TextStyle(
+            fontSize: 28.0 * fontSize,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF006064),
+          ),
+        ),
+        SizedBox(height: 24 * fontSize),
+        Text(
+          'Skills Assessments that are close to expiry',
+          style: TextStyle(
+            fontSize: 18.0 * fontSize,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF006064),
+          ),
+        ),
+        SizedBox(height: 16 * fontSize),
+        Text(
+          'Applicants with a Skills Assessment that is close to expiring should consider applying for a renewal of their assessment at the same time as they apply for a state or territory migration program – or earlier. Each state and territory has its own criteria for applications and sometimes the timeframes are short. Applicants will be more likely to avoid disappointment if they apply for a renewal early rather than wait for an invitation from a state or territory.',
+          style: TextStyle(
+            fontSize: 16.0 * fontSize,
+            height: 1.5,
+            color: const Color(0xFF006064),
+          ),
+        ),
+        SizedBox(height: 12 * fontSize),
+        InkWell(
+          onTap: () {},
+          child: Text(
+            'Find out how to renew your Skills Assessment before it expires here.',
+            style: TextStyle(
+              fontSize: 16.0 * fontSize,
+              color: const Color.fromARGB(255, 5, 124, 128),
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        SizedBox(height: 20 * fontSize),
+        Text(
+          'Skills assessment documents: professional and general occupations',
+          style: TextStyle(
+            fontSize: 18.0 * fontSize,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF006064),
+          ),
+        ),
+        SizedBox(height: 16 * fontSize),
+        Text(
+          'Applicants are expected to provide all the documents required at the time they submit their application. We have changed our timeframes for applications that do not have complete documents. We will close incomplete applications that do not meet the deadline and there will be a fee to reopen the application. You can find out more here. It is important to ensure you lodge a complete set of required documents when you apply, and this will avoid delays with your application.',
+          style: TextStyle(
+            fontSize: 16.0 * fontSize,
+            height: 1.5,
+            color: const Color(0xFF006064),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildGatherDocSection(bool isSmallScreen) {
-    // List of document requirements
-    final List<String> documentItems = [
+    const documentItems = [
       'Resume / curriculum vitae (CV)',
       'Photograph',
       "Proof of identity",
@@ -271,14 +362,13 @@ class EligibilityCriteria extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildGatherDocTitle(),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   _buildAccordionList(documentItems),
                 ],
               )
               : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left column - Title and description
                   Expanded(
                     flex: 1,
                     child: Padding(
@@ -286,155 +376,17 @@ class EligibilityCriteria extends StatelessWidget {
                       child: _buildGatherDocTitle(),
                     ),
                   ),
-                  // Right column - Expandable document items
                   Expanded(flex: 2, child: _buildAccordionList(documentItems)),
                 ],
               ),
     );
   }
 
- Widget _announcement(BuildContext context) {
-  // Get the screen width to adjust layout based on screen size
-  final screenWidth = MediaQuery.of(context).size.width;
-  
-  // Determine if we're on a mobile device (arbitrary breakpoint, adjust as needed)
-  final isMobile = screenWidth < 600;
-  
-  // Add horizontal padding to the whole widget
-  return Padding(
-    padding: EdgeInsets.symmetric(
-      horizontal: isMobile ? 16.0 : 24.0, // Smaller padding on mobile
-      vertical: 8.0
-    ),
-    child: Container(
-      width: double.infinity,
-      child: isMobile ? _buildMobileLayout(context) : _buildDesktopLayout(context),
-    ),
-  );
-}
-
-// Layout for mobile devices (vertical layout)
-Widget _buildMobileLayout(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Yellow horizontal accent line for mobile
-      Container(
-        height: 5,
-        width: double.infinity,
-        color: const Color(0xFFEEAA00), // Yellow accent color
-      ),
-      // Main content
-      Container(
-        color: const Color(0xFFFFF8F0), // Light cream background
-        padding: const EdgeInsets.all(16.0),
-        child: _buildAnnouncementContent(fontSize: 0.9), // Slightly smaller text for mobile
-      ),
-    ],
-  );
-}
-
-// Layout for desktop devices (horizontal layout)
-Widget _buildDesktopLayout(BuildContext context) {
-  return IntrinsicHeight( // Makes the yellow line match content height
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Yellow vertical accent line
-        Container(
-          width: 5,
-          color: const Color(0xFFEEAA00), // Yellow accent color
-        ),
-        // Main content
-        Expanded(
-          child: Container(
-            color: const Color(0xFFFFF8F0), // Light cream background
-            padding: const EdgeInsets.all(24.0),
-            child: _buildAnnouncementContent(fontSize: 1.0),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-// Extract content to avoid duplication
-Widget _buildAnnouncementContent({required double fontSize}) {
-  // Base font sizes
-  final headingSize = 28.0 * fontSize;
-  final subheadingSize = 18.0 * fontSize;
-  final bodySize = 16.0 * fontSize;
-  
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'Announcements',
-        style: TextStyle(
-          fontSize: headingSize,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF006064), // Dark teal color for headings
-        ),
-      ),
-      SizedBox(height: 24 * fontSize),
-      Text(
-        'Skills Assessments that are close to expiry',
-        style: TextStyle(
-          fontSize: subheadingSize,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF006064), // Dark teal color for headings
-        ),
-      ),
-      SizedBox(height: 16 * fontSize),
-      Text(
-        'Applicants with a Skills Assessment that is close to expiring should consider applying for a renewal of their assessment at the same time as they apply for a state or territory migration program – or earlier. Each state and territory has its own criteria for applications and sometimes the timeframes are short. Applicants will be more likely to avoid disappointment if they apply for a renewal early rather than wait for an invitation from a state or territory.',
-        style: TextStyle(
-          fontSize: bodySize,
-          height: 1.5,
-          color: const Color(0xFF006064), // Dark teal color for text
-        ),
-      ),
-      SizedBox(height: 12 * fontSize),
-      InkWell(
-        onTap: () {
-          // Add link functionality here
-        },
-        child: Text(
-          'Find out how to renew your Skills Assessment before it expires here.',
-          style: TextStyle(
-            fontSize: bodySize,
-            color: const Color.fromARGB(255, 5, 124, 128), // Dark teal color for links
-            decoration: TextDecoration.underline,
-          ),
-        ),
-      ),
-      SizedBox(height: 20 * fontSize),
-      Text(
-        'Skills assessment documents: professional and general occupations',
-        style: TextStyle(
-          fontSize: subheadingSize,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF006064), // Dark teal color for headings
-        ),
-      ),
-      SizedBox(height: 16 * fontSize),
-      Text(
-        'Applicants are expected to provide all the documents required at the time they submit their application. We have changed our timeframes for applications that do not have complete documents. We will close incomplete applications that do not meet the deadline and there will be a fee to reopen the application. You can find out more here. It is important to ensure you lodge a complete set of required documents when you apply, and this will avoid delays with your application.',
-        style: TextStyle(
-          fontSize: bodySize,
-          height: 1.5,
-          color: const Color(0xFF006064), // Dark teal color for text
-        ),
-      ),
-    ],
-  );
-}
-  // Title and description for document gathering section
   Widget _buildGatherDocTitle() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Gather the documents you will need",
           style: TextStyle(
             fontSize: 36,
@@ -481,7 +433,6 @@ Widget _buildAnnouncementContent({required double fontSize}) {
     );
   }
 
-  // Search occupation section
   Widget _buildSearchSection(
     double screenHeight,
     double screenWidth,
@@ -489,7 +440,7 @@ Widget _buildAnnouncementContent({required double fontSize}) {
   ) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.only(bottom: 100, top: 50),
+        padding: const EdgeInsets.only(bottom: 100, top: 50),
         child: Container(
           width: isSmallScreen ? screenWidth * 0.9 : screenWidth * 0.6,
           height: isSmallScreen ? screenHeight * 0.5 : screenHeight * 0.44,
@@ -507,7 +458,7 @@ Widget _buildAnnouncementContent({required double fontSize}) {
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
+              SizedBox(
                 width: isSmallScreen ? screenWidth * 0.8 : screenWidth * 0.46,
                 child: const _SearchBar(),
               ),
@@ -518,10 +469,8 @@ Widget _buildAnnouncementContent({required double fontSize}) {
     );
   }
 
-  // FAQ section with expandable items
   Widget _buildFaqSection(bool isSmallScreen) {
-    // List of FAQ questions
-    final List<String> faqItems = [
+    const faqItems = [
       'What if I do not meet the requirements for my nominated occupation?',
       'How long will it take to process my application?',
       'What if my occupation is not listed?',
@@ -539,30 +488,27 @@ Widget _buildAnnouncementContent({required double fontSize}) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildFaqTitle(),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   _buildAccordionList(faqItems),
                 ],
               )
               : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left column - Title and View all button
                   Expanded(flex: 1, child: _buildFaqTitle()),
-                  // Right column - FAQ accordions
                   Expanded(flex: 2, child: _buildAccordionList(faqItems)),
                 ],
               ),
     );
   }
 
-  // Title and view all button for FAQ section
   Widget _buildFaqTitle() {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Explore FAQs",
             style: TextStyle(
               fontSize: 32,
@@ -571,12 +517,12 @@ Widget _buildAnnouncementContent({required double fontSize}) {
               height: 1.3,
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           InkWell(
             onTap: () {},
             child: Row(
               children: [
-                Text(
+                const Text(
                   "View all",
                   style: TextStyle(
                     fontSize: 16,
@@ -584,15 +530,15 @@ Widget _buildAnnouncementContent({required double fontSize}) {
                     color: kAccentGreen,
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: kAccentGreen,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_forward,
                     color: Colors.white,
                     size: 18,
@@ -606,25 +552,20 @@ Widget _buildAnnouncementContent({required double fontSize}) {
     );
   }
 
-  // Reusable accordion list builder
   Widget _buildAccordionList(List<String> items) {
     return Container(
-      padding: EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.only(top: 6),
       child: Column(
-        children:
-            items.map((title) {
-              return _buildAccordionItem(title);
-            }).toList(),
+        children: items.map((title) => _buildAccordionItem(title)).toList(),
       ),
     );
   }
 
-  // Individual accordion item with dotted line separator
   Widget _buildAccordionItem(String title) {
     return Theme(
       data: ThemeData(
         dividerColor: Colors.transparent,
-        colorScheme: ColorScheme.light(
+        colorScheme: const ColorScheme.light(
           surfaceTint: Colors.transparent,
           primary: kAccentGreen,
         ),
@@ -632,9 +573,16 @@ Widget _buildAnnouncementContent({required double fontSize}) {
       child: Column(
         children: [
           ExpansionTile(
-            tilePadding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
+            tilePadding: const EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 0,
+            ),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
-            childrenPadding: EdgeInsets.only(left: 50, bottom: 16, right: 20),
+            childrenPadding: const EdgeInsets.only(
+              left: 50,
+              bottom: 16,
+              right: 20,
+            ),
             leading: Container(
               width: 32,
               height: 32,
@@ -642,7 +590,7 @@ Widget _buildAnnouncementContent({required double fontSize}) {
                 shape: BoxShape.circle,
                 border: Border.all(color: kAccentGreen, width: 3),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.add,
                 color: kAccentGreen,
                 size: 22,
@@ -651,22 +599,21 @@ Widget _buildAnnouncementContent({required double fontSize}) {
             ),
             title: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: kAccentGreen,
               ),
             ),
-            trailing: SizedBox.shrink(),
-            children: [
+            trailing: const SizedBox.shrink(),
+            children: const [
               Text(
                 'This is the answer to the FAQ question.',
                 style: TextStyle(fontSize: 15, height: 1.5),
               ),
             ],
           ),
-          // Dotted line separator
-          Container(
+          SizedBox(
             width: double.infinity,
             height: 1,
             child: CustomPaint(
@@ -679,22 +626,20 @@ Widget _buildAnnouncementContent({required double fontSize}) {
   }
 }
 
-// Custom painter for dotted line separators
 class DottedLinePainter extends CustomPainter {
   final Color color;
-
   DottedLinePainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint =
+    final paint =
         Paint()
           ..color = color
           ..strokeWidth = 1
           ..strokeCap = StrokeCap.round;
 
-    const double dashWidth = 3;
-    const double dashSpace = 3;
+    const dashWidth = 3.0;
+    const dashSpace = 3.0;
     double startX = 0;
 
     while (startX < size.width) {
@@ -707,7 +652,6 @@ class DottedLinePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// Search bar component
 class _SearchBar extends StatelessWidget {
   const _SearchBar();
 
@@ -715,7 +659,6 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final isMobile = width < 600;
-    final isTablet = width >= 600 && width < 1024;
 
     return Container(
       height: 57,
@@ -769,5 +712,4 @@ class _SearchBar extends StatelessWidget {
       ),
     );
   }
-  
 }
