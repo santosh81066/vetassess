@@ -1,20 +1,34 @@
+// screens/login.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vetassess/screens/applioptions.dart';
+import '../models/login_model.dart';
+import '../providers/login_provider.dart';
+import '../widgets/login_page_layout.dart';
 
-import 'package:vetassess/widgets/login_page_layout.dart';
-
-class Login extends StatefulWidget {
+class Login extends ConsumerStatefulWidget {
   const Login({super.key});
 
   @override
-  LoginState createState() => LoginState();
+  ConsumerState<Login> createState() => _LoginState();
 }
 
-class LoginState extends State<Login> {
+class _LoginState extends ConsumerState<Login> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _captchaController = TextEditingController();
+
+  String _selectedRole = "applicant"; // Default role
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset login state and fetch captcha when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(loginProvider.notifier).resetState();
+      ref.read(loginProvider.notifier).fetchCaptcha();
+    });
+  }
 
   // Custom input field to reduce code duplication
   Widget _buildInputField({
@@ -65,11 +79,67 @@ class LoginState extends State<Login> {
     );
   }
 
+  void _handleLogin() {
+    final loginState = ref.read(loginProvider);
+
+    // Validate inputs
+    if (_usernameController.text.trim().isEmpty) {
+      _showSnackBar('Please enter username/email');
+      return;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      _showSnackBar('Please enter password');
+      return;
+    }
+    if (_captchaController.text.trim().isEmpty) {
+      _showSnackBar('Please enter captcha');
+      return;
+    }
+    if (loginState.captcha == null) {
+      _showSnackBar('Captcha not loaded. Please refresh.');
+      return;
+    }
+
+    final loginRequest = LoginRequest(
+      email: _usernameController.text.trim(),
+      password: _passwordController.text.trim(),
+      captchaInput: _captchaController.text.trim(),
+      captchaOriginal: loginState.captcha!,
+      role: _selectedRole,
+    );
+
+    ref.read(loginProvider.notifier).login(loginRequest);
+  }
+
+  void _refreshCaptcha() {
+    ref.read(loginProvider.notifier).fetchCaptcha();
+    _captchaController.clear();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red[600]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loginState = ref.watch(loginProvider);
+
+    // Listen to login state changes
+    ref.listen<LoginState>(loginProvider, (previous, next) {
+      if (next.isSuccess && next.response != null) {
+        // Login successful, navigate to next screen
+        context.go('/appli_opt');
+        _showSnackBar('Login successful!');
+      } else if (next.error != null) {
+        // Show error message
+        _showSnackBar(next.error!);
+      }
+    });
+
     return LoginPageLayout(
-      child: // Main content
-          Container(
+      child: Container(
         color: Colors.white,
         child: Center(
           child: Column(
@@ -140,6 +210,41 @@ class LoginState extends State<Login> {
                             isPassword: true,
                           ),
 
+                          // Role selection
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Text(
+                                'Role: ',
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Radio<String>(
+                                value: 'applicant',
+                                groupValue: _selectedRole,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedRole = value!;
+                                  });
+                                },
+                              ),
+                              const Text('Applicant'),
+                              const SizedBox(width: 10),
+                              Radio<String>(
+                                value: 'agent',
+                                groupValue: _selectedRole,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedRole = value!;
+                                  });
+                                },
+                              ),
+                              const Text('Agent'),
+                            ],
+                          ),
+
                           // Forgot password link
                           Align(
                             alignment: Alignment.centerRight,
@@ -167,27 +272,93 @@ class LoginState extends State<Login> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text(
-                                'Verification image',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Verification image',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  TextButton(
+                                    onPressed: _refreshCaptcha,
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size.zero,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.refresh,
+                                          size: 16,
+                                          color: Colors.orange[800],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Refresh',
+                                          style: TextStyle(
+                                            color: Colors.orange[800],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 4),
                               Container(
+                                height: 36,
+                                width: 250,
                                 decoration: BoxDecoration(
                                   border: Border.all(
                                     color: Colors.grey[400]!,
                                     width: 1,
                                   ),
+                                  color: Colors.grey[100],
                                 ),
-                                child: Image.asset(
-                                  'assets/images/captcha.jpg',
-                                  height: 36,
-                                  width: 250,
-                                ),
+                                child:
+                                    loginState.isLoadingCaptcha
+                                        ? const Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                        )
+                                        : loginState.captcha != null
+                                        ? Center(
+                                          child: Text(
+                                            loginState.captcha!,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 4,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        )
+                                        : const Center(
+                                          child: Text(
+                                            'Failed to load captcha',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
                               ),
                             ],
                           ),
@@ -232,7 +403,8 @@ class LoginState extends State<Login> {
                             width: double.infinity,
                             height: 38,
                             child: ElevatedButton(
-                              onPressed: () => context.go('/appli_opt'),
+                              onPressed:
+                                  loginState.isLoading ? null : _handleLogin,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF00897B),
                                 shape: RoundedRectangleBorder(
@@ -240,14 +412,27 @@ class LoginState extends State<Login> {
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child:
+                                  loginState.isLoading
+                                      ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                      : const Text(
+                                        'Login',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                             ),
                           ),
 
@@ -269,7 +454,9 @@ class LoginState extends State<Login> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     TextButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        context.go('/register');
+                                      },
                                       style: TextButton.styleFrom(
                                         minimumSize: Size.zero,
                                         padding: const EdgeInsets.symmetric(
