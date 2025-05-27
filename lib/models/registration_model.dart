@@ -61,14 +61,12 @@ class SignupState {
   final String errorMessage;
   final SignupResponse? response;
   final String captchaText;
-  final bool isCaptchaLoading;
 
   SignupState({
     this.isLoading = false,
     this.errorMessage = '',
     this.response,
-    this.captchaText = '',
-    this.isCaptchaLoading = false,
+    this.captchaText = 'ABC123',
   });
 
   SignupState copyWith({
@@ -76,14 +74,12 @@ class SignupState {
     String? errorMessage,
     SignupResponse? response,
     String? captchaText,
-    bool? isCaptchaLoading,
   }) {
     return SignupState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
       response: response ?? this.response,
       captchaText: captchaText ?? this.captchaText,
-      isCaptchaLoading: isCaptchaLoading ?? this.isCaptchaLoading,
     );
   }
 }
@@ -134,7 +130,11 @@ class SignupFormData {
     }
   }
 
-  String? validateField(String fieldName, String value) {
+  String? validateField(
+    String fieldName,
+    String value, [
+    String? compareValue,
+  ]) {
     switch (fieldName) {
       case 'givenNames':
         return value.isEmpty ? 'Given names are required' : null;
@@ -150,7 +150,8 @@ class SignupFormData {
         return null;
       case 'confirmEmail':
         if (value.isEmpty) return 'Please confirm your email';
-        if (value != email) return 'Emails do not match';
+        if (compareValue != null && value != compareValue)
+          return 'Emails do not match';
         return null;
       case 'password':
         if (value.isEmpty) return 'Password is required';
@@ -158,7 +159,8 @@ class SignupFormData {
         return null;
       case 'confirmPassword':
         if (value.isEmpty) return 'Please confirm your password';
-        if (value != password) return 'Passwords do not match';
+        if (compareValue != null && value != compareValue)
+          return 'Passwords do not match';
         return null;
       case 'captcha':
         return value.isEmpty ? 'Please enter the captcha text' : null;

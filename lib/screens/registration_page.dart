@@ -64,7 +64,24 @@ class _VetassessRegistrationFormState
 
   void _validateField(String fieldName, String value) {
     final formData = ref.read(signupFormProvider);
-    final error = formData.validateField(fieldName, value);
+    String? error;
+
+    // For confirmEmail and confirmPassword, pass the original value for comparison
+    if (fieldName == 'confirmEmail') {
+      error = formData.validateField(
+        fieldName,
+        value,
+        _controllers['email']?.text,
+      );
+    } else if (fieldName == 'confirmPassword') {
+      error = formData.validateField(
+        fieldName,
+        value,
+        _controllers['password']?.text,
+      );
+    } else {
+      error = formData.validateField(fieldName, value);
+    }
 
     setState(() {
       if (error != null) {
@@ -87,7 +104,25 @@ class _VetassessRegistrationFormState
     bool hasErrors = false;
     _controllers.forEach((fieldName, controller) {
       if (fieldName != 'captcha') {
-        final error = formData.validateField(fieldName, controller.text);
+        String? error;
+
+        // Handle confirmation fields
+        if (fieldName == 'confirmEmail') {
+          error = formData.validateField(
+            fieldName,
+            controller.text,
+            _controllers['email']?.text,
+          );
+        } else if (fieldName == 'confirmPassword') {
+          error = formData.validateField(
+            fieldName,
+            controller.text,
+            _controllers['password']?.text,
+          );
+        } else {
+          error = formData.validateField(fieldName, controller.text);
+        }
+
         if (error != null) {
           _errors[fieldName] = error;
           hasErrors = true;
@@ -294,7 +329,26 @@ class _VetassessRegistrationFormState
                       _errors[fieldName] != null,
                     ),
                     style: TextStyle(fontSize: 14),
-                    onChanged: (value) => _validateField(fieldName, value),
+                    onChanged: (value) {
+                      _validateField(fieldName, value);
+
+                      // Re-validate confirmation fields when original fields change
+                      if (fieldName == 'email' &&
+                          _controllers['confirmEmail']?.text.isNotEmpty ==
+                              true) {
+                        _validateField(
+                          'confirmEmail',
+                          _controllers['confirmEmail']!.text,
+                        );
+                      } else if (fieldName == 'password' &&
+                          _controllers['confirmPassword']?.text.isNotEmpty ==
+                              true) {
+                        _validateField(
+                          'confirmPassword',
+                          _controllers['confirmPassword']!.text,
+                        );
+                      }
+                    },
                   ),
                   if (_errors[fieldName] != null)
                     Padding(
@@ -410,49 +464,18 @@ class _VetassessRegistrationFormState
                 ),
                 GestureDetector(
                   onTap:
-                      signupState.isCaptchaLoading
-                          ? null
-                          : () async {
-                            ref.read(signupProvider.notifier).state =
-                                signupState.copyWith(isCaptchaLoading: true);
-                            await ref
-                                .read(signupProvider.notifier)
-                                .refreshCaptcha();
-                            ref.read(signupProvider.notifier).state =
-                                signupState.copyWith(isCaptchaLoading: false);
-                          },
+                      () => ref.read(signupProvider.notifier).refreshCaptcha(),
                   child: Container(
                     width: 35,
                     height: 38,
                     decoration: BoxDecoration(
-                      color:
-                          signupState.isCaptchaLoading
-                              ? Colors.grey.shade400
-                              : Color(0xFFFF8C00),
+                      color: Color(0xFFFF8C00),
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(2),
                         bottomRight: Radius.circular(2),
                       ),
                     ),
-                    child:
-                        signupState.isCaptchaLoading
-                            ? SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )
-                            : Icon(
-                              Icons.refresh,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                    child: Icon(Icons.refresh, color: Colors.white, size: 18),
                   ),
                 ),
               ],
