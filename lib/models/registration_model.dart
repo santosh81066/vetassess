@@ -159,8 +159,9 @@ class SignupFormData {
         return null;
       case 'confirmPassword':
         if (value.isEmpty) return 'Please confirm your password';
-        if (compareValue != null && value != compareValue)
+        if (compareValue != null && value != compareValue) {
           return 'Passwords do not match';
+        }
         return null;
       case 'captcha':
         return value.isEmpty ? 'Please enter the captcha text' : null;
