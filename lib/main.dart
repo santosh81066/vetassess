@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vetassess/screens/application_forms/appli_documents_uploaded.dart';
@@ -20,6 +21,7 @@ import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/screens/not_found_screen.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
 import 'package:vetassess/screens/profissional_viewall.dart';
+import 'package:vetassess/screens/registration_page.dart';
 import 'package:vetassess/screens/skills_assessment_support.dart';
 import 'package:vetassess/screens/tertiary_education.dart';
 import 'package:vetassess/widgets/SkillsAssessmentDropdownPanel.dart';
@@ -29,7 +31,7 @@ import 'package:vetassess/widgets/under_maintenance.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const VetassessApp());
+  runApp(ProviderScope(child: VetassessApp()));
 }
 
 class VetassessApp extends StatelessWidget {
@@ -47,6 +49,10 @@ class VetassessApp extends StatelessWidget {
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(path: '/login', builder: (context, state) => const Login()),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const VetassessRegistrationForm(),
+        ),
         GoRoute(
           path: '/application_process',
           builder: (context, state) => const ApplicationProcess(),
