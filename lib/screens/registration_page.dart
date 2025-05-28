@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/registration_model.dart';
 import '../providers/registration_provider.dart';
 import '../widgets/login_page_layout.dart';
@@ -15,17 +16,8 @@ class VetassessRegistrationForm extends ConsumerStatefulWidget {
 class _VetassessRegistrationFormState
     extends ConsumerState<VetassessRegistrationForm> {
   final _formKey = GlobalKey<FormState>();
-  final Map<String, TextEditingController> _controllers = {};
-  final Map<String, String> _errors = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeControllers();
-  }
-
-  void _initializeControllers() {
-    final fields = [
+  final Map<String, TextEditingController> _controllers = {
+    for (String field in [
       'givenNames',
       'surname',
       'dateOfBirth',
@@ -34,12 +26,10 @@ class _VetassessRegistrationFormState
       'password',
       'confirmPassword',
       'captcha',
-    ];
-
-    for (String field in fields) {
-      _controllers[field] = TextEditingController();
-    }
-  }
+    ])
+      field: TextEditingController(),
+  };
+  final Map<String, String> _errors = {};
 
   @override
   void dispose() {
@@ -48,16 +38,16 @@ class _VetassessRegistrationFormState
   }
 
   void _updateFormData() {
-    final formData = ref.read(signupFormProvider.notifier);
-    formData.update((state) {
-      state.givenNames = _controllers['givenNames']?.text ?? '';
-      state.surname = _controllers['surname']?.text ?? '';
-      state.dateOfBirth = _controllers['dateOfBirth']?.text ?? '';
-      state.email = _controllers['email']?.text ?? '';
-      state.confirmEmail = _controllers['confirmEmail']?.text ?? '';
-      state.password = _controllers['password']?.text ?? '';
-      state.confirmPassword = _controllers['confirmPassword']?.text ?? '';
-      state.captchaInput = _controllers['captcha']?.text ?? '';
+    ref.read(signupFormProvider.notifier).update((state) {
+      state
+        ..givenNames = _controllers['givenNames']?.text ?? ''
+        ..surname = _controllers['surname']?.text ?? ''
+        ..dateOfBirth = _controllers['dateOfBirth']?.text ?? ''
+        ..email = _controllers['email']?.text ?? ''
+        ..confirmEmail = _controllers['confirmEmail']?.text ?? ''
+        ..password = _controllers['password']?.text ?? ''
+        ..confirmPassword = _controllers['confirmPassword']?.text ?? ''
+        ..captchaInput = _controllers['captcha']?.text ?? '';
       return state;
     });
   }
@@ -66,7 +56,6 @@ class _VetassessRegistrationFormState
     final formData = ref.read(signupFormProvider);
     String? error;
 
-    // For confirmEmail and confirmPassword, pass the original value for comparison
     if (fieldName == 'confirmEmail') {
       error = formData.validateField(
         fieldName,
@@ -96,33 +85,13 @@ class _VetassessRegistrationFormState
     _updateFormData();
     final formData = ref.read(signupFormProvider);
 
-    // Validate all fields
-    setState(() {
-      _errors.clear();
-    });
-
+    setState(() => _errors.clear());
     bool hasErrors = false;
+
+    // Validate all fields except captcha
     _controllers.forEach((fieldName, controller) {
       if (fieldName != 'captcha') {
-        String? error;
-
-        // Handle confirmation fields
-        if (fieldName == 'confirmEmail') {
-          error = formData.validateField(
-            fieldName,
-            controller.text,
-            _controllers['email']?.text,
-          );
-        } else if (fieldName == 'confirmPassword') {
-          error = formData.validateField(
-            fieldName,
-            controller.text,
-            _controllers['password']?.text,
-          );
-        } else {
-          error = formData.validateField(fieldName, controller.text);
-        }
-
+        String? error = _getFieldError(fieldName, controller.text, formData);
         if (error != null) {
           _errors[fieldName] = error;
           hasErrors = true;
@@ -130,7 +99,7 @@ class _VetassessRegistrationFormState
       }
     });
 
-    // Validate captcha
+    // Validate captcha and privacy policy
     final captchaError = formData.validateField(
       'captcha',
       _controllers['captcha']?.text ?? '',
@@ -140,7 +109,6 @@ class _VetassessRegistrationFormState
       hasErrors = true;
     }
 
-    // Check if privacy policy is accepted
     if (!formData.isPrivacyPolicyAccepted) {
       _errors['privacyPolicy'] = 'You must accept the Privacy Policy';
       hasErrors = true;
@@ -151,8 +119,24 @@ class _VetassessRegistrationFormState
       return;
     }
 
-    // Submit the form
     await ref.read(signupProvider.notifier).signup(formData);
+  }
+
+  String? _getFieldError(String fieldName, String value, formData) {
+    if (fieldName == 'confirmEmail') {
+      return formData.validateField(
+        fieldName,
+        value,
+        _controllers['email']?.text,
+      );
+    } else if (fieldName == 'confirmPassword') {
+      return formData.validateField(
+        fieldName,
+        value,
+        _controllers['password']?.text,
+      );
+    }
+    return formData.validateField(fieldName, value);
   }
 
   @override
@@ -160,37 +144,28 @@ class _VetassessRegistrationFormState
     final signupState = ref.watch(signupProvider);
     final formData = ref.watch(signupFormProvider);
 
-    // Listen to signup state changes
     ref.listen<SignupState>(signupProvider, (previous, next) {
       if (next.errorMessage.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showSnackBar(next.errorMessage, Colors.red);
       } else if (next.response != null && previous?.response == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.response?.message ?? 'Registration successful!'),
-            backgroundColor: Colors.green,
-          ),
+        _showSnackBar(
+          next.response?.message ?? 'Registration successful!',
+          Colors.green,
         );
-        // Navigate to login or dashboard
-        Navigator.pop(context);
+        context.go('/login');
       }
     });
 
     return LoginPageLayout(
       child: Container(
         color: Colors.white,
-        margin: EdgeInsets.symmetric(horizontal: 150, vertical: 50),
+        margin: const EdgeInsets.symmetric(horizontal: 150, vertical: 50),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Applicant Registration',
                 style: TextStyle(
                   fontSize: 28,
@@ -198,9 +173,9 @@ class _VetassessRegistrationFormState
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Container(
-                padding: EdgeInsets.all(30),
+                padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(4),
@@ -208,7 +183,7 @@ class _VetassessRegistrationFormState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       '* Required Fields',
                       style: TextStyle(
                         color: Colors.red,
@@ -216,9 +191,9 @@ class _VetassessRegistrationFormState
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(height: 25),
+                    const SizedBox(height: 25),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 200),
                       child: Column(
                         children: [
                           ..._buildFormFields(),
@@ -234,13 +209,13 @@ class _VetassessRegistrationFormState
                               });
                             },
                           ),
-                          SizedBox(height: 15),
+                          const SizedBox(height: 15),
                           _buildCaptchaSection(),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           _buildCookiesNotice(),
-                          SizedBox(height: 15),
+                          const SizedBox(height: 15),
                           _buildPrivacyPolicyCheckbox(),
-                          SizedBox(height: 30),
+                          const SizedBox(height: 30),
                           _buildActionButtons(),
                         ],
                       ),
@@ -253,6 +228,12 @@ class _VetassessRegistrationFormState
         ),
       ),
     );
+  }
+
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   List<Widget> _buildFormFields() {
@@ -274,13 +255,8 @@ class _VetassessRegistrationFormState
 
     return fields
         .map(
-          (field) => _buildFormField(
-            field.$1, // label
-            field.$2, // hintText
-            field.$3, // fieldName
-            field.$4, // isRequired
-            field.$5, // isPassword
-          ),
+          (field) =>
+              _buildFormField(field.$1, field.$2, field.$3, field.$4, field.$5),
         )
         .toList();
   }
@@ -299,24 +275,27 @@ class _VetassessRegistrationFormState
         children: [
           Container(
             width: 200,
-            padding: EdgeInsets.only(top: 12, right: 20),
+            padding: const EdgeInsets.only(top: 12, right: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Flexible(
                   child: Text(
                     label,
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
                     textAlign: TextAlign.right,
                   ),
                 ),
                 if (isRequired)
-                  Text(' *', style: TextStyle(color: Colors.red, fontSize: 14)),
+                  const Text(
+                    ' *',
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
               ],
             ),
           ),
           Expanded(
-            child: Container(
+            child: SizedBox(
               width: 250,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,34 +307,18 @@ class _VetassessRegistrationFormState
                       hintText,
                       _errors[fieldName] != null,
                     ),
-                    style: TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 14),
                     onChanged: (value) {
                       _validateField(fieldName, value);
-
-                      // Re-validate confirmation fields when original fields change
-                      if (fieldName == 'email' &&
-                          _controllers['confirmEmail']?.text.isNotEmpty ==
-                              true) {
-                        _validateField(
-                          'confirmEmail',
-                          _controllers['confirmEmail']!.text,
-                        );
-                      } else if (fieldName == 'password' &&
-                          _controllers['confirmPassword']?.text.isNotEmpty ==
-                              true) {
-                        _validateField(
-                          'confirmPassword',
-                          _controllers['confirmPassword']!.text,
-                        );
-                      }
+                      _revalidateConfirmationFields(fieldName);
                     },
                   ),
                   if (_errors[fieldName] != null)
                     Padding(
-                      padding: EdgeInsets.only(top: 5),
+                      padding: const EdgeInsets.only(top: 5),
                       child: Text(
                         _errors[fieldName]!,
-                        style: TextStyle(color: Colors.red, fontSize: 12),
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
                       ),
                     ),
                 ],
@@ -367,22 +330,28 @@ class _VetassessRegistrationFormState
     );
   }
 
+  void _revalidateConfirmationFields(String fieldName) {
+    if (fieldName == 'email' &&
+        _controllers['confirmEmail']?.text.isNotEmpty == true) {
+      _validateField('confirmEmail', _controllers['confirmEmail']!.text);
+    } else if (fieldName == 'password' &&
+        _controllers['confirmPassword']?.text.isNotEmpty == true) {
+      _validateField('confirmPassword', _controllers['confirmPassword']!.text);
+    }
+  }
+
   InputDecoration _inputDecoration(String hintText, bool hasError) {
+    final borderColor = hasError ? Colors.red : Colors.grey.shade400;
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(3),
+      borderSide: BorderSide(color: borderColor),
+    );
+
     return InputDecoration(
       hintText: hintText,
       hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(3),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.grey.shade400,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(3),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.grey.shade400,
-        ),
-      ),
+      border: border,
+      enabledBorder: border,
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
         borderSide: BorderSide(
@@ -391,13 +360,13 @@ class _VetassessRegistrationFormState
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
-        borderSide: BorderSide(color: Colors.red),
+        borderSide: const BorderSide(color: Colors.red),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(3),
-        borderSide: BorderSide(color: Colors.red),
+        borderSide: const BorderSide(color: Colors.red),
       ),
-      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       isDense: true,
     );
   }
@@ -408,7 +377,7 @@ class _VetassessRegistrationFormState
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 220),
+          const SizedBox(width: 220),
           SizedBox(
             width: 18,
             height: 18,
@@ -419,11 +388,11 @@ class _VetassessRegistrationFormState
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ),
         ],
@@ -438,79 +407,83 @@ class _VetassessRegistrationFormState
       children: [
         _buildCaptchaRow(
           'Verification image',
-          Container(
-            width: 250,
-            height: 40,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade400),
-              borderRadius: BorderRadius.circular(3),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      signupState.captchaText,
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap:
-                      () => ref.read(signupProvider.notifier).refreshCaptcha(),
-                  child: Container(
-                    width: 35,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFF8C00),
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(2),
-                        bottomRight: Radius.circular(2),
-                      ),
-                    ),
-                    child: Icon(Icons.refresh, color: Colors.white, size: 18),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildCaptchaImage(signupState.captchaText),
         ),
-        SizedBox(height: 15),
-        _buildCaptchaRow(
-          'Enter text shown in the image',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 250,
-                child: TextFormField(
-                  controller: _controllers['captcha'],
-                  decoration: _inputDecoration(
-                    'Text shown in the image',
-                    _errors['captcha'] != null,
-                  ),
-                  style: TextStyle(fontSize: 14),
-                  onChanged: (value) => _validateField('captcha', value),
+        const SizedBox(height: 15),
+        _buildCaptchaRow('Enter text shown in the image', _buildCaptchaInput()),
+      ],
+    );
+  }
+
+  Widget _buildCaptchaImage(String captchaText) {
+    return Container(
+      width: 250,
+      height: 40,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                captchaText,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                  color: Colors.black87,
                 ),
               ),
-              if (_errors['captcha'] != null)
-                Padding(
-                  padding: EdgeInsets.only(top: 5),
-                  child: Text(
-                    _errors['captcha']!,
-                    style: TextStyle(color: Colors.red, fontSize: 12),
-                  ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => ref.read(signupProvider.notifier).refreshCaptcha(),
+            child: Container(
+              width: 35,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFF8C00),
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(2),
+                  bottomRight: Radius.circular(2),
                 ),
-            ],
+              ),
+              child: const Icon(Icons.refresh, color: Colors.white, size: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCaptchaInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 250,
+          child: TextFormField(
+            controller: _controllers['captcha'],
+            decoration: _inputDecoration(
+              'Text shown in the image',
+              _errors['captcha'] != null,
+            ),
+            style: const TextStyle(fontSize: 14),
+            onChanged: (value) => _validateField('captcha', value),
           ),
         ),
+        if (_errors['captcha'] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              _errors['captcha']!,
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
       ],
     );
   }
@@ -521,18 +494,21 @@ class _VetassessRegistrationFormState
       children: [
         Container(
           width: 200,
-          padding: EdgeInsets.only(top: 12, right: 20),
+          padding: const EdgeInsets.only(top: 12, right: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Flexible(
                 child: Text(
                   label,
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
                   textAlign: TextAlign.right,
                 ),
               ),
-              Text(' *', style: TextStyle(color: Colors.red, fontSize: 14)),
+              const Text(
+                ' *',
+                style: TextStyle(color: Colors.red, fontSize: 14),
+              ),
             ],
           ),
         ),
@@ -545,7 +521,7 @@ class _VetassessRegistrationFormState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Cookies Notice:',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -553,9 +529,9 @@ class _VetassessRegistrationFormState
             color: Colors.black87,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         RichText(
-          text: TextSpan(
+          text: const TextSpan(
             style: TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
             children: [
               TextSpan(
@@ -597,19 +573,17 @@ class _VetassessRegistrationFormState
                     return state;
                   });
                   if (value == true) {
-                    setState(() {
-                      _errors.remove('privacyPolicy');
-                    });
+                    setState(() => _errors.remove('privacyPolicy'));
                   }
                 },
                 side: BorderSide(color: Colors.grey.shade500, width: 1),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: RichText(
-                text: TextSpan(
+                text: const TextSpan(
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.black87,
@@ -640,10 +614,10 @@ class _VetassessRegistrationFormState
         ),
         if (_errors['privacyPolicy'] != null)
           Padding(
-            padding: EdgeInsets.only(top: 5, left: 26),
+            padding: const EdgeInsets.only(top: 5, left: 26),
             child: Text(
               _errors['privacyPolicy']!,
-              style: TextStyle(color: Colors.red, fontSize: 12),
+              style: const TextStyle(color: Colors.red, fontSize: 12),
             ),
           ),
       ],
@@ -658,14 +632,14 @@ class _VetassessRegistrationFormState
       children: [
         _buildButton(
           'Cancel',
-          Color(0xFF00565B),
+          const Color(0xFF00565B),
           () => Navigator.pop(context),
           false,
         ),
-        SizedBox(width: 15),
+        const SizedBox(width: 15),
         _buildButton(
           signupState.isLoading ? 'Registering...' : 'Register',
-          Color(0xFF00565B),
+          const Color(0xFF00565B),
           signupState.isLoading ? null : _handleSignup,
           signupState.isLoading,
         ),
@@ -679,7 +653,7 @@ class _VetassessRegistrationFormState
     VoidCallback? onPressed,
     bool isLoading,
   ) {
-    return Container(
+    return SizedBox(
       height: 35,
       child: ElevatedButton(
         onPressed: onPressed,
@@ -687,13 +661,13 @@ class _VetassessRegistrationFormState
           backgroundColor: color,
           disabledBackgroundColor: Colors.grey.shade300,
           foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
           elevation: 1,
         ),
         child:
             isLoading
-                ? SizedBox(
+                ? const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
@@ -701,7 +675,7 @@ class _VetassessRegistrationFormState
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-                : Text(text, style: TextStyle(fontSize: 14)),
+                : Text(text, style: const TextStyle(fontSize: 14)),
       ),
     );
   }
