@@ -17,8 +17,8 @@ class NominateScreen extends StatelessWidget {
     return BasePageLayout(
       child: Column(
         children: [
-          _buildHeaderBanner(screenHeight, screenWidth),
-          _buildBreadcrumbs(screenWidth),
+        
+          _buildResponsiveHeaderBanner(),_buildResponsiveBreadcrumbs() ,
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 35.0),
             child: Column(
@@ -891,7 +891,7 @@ Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
   
   return Container(
     width: screenWidth,
-    height: isMobile ? screenHeight * 0.35 : screenHeight * 0.45,
+    height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
     decoration: const BoxDecoration(color: tealColor),
     child: Stack(
       children: [
@@ -900,7 +900,7 @@ Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
           right: 0,
           child: Image.asset(
             'assets/images/internal_page_banner.png',
-            height: isMobile ? screenHeight * 0.35 : screenHeight * 0.45,
+            height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
             fit: BoxFit.fitHeight,
           ),
         ),
@@ -1041,4 +1041,5 @@ Widget _buildResponsiveBreadcrumbs() {
       return _buildBreadcrumbs(constraints.maxWidth);
     },
   );
-}}
+}
+}

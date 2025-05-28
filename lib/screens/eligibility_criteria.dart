@@ -8,6 +8,7 @@ const Color kYellowColor = Color(0xFFF9C700);
 const Color kDottedLineColor = Color(0xFF008996);
 const Color kAccentGreen = Color(0xFF0A594C);
 const Color kAccentGold = Color(0xFFFFA000);
+const Color kAmberColor = Color(0xFFFFA000);
 
 class EligibilityCriteria extends StatelessWidget {
   const EligibilityCriteria({super.key});
@@ -21,9 +22,9 @@ class EligibilityCriteria extends StatelessWidget {
     return BasePageLayout(
       child: Column(
         children: [
-          _buildHeaderBanner(screenHeight, screenWidth, isSmallScreen),
-          _buildBreadcrumbs(isSmallScreen),
-          ..._buildProcessSteps(screenWidth, isSmallScreen),
+          _buildHeaderBanner(context),
+          _buildBreadcrumbs(context),
+          ..._buildProcessSteps(context),
           _buildAnnouncement(context),
           _buildGatherDocSection(isSmallScreen),
           _buildSearchSection(screenHeight, screenWidth, isSmallScreen),
@@ -33,60 +34,174 @@ class EligibilityCriteria extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderBanner(
-    double screenHeight,
-    double screenWidth,
-    bool isSmallScreen,
-  ) {
+ // Helper method to get responsive values based on screen size
+  double getResponsiveValue(BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) {
+    double width = MediaQuery.of(context).size.width;
+    if (width < 600) {
+      return mobile;
+    } else if (width < 1024) {
+      return tablet;
+    } else {
+      return desktop;
+    }
+  }
+
+  // Helper method to check screen size categories
+  bool isMobile(BuildContext context) => MediaQuery.of(context).size.width < 600;
+  bool isTablet(BuildContext context) => MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 1024;
+  bool isDesktop(BuildContext context) => MediaQuery.of(context).size.width >= 1024;
+
+  Widget _buildHeaderBanner(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    
     return Container(
       width: screenWidth,
-      height: screenHeight * 0.64,
+      height: getResponsiveValue(
+        context,
+        mobile: screenHeight * 0.5,
+        tablet: screenHeight * 0.6,
+        desktop: screenHeight * 0.64,
+      ),
       decoration: const BoxDecoration(color: kTealColor),
       child: Stack(
         children: [
+          // Background image
           Positioned(
             right: 0,
             child: Image.asset(
               'assets/images/internal_page_banner.png',
-              height: screenHeight * 0.64,
+              height: getResponsiveValue(
+                context,
+                mobile: screenHeight * 0.5,
+                tablet: screenHeight * 0.6,
+                desktop: screenHeight * 0.64,
+              ),
               fit: BoxFit.fitHeight,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: getResponsiveValue(
+                    context,
+                    mobile: screenHeight * 0.5,
+                    tablet: screenHeight * 0.6,
+                    desktop: screenHeight * 0.64,
+                  ),
+                  width: getResponsiveValue(
+                    context,
+                    mobile: 150,
+                    tablet: 200,
+                    desktop: 300,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        kTealColor.withOpacity(0.8),
+                        kTealColor.withOpacity(0.4),
+                      ],
+                    ),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Banner Image',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          Container(
-            width: isSmallScreen ? screenWidth * 0.9 : screenWidth * 0.66,
-            padding: EdgeInsets.only(
-              top: isSmallScreen ? 60 : 100,
-              left: isSmallScreen ? 20 : 170,
-              right: isSmallScreen ? 20 : 0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isSmallScreen
-                      ? "Application process for a professional or general skills application"
-                      : "Application process for a \nprofessional or general \nskills application",
-                  style: TextStyle(
-                    color: const Color(0xFFFFA000),
-                    fontSize: isSmallScreen ? 28 : 42,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    height: isSmallScreen ? 1.2 : 1.0,
-                  ),
+          // Content container
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            right: isMobile(context) ? 0 : null,
+            child: Container(
+              width: isMobile(context) 
+                ? screenWidth * 0.95 
+                : isTablet(context) 
+                  ? screenWidth * 0.7
+                  : screenWidth * 0.66,
+              padding: EdgeInsets.only(
+                top: getResponsiveValue(
+                  context,
+                  mobile: 40,
+                  tablet: 80,
+                  desktop: 100,
                 ),
-                SizedBox(height: isSmallScreen ? 20 : 30),
-                Text(
-                  isSmallScreen
-                      ? "Start your migration journey by applying for a skills assessment for your professional occupation."
-                      : "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isSmallScreen ? 14 : 16,
-                    height: 1.5,
-                    letterSpacing: 0.3,
-                  ),
+                left: getResponsiveValue(
+                  context,
+                  mobile: 20,
+                  tablet: 40,
+                  desktop: 170,
                 ),
-              ],
+                right: getResponsiveValue(
+                  context,
+                  mobile: 20,
+                  tablet: 40,
+                  desktop: 0,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // Main heading
+                  Text(
+                    isMobile(context)
+                        ? "Application process for a professional or general skills application"
+                        : "Application process for a \nprofessional or general \nskills application",
+                    style: TextStyle(
+                      color: kAmberColor,
+                      fontSize: getResponsiveValue(
+                        context,
+                        mobile: 24,
+                        tablet: 32,
+                        desktop: 42,
+                      ),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      height: isMobile(context) ? 1.2 : 1.0,
+                    ),
+                  ),
+                  SizedBox(
+                    height: getResponsiveValue(
+                      context,
+                      mobile: 16,
+                      tablet: 24,
+                      desktop: 30,
+                    ),
+                  ),
+                  // Subtitle
+                  Text(
+                    isMobile(context)
+                        ? "Start your migration journey by applying for a skills assessment for your professional occupation."
+                        : "Start your migration journey by applying for a skills assessment for your professional \noccupation.",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: getResponsiveValue(
+                        context,
+                        mobile: 14,
+                        tablet: 15,
+                        desktop: 16,
+                      ),
+                      height: 1.5,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -94,7 +209,9 @@ class EligibilityCriteria extends StatelessWidget {
     );
   }
 
-  Widget _buildBreadcrumbs(bool isSmallScreen) {
+  Widget _buildBreadcrumbs(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     const linkStyle = TextStyle(
       fontSize: 14,
       color: Color(0xFF0d5257),
@@ -113,17 +230,27 @@ class EligibilityCriteria extends StatelessWidget {
     ];
 
     return Container(
+      width: screenWidth,
       padding: EdgeInsets.symmetric(
         vertical: 12,
-        horizontal: isSmallScreen ? 20 : 150,
+        horizontal: getResponsiveValue(
+          context,
+          mobile: 20,
+          tablet: 40,
+          desktop: 150,
+        ),
       ),
-      child:
-          isSmallScreen
-              ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: isMobile(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildBreadcrumbItems(breadcrumbs, linkStyle),
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
                 children: _buildBreadcrumbItems(breadcrumbs, linkStyle),
-              )
-              : Row(children: _buildBreadcrumbItems(breadcrumbs, linkStyle)),
+              ),
+            ),
     );
   }
 
@@ -134,70 +261,169 @@ class EligibilityCriteria extends StatelessWidget {
     List<Widget> widgets = [];
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
+      final text = item['text'] ?? '';
       final isActive = item['isActive'] == 'true';
 
-      widgets.add(
-        isActive
-            ? Text(
-              item['text']!,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
-            )
-            : TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-              ),
-              child: Text(item['text']!, style: linkStyle),
-            ),
-      );
+      if (text.isNotEmpty) {
+        widgets.add(
+          isActive
+              ? Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.grey[600], 
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                )
+              : InkWell(
+                  onTap: () {
+                    // Handle navigation
+                    print('Navigate to: $text');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      text, 
+                      style: linkStyle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+        );
 
-      if (i < items.length - 1) {
-        widgets.add(const Text(' / ', style: TextStyle(color: Colors.grey)));
+        if (i < items.length - 1) {
+          widgets.add(
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4.0),
+              child: Text(
+                ' / ', 
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          );
+        }
       }
     }
     return widgets;
   }
 
-  List<Widget> _buildProcessSteps(double screenWidth, bool isSmallScreen) {
-    const stepText =
-        'We provide skills assessments \nfor the largest range of \noccupations in Australia.';
+  List<Widget> _buildProcessSteps(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    const stepText = 'We provide skills assessments \nfor the largest range of \noccupations in Australia.';
     const description =
         "The Australian Government has authorised us to provide skills assessments for 341 professional and other non-trade occupations. If you're a professional needing a skills assessment to migrate to Australia, we can offer you a service that understands and can assess your experience and qualifications.";
 
     final stepInfoColumn = Container(
-      width: isSmallScreen ? screenWidth * 0.9 : screenWidth * 0.4,
+      width: isMobile(context) 
+        ? screenWidth * 0.9 
+        : isTablet(context) 
+          ? screenWidth * 0.5
+          : screenWidth * 0.4,
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            stepText,
+            isMobile(context) 
+              ? stepText.replaceAll('\n', ' ')
+              : stepText,
             style: TextStyle(
-              fontSize: isSmallScreen ? 24 : 32,
+              fontSize: getResponsiveValue(
+                context,
+                mobile: 22,
+                tablet: 28,
+                desktop: 32,
+              ),
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF006064),
+              color: kTealColor,
+              height: 1.2,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(
+            height: getResponsiveValue(
+              context,
+              mobile: 16,
+              tablet: 18,
+              desktop: 20,
+            ),
+          ),
           Text(
             description,
             style: TextStyle(
-              fontSize: isSmallScreen ? 14 : 16,
+              fontSize: getResponsiveValue(
+                context,
+                mobile: 14,
+                tablet: 15,
+                desktop: 16,
+              ),
               height: 1.5,
               letterSpacing: 0.3,
+              color: Colors.grey[700],
             ),
           ),
         ],
       ),
     );
 
-    final imageWidget = Image.asset(
-      'assets/images/skiil_assesment_support.jpg',
-      height: isSmallScreen ? 300 : 450,
-      width: isSmallScreen ? screenWidth * 0.9 : 600,
-      fit: BoxFit.cover,
+    final imageWidget = ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        'assets/images/skiil_assesment_support.jpg',
+        height: getResponsiveValue(
+          context,
+          mobile: 250,
+          tablet: 350,
+          desktop: 450,
+        ),
+        width: isMobile(context) 
+          ? screenWidth * 0.9 
+          : isTablet(context)
+            ? screenWidth * 0.4
+            : 600,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: getResponsiveValue(
+              context,
+              mobile: 250,
+              tablet: 350,
+              desktop: 450,
+            ),
+            width: isMobile(context) 
+              ? screenWidth * 0.9 
+              : isTablet(context)
+                ? screenWidth * 0.4
+                : 600,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.image,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Skills Assessment Image',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
 
     return [
@@ -205,25 +431,48 @@ class EligibilityCriteria extends StatelessWidget {
         color: Colors.white,
         width: screenWidth,
         padding: EdgeInsets.symmetric(
-          horizontal: isSmallScreen ? screenWidth * 0.05 : screenWidth * 0.1,
-          vertical: isSmallScreen ? 30 : screenWidth * 0.06,
+          horizontal: getResponsiveValue(
+            context,
+            mobile: screenWidth * 0.05,
+            tablet: screenWidth * 0.08,
+            desktop: screenWidth * 0.1,
+          ),
+          vertical: getResponsiveValue(
+            context,
+            mobile: 30,
+            tablet: 40,
+            desktop: screenWidth * 0.06,
+          ),
         ),
-        child:
-            isSmallScreen
-                ? Column(
-                  children: [
-                    stepInfoColumn,
-                    const SizedBox(height: 20),
-                    imageWidget,
-                  ],
-                )
-                : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [stepInfoColumn, imageWidget],
-                ),
+        child: isMobile(context)
+            ? Column(
+                children: [
+                  stepInfoColumn,
+                  SizedBox(
+                    height: getResponsiveValue(
+                      context,
+                      mobile: 20,
+                      tablet: 30,
+                      desktop: 40,
+                    ),
+                  ),
+                  imageWidget,
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: stepInfoColumn),
+                  const SizedBox(width: 40),
+                  imageWidget,
+                ],
+              ),
       ),
     ];
   }
+
+
 
   Widget _buildAnnouncement(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;

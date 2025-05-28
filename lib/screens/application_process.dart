@@ -22,7 +22,7 @@ class ApplicationProcess extends StatelessWidget {
         children: [
           _buildHeaderBanner(screenHeight, screenWidth),
           _buildBreadcrumbs(),
-          _buildMainContent(screenWidth, screenHeight,context),
+          _buildMainContent(context),
           ProcessStepsSection(),
           _buildKeyTermsSection(
             'Key terms for Qualifications\nAssessment Criteria',
@@ -46,7 +46,7 @@ class ApplicationProcess extends StatelessWidget {
             context,
           ),
           SizedBox(height: screenHeight / 6),
-          _buildAfterApplicationSection(isLargeScreen),
+          _buildAfterApplicationSection(),
           _buildFaqSection(
             title: 'Explore FAQs',
             items: [
@@ -244,57 +244,73 @@ Widget _buildBreadcrumbs() {
     },
   );
 }
-  Widget _buildMainContent(double screenWidth, double screenHeight, BuildContext context) {
+  Widget _buildMainContent(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final screenWidth = size.width;
+    final screenHeight = size.height;
+    
+    // Define responsive breakpoints
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    final isDesktop = screenWidth >= 1024;
+    
+    // Responsive padding
+    final horizontalPadding = isMobile 
+        ? 16.0 
+        : isTablet 
+            ? 40.0 
+            : screenWidth * 0.1; // 10% of screen width for desktop
+    
+    final topPadding = isMobile ? 20.0 : 50.0;
+    final bottomPadding = isMobile ? 40.0 : 100.0;
+
     return Container(
-      padding: const EdgeInsets.only(
-        top: 50,
-        right: 170,
-        left: 170,
-        bottom: 100,
+      padding: EdgeInsets.only(
+        top: topPadding,
+        right: horizontalPadding,
+        left: horizontalPadding,
+        bottom: bottomPadding,
       ),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          // Title with responsive font size
+          Text(
             'Application Process',
             style: TextStyle(
-              fontSize: 32,
+              fontSize: isMobile ? 24 : isTablet ? 28 : 32,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF006064),
+              color: const Color(0xFF006064),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: isMobile ? 16 : 24),
+          
+          // Content container with responsive width
           Container(
-            padding: const EdgeInsets.only(bottom: 150),
-            width: screenWidth * 0.55,
-            child: const Column(
+            padding: EdgeInsets.only(
+              bottom: isMobile ? 60 : isTablet ? 100 : 150
+            ),
+            width: isMobile 
+                ? double.infinity 
+                : isTablet 
+                    ? screenWidth * 0.8 
+                    : screenWidth * 0.55,
+            child: Column(
               children: [
-                Text(
+                _buildResponsiveText(
                   'A VETASSESS full skills assessment involves assessing your qualifications and employment against the suitability of your nominated occupation.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
-                    letterSpacing: 0.3,
-                  ),
+                  isMobile,
                 ),
-                SizedBox(height: 24),
-                Text(
+                SizedBox(height: isMobile ? 16 : 24),
+                _buildResponsiveText(
                   'We assess your qualification/s against the Australian Qualifications Framework (AQF) and to determine the relevance of your qualifications for your nominated occupation. Employment assessment involves determining whether your work experience - whether in Australia or overseas - is at an appropriate skill level to your nominated occupation.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
-                    letterSpacing: 0.3,
-                  ),
+                  isMobile,
                 ),
-                SizedBox(height: 24),
-                Text(
+                SizedBox(height: isMobile ? 16 : 24),
+                _buildResponsiveText(
                   'You need a positive assessment of both your qualifications and your employment for your skills assessment to be successful.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
-                    letterSpacing: 0.3,
-                  ),
+                  isMobile,
                 ),
               ],
             ),
@@ -304,77 +320,470 @@ Widget _buildBreadcrumbs() {
       ),
     );
   }
-Widget _buildTradesBanner(BuildContext context) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = constraints.maxWidth;
-      final screenHeight = MediaQuery.of(context).size.height;
-      
-      // Responsive breakpoints
-      final isTablet = screenWidth >= 768;
-      final isDesktop = screenWidth >= 1024;
-      final isMobile = screenWidth < 768;
-      
-      // Responsive dimensions
-      final bannerHeight = isDesktop 
-          ? screenHeight * 0.3 
-          : isTablet 
-              ? screenHeight * 0.28 
-              : screenHeight * 0.25;
-              
-      final svgSize = isDesktop 
-          ? screenHeight * 0.18 
-          : isTablet 
-              ? screenHeight * 0.16 
-              : screenHeight * 0.15;
-              
-      final horizontalPadding = isDesktop 
-          ? 120.0 
-          : isTablet 
-              ? 80.0 
-              : 20.0;
-              
-      final fontSize = isDesktop 
-          ? 32.0 
-          : isTablet 
-              ? 28.0 
-              : isMobile && screenWidth < 400 
-                  ? 20.0 
-                  : 26.0;
-                  
-      final buttonWidth = isDesktop 
-          ? 150.0 
-          : isTablet 
-              ? 135.0 
-              : 125.0;
 
+  Widget _buildResponsiveText(String text, bool isMobile) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: isMobile ? 14 : 16,
+        height: 1.5,
+        letterSpacing: 0.3,
+      ),
+    );
+  }
+
+  Widget _buildTradesBanner(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = MediaQuery.of(context).size;
+        final screenWidth = size.width;
+        final screenHeight = size.height;
+        
+        // Responsive breakpoints
+        final isMobile = screenWidth < 600;
+        final isTablet = screenWidth >= 600 && screenWidth < 1024;
+        final isDesktop = screenWidth >= 1024;
+        
+        // Responsive dimensions with safe constraints
+        final bannerHeight = isMobile 
+            ? 200.0 // Fixed height for mobile to avoid overflow
+            : isTablet 
+                ? screenHeight * 0.25 
+                : screenHeight * 0.3;
+                
+        final svgSize = isMobile 
+            ? 120.0 
+            : isTablet 
+                ? screenHeight * 0.16 
+                : screenHeight * 0.18;
+                
+        final horizontalPadding = isMobile 
+            ? 16.0 
+            : isTablet 
+                ? 40.0 
+                : 80.0;
+                
+        final fontSize = isMobile 
+            ? 18.0 
+            : isTablet 
+                ? 24.0 
+                : 28.0;
+                
+        final buttonWidth = isMobile 
+            ? 100.0 
+            : isTablet 
+                ? 120.0 
+                : 150.0;
+
+        return Container(
+          width: double.infinity,
+          constraints: BoxConstraints(
+            minHeight: 150, // Minimum height to prevent too small banners
+            maxHeight: screenHeight * 0.4, // Maximum height to prevent overflow
+          ),
+          height: bannerHeight,
+          decoration: const BoxDecoration(color: tealColor),
+          child: Stack(
+            children: [
+              // Background SVG - only show on larger screens to avoid clutter
+              if (!isMobile)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  child: SvgPicture.asset(
+                    'assets/images/vet.svg',
+                    width: svgSize,
+                    height: bannerHeight,
+                    fit: BoxFit.contain, // Changed to contain to prevent overflow
+                  ),
+                ),
+              
+              // Content
+              Positioned.fill(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: isMobile
+                      ? _buildMobileLayout(fontSize, buttonWidth)
+                      : _buildDesktopLayout(fontSize, buttonWidth),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Layout for mobile devices (stacked vertically)
+  Widget _buildMobileLayout(double fontSize, double buttonWidth) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Flexible(
+          child: Text(
+            'Looking for the trades assessment process?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: const Color(0xFFFFA000),
+              fontSize: fontSize,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+              height: 1.2,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildActionButton("Go Here", buttonWidth),
+      ],
+    );
+  }
+
+  // Layout for tablet and desktop (horizontal)
+  Widget _buildDesktopLayout(double fontSize, double buttonWidth) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Text(
+            'Looking for the trades assessment process?',
+            style: TextStyle(
+              color: const Color(0xFFFFA000),
+              fontSize: fontSize,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+              height: 1.2,
+            ),
+          ),
+        ),
+        const SizedBox(width: 20),
+        _buildActionButton("Go Here", buttonWidth),
+      ],
+    );
+  }
+
+
+
+
+Widget _buildKeyTermsSection(
+  String sectionTitle,
+  List<String> expandableTitles,
+  bool includeParagraphs,
+  BuildContext context,
+) {
+  // Get screen dimensions
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+  
+  // Calculate responsive dimensions
+  final horizontalPadding = screenWidth * 0.05; // 5% of screen width
+  final verticalPadding = screenHeight * 0.03; // 3% of screen height
+  final leftColumnWidth = screenWidth > 800 
+      ? screenWidth * 0.3 // 30% for larger screens
+      : screenWidth * 0.35; // 35% for smaller screens
+  
+  // Responsive font sizes
+  final titleFontSize = screenWidth > 800 ? 28.0 : 24.0;
+  final expandableFontSize = screenWidth > 800 ? 16.0 : 14.0;
+  final paragraphFontSize = screenWidth > 800 ? 15.0 : 13.0;
+
+  // Generate expandable sections
+  List<Widget> expandableSections = _buildExpandableSections(
+    expandableTitles,
+    includeParagraphs,
+    context,
+  );
+
+  return Container(
+    padding: EdgeInsets.symmetric(
+      horizontal: horizontalPadding,
+      vertical: verticalPadding,
+    ),
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.05),
+          spreadRadius: 1,
+          blurRadius: 1,
+          offset: const Offset(0, 1),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Yellow top divider
+        Container(
+          margin: EdgeInsets.only(bottom: screenHeight * 0.02),
+          height: 1,
+          color: yellowColor,
+        ),
+        // Main content with responsive layout
+        screenWidth > 600
+            ? _buildTwoColumnLayout(
+                sectionTitle,
+                expandableSections,
+                leftColumnWidth,
+                titleFontSize,
+                context,
+              )
+            : _buildSingleColumnLayout(
+                sectionTitle,
+                expandableSections,
+                titleFontSize,
+                context,
+              ),
+      ],
+    ),
+  );
+}
+
+Widget _buildTwoColumnLayout(
+  String sectionTitle,
+  List<Widget> expandableSections,
+  double leftColumnWidth,
+  double titleFontSize,
+  BuildContext context,
+) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  final responsivePadding = screenHeight * 0.02;
+
+  return IntrinsicHeight(
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left column - Title only
+        Container(
+          width: leftColumnWidth,
+          padding: EdgeInsets.fromLTRB(
+            responsivePadding,
+            responsivePadding,
+            0,
+            responsivePadding,
+          ),
+          child: Text(
+            sectionTitle,
+            style: TextStyle(
+              fontSize: titleFontSize,
+              fontWeight: FontWeight.w700,
+              color: tealColor,
+              height: 1.3,
+            ),
+          ),
+        ),
+        // Right column - Content
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: expandableSections,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildSingleColumnLayout(
+  String sectionTitle,
+  List<Widget> expandableSections,
+  double titleFontSize,
+  BuildContext context,
+) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  final responsivePadding = screenHeight * 0.02;
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Title section
+      Padding(
+        padding: EdgeInsets.fromLTRB(
+          responsivePadding,
+          responsivePadding,
+          responsivePadding,
+          responsivePadding,
+        ),
+        child: Text(
+          sectionTitle,
+          style: TextStyle(
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.w700,
+            color: tealColor,
+            height: 1.3,
+          ),
+        ),
+      ),
+      // Expandable sections
+      ...expandableSections,
+    ],
+  );
+}
+
+List<Widget> _buildExpandableSections(
+  List<String> expandableTitles,
+  bool includeParagraphs,
+  BuildContext context,
+) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+  
+  // Responsive dimensions
+  final horizontalPadding = screenWidth * 0.02;
+  final verticalPadding = screenHeight * 0.01;
+  final expandableFontSize = screenWidth > 800 ? 16.0 : 14.0;
+  final paragraphFontSize = screenWidth > 800 ? 15.0 : 13.0;
+  
+  List<Widget> expandableSections = [];
+
+  for (int i = 0; i < expandableTitles.length; i++) {
+    // Add expandable tile
+    expandableSections.add(
+      Theme(
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+          colorScheme: Theme.of(context)
+              .colorScheme
+              .copyWith(surfaceTint: Colors.transparent),
+        ),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.fromLTRB(
+            horizontalPadding * 1.2,
+            i == 0 ? verticalPadding * 2.4 : verticalPadding * 1.2,
+            horizontalPadding * 1.2,
+            verticalPadding * 1.2,
+          ),
+          title: Text(
+            expandableTitles[i],
+            style: TextStyle(
+              fontSize: expandableFontSize,
+              fontWeight: FontWeight.w600,
+              color: tealColor,
+            ),
+          ),
+          trailing: _buildCircleIcon(Icons.add, tealColor),
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding * 1.2,
+                0,
+                horizontalPadding * 1.2,
+                verticalPadding * 1.6,
+              ),
+              child: Text(
+                'Content for required educational level',
+                style: TextStyle(
+                  fontSize: paragraphFontSize,
+                  color: Colors.black87,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // Add dotted line separator if not the last item
+    if (i < expandableTitles.length - 1 || includeParagraphs) {
+      expandableSections.add(_buildDottedLine(color: Color(0xFFfd7e14)));
+    }
+  }
+
+  // Add text paragraphs if required
+  if (includeParagraphs) {
+    final textStyle = TextStyle(
+      fontSize: paragraphFontSize,
+      color: Colors.black87,
+      height: 1.5,
+    );
+    
+    final List<String> paragraphs = [
+      'Please note that we will not be assessing an Australian Graduate Diploma or comparable overseas postgraduate diploma, either alone or in combination with underpinning sub-degree qualifications, for comparability to the educational level of an Australian Bachelor degree.',
+      'This is based on the different nature and learning outcomes of an Australian Bachelor degree compared to other qualifications on the AQF.',
+      'Therefore, a qualification assessed at AQF Graduate Diploma level cannot be used to meet the requirements of occupations that require a minimum of an AQF Bachelor degree level.',
+      'The Postgraduate Diploma may, however, be considered for assessment against the requirements of occupations which require a qualification at AQF Diploma or Advanced Diploma/ Associate degree level.',
+    ];
+
+    for (int i = 0; i < paragraphs.length; i++) {
+      expandableSections.add(
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding * 1.2,
+            verticalPadding * 2.4,
+            horizontalPadding * 1.2,
+            i < paragraphs.length - 1 ? 0 : verticalPadding * 2.4,
+          ),
+          child: Text(paragraphs[i], style: textStyle),
+        ),
+      );
+
+      if (i < paragraphs.length - 1) {
+        expandableSections.add(SizedBox(height: verticalPadding * 2.4));
+      }
+    }
+  }
+
+  return expandableSections;
+}
+
+Widget _buildAfterApplicationSection() {
+  return Builder(
+    builder: (context) {
+      final screenSize = MediaQuery.of(context).size;
+      final screenWidth = screenSize.width;
+      final screenHeight = screenSize.height;
+      
+      // Clean responsive breakpoints
+      final bool isMobile = screenWidth < 768;
+      final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+      final bool isDesktop = screenWidth >= 1024;
+      
+      // Responsive scaling factor
+      final double scaleFactor = isMobile ? 0.8 : 1.0;
+      
       return Container(
         width: double.infinity,
-        height: bannerHeight,
-        decoration: const BoxDecoration(color: tealColor),
-        child: Stack(
+        color: Color(0xfff2f2f2),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 16.0 : (isTablet ? 80.0 : 170.0),
+          vertical: isMobile ? 24.0 : 40.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Background SVG
-            Positioned(
-              left: 0,
-              top: 0,
-              child: SvgPicture.asset(
-                'assets/images/vet.svg',
-                width: svgSize,
-                height: bannerHeight * 1.04,
-                fit: BoxFit.fitHeight,
+            Text(
+              'After your application',
+              style: TextStyle(
+                fontSize: isMobile ? 22.0 : (isTablet ? 26.0 : 28.0),
+                fontWeight: FontWeight.bold,
+                color: tealColor,
               ),
             ),
-            
-            // Content
-            Center(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: isMobile && screenWidth < 600
-                    ? _buildMobileLayout(fontSize, buttonWidth)
-                    : _buildDesktopLayout(fontSize, buttonWidth),
+            SizedBox(height: 16.0 * scaleFactor),
+            Text(
+              'You can ask for a review or an appeal of a VETASSESS skills assessment outcome, and you can apply to \nhave your skills assessed against another occupation.',
+              style: TextStyle(
+                fontSize: isMobile ? 14.0 : 16.0,
+                height: 1.5,
+                color: Colors.black87,
               ),
             ),
+            SizedBox(height: 30.0 * scaleFactor),
+            isDesktop 
+                ? _buildOptionsGrid(
+                    screenWidth: screenWidth,
+                    isMobile: isMobile,
+                    isTablet: isTablet,
+                  )
+                : _buildOptionsColumn(
+                    isMobile: isMobile,
+                    scaleFactor: scaleFactor,
+                  ),
+            SizedBox(height: 40.0 * scaleFactor),
           ],
         ),
       );
@@ -382,623 +791,859 @@ Widget _buildTradesBanner(BuildContext context) {
   );
 }
 
-// Layout for mobile devices (stacked vertically)
-Widget _buildMobileLayout(double fontSize, double buttonWidth) {
+Widget _buildOptionsGrid({
+  required double screenWidth,
+  required bool isMobile,
+  required bool isTablet,
+}) {
+  final List<Map<String, String>> options = _getOptionData();
+  
+  // Clean grid configuration
+  final int crossAxisCount = screenWidth < 1200 ? 2 : 3;
+  final double spacing = isTablet ? 18.0 : 20.0;
+  final double aspectRatio = isTablet ? 1.1 : 1.05;
+
+  return GridView.builder(
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: crossAxisCount,
+      crossAxisSpacing: spacing,
+      mainAxisSpacing: spacing,
+      childAspectRatio: aspectRatio,
+    ),
+    shrinkWrap: true,
+    physics: NeverScrollableScrollPhysics(),
+    itemCount: options.length,
+    itemBuilder: (context, index) {
+      final option = options[index];
+      return _buildOptionCard(
+        option['title']!,
+        option['description']!,
+        isMobile: isMobile,
+        isTablet: isTablet,
+      );
+    },
+  );
+}
+
+Widget _buildOptionsColumn({
+  required bool isMobile,
+  required double scaleFactor,
+}) {
+  final List<Map<String, String>> options = _getOptionData();
+
   return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Text(
-        'Looking for the trades assessment process?',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: const Color(0xFFFFA000),
-          fontSize: fontSize,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          height: 1.2,
-        ),
-      ),
-      const SizedBox(height: 20),
-      _buildActionButton("Go Here", buttonWidth),
-    ],
+    children: options.asMap().entries.map((entry) {
+      final option = entry.value;
+      final isLast = entry.key == options.length - 1;
+      
+      return Column(
+        children: [
+          _buildOptionCard(
+            option['title']!,
+            option['description']!,
+            isMobile: isMobile,
+            isTablet: false,
+          ),
+          if (!isLast) SizedBox(height: 20.0 * scaleFactor),
+        ],
+      );
+    }).toList(),
   );
 }
 
-// Layout for tablet and desktop (horizontal)
-Widget _buildDesktopLayout(double fontSize, double buttonWidth) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Expanded(
-        flex: 3,
-        child: Text(
-          'Looking for the trades assessment process?',
-          style: TextStyle(
-            color: const Color(0xFFFFA000),
-            fontSize: fontSize,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-            height: 1.2,
-          ),
-        ),
-      ),
-      const SizedBox(width: 20),
-      _buildActionButton("Go Here", buttonWidth),
-    ],
-  );
+List<Map<String, String>> _getOptionData() {
+  return [
+    {
+      'title': 'Renew your Application',
+      'description':
+          'Find out how to renew your application before it expires.',
+    },
+    {
+      'title': 'Apply for Review',
+      'description':
+          'If you disagree with your unsuccessful skills assessment outcome, you can ask for a review of the decision.',
+    },
+    {
+      'title': 'Apply for Reassessment',
+      'description':
+          'You can apply for a reassessment with a change of occupation.',
+    },
+    {
+      'title': 'Provide Feedback',
+      'description':
+          'The team at VETASSESS will gladly receive and respond to all feedback from customers in a professional, timely and respectful manner. We aim to respond to all feedback within ten business days.',
+    },
+  ];
 }
-  Widget _buildKeyTermsSection(
-    String sectionTitle,
-    List<String> expandableTitles,
-    bool includeParagraphs,
-    BuildContext context,
-  ) {
-    // Generate expandable sections
-    List<Widget> expandableSections = _buildExpandableSections(
-      expandableTitles,
-      includeParagraphs,
-      context,
-    );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 150),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 1,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Yellow top divider
-          Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            height: 1,
-            color: yellowColor,
-          ),
-          // Main content with two columns
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left column - Title only
-                Container(
-                  width: 400,
-                  padding: const EdgeInsets.fromLTRB(24, 24, 0, 24),
-                  child: Text(
-                    sectionTitle,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: tealColor,
-                      height: 1.3,
-                    ),
-                  ),
-                ),
-                // Right column - Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: expandableSections,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+Widget _buildOptionCard(
+  String title,
+  String description, {
+  required bool isMobile,
+  required bool isTablet,
+}) {
+  // Clean responsive values
+  final double cardPadding = isMobile ? 12.0 : 14.0;
+  final double titleFontSize = isMobile ? 18.0 : (isTablet ? 19.0 : 20.0);
+  final double descriptionFontSize = isMobile ? 14.0 : 16.0;
+  final double buttonFontSize = isMobile ? 14.0 : 16.0;
+  final double iconSize = isMobile ? 16.0 : 18.0;
+  final double containerSize = isMobile ? 28.0 : 32.0;
+  final double underlineWidth = isMobile ? 75.0 : 90.0;
 
-  List<Widget> _buildExpandableSections(
-    List<String> expandableTitles,
-    bool includeParagraphs,
-    BuildContext context,
-  ) {
-    List<Widget> expandableSections = [];
-
-    for (int i = 0; i < expandableTitles.length; i++) {
-      // Add expandable tile
-      expandableSections.add(
-        Theme(
-          data: Theme.of(context).copyWith(
-            dividerColor: Colors.transparent,
-            colorScheme: Theme.of(
-              context,
-            ).colorScheme.copyWith(surfaceTint: Colors.transparent),
-          ),
-          child: ExpansionTile(
-            tilePadding: EdgeInsets.fromLTRB(24, i == 0 ? 24 : 12, 24, 12),
-            title: Text(
-              expandableTitles[i],
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: tealColor,
-              ),
-            ),
-            trailing: _buildCircleIcon(Icons.add, tealColor),
-            children: const [
-              Padding(
-                padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
-                child: Text('Content for required educational level'),
-              ),
-            ],
-          ),
+  return Container(
+    width: double.infinity,
+    padding: EdgeInsets.all(cardPadding),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: Colors.grey.shade200, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.05),
+          spreadRadius: 0,
+          blurRadius: 2,
+          offset: const Offset(0, 1),
         ),
-      );
-
-      // Add dotted line separator if not the last item
-      if (i < expandableTitles.length - 1 || includeParagraphs) {
-        expandableSections.add(_buildDottedLine());
-      }
-    }
-
-    // Add text paragraphs if required
-    if (includeParagraphs) {
-      const textStyle = TextStyle(
-        fontSize: 15,
-        color: Colors.black87,
-        height: 1.5,
-      );
-      final List<String> paragraphs = [
-        'Please note that we will not be assessing an Australian Graduate Diploma or comparable overseas postgraduate diploma, either alone or in combination with underpinning sub-degree qualifications, for comparability to the educational level of an Australian Bachelor degree.',
-        'This is based on the different nature and learning outcomes of an Australian Bachelor degree compared to other qualifications on the AQF.',
-        'Therefore, a qualification assessed at AQF Graduate Diploma level cannot be used to meet the requirements of occupations that require a minimum of an AQF Bachelor degree level.',
-        'The Postgraduate Diploma may, however, be considered for assessment against the requirements of occupations which require a qualification at AQF Diploma or Advanced Diploma/ Associate degree level.',
-      ];
-
-      for (int i = 0; i < paragraphs.length; i++) {
-        expandableSections.add(
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              24,
-              24,
-              24,
-              i < paragraphs.length - 1 ? 0 : 24,
-            ),
-            child: Text(paragraphs[i], style: textStyle),
-          ),
-        );
-
-        if (i < paragraphs.length - 1) {
-          expandableSections.add(const SizedBox(height: 24));
-        }
-      }
-    }
-
-    return expandableSections;
-  }
-
-  Widget _buildAfterApplicationSection(bool isLargeScreen) {
-    return Container(
-      color: Color(0xfff2f2f2),
-      padding: EdgeInsets.symmetric(
-        horizontal: isLargeScreen ? 170.0 : 20.0,
-        vertical: 40.0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'After your application',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: tealColor,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'You can ask for a review or an appeal of a VETASSESS skills assessment outcome, and you can apply to \nhave your skills assessed against another occupation.',
-            style: TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
-          ),
-          const SizedBox(height: 30),
-          isLargeScreen ? _buildOptionsGrid() : _buildOptionsColumn(),
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptionsGrid() {
-    final List<Map<String, String>> options = _getOptionData();
-
-    return GridView.count(
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 20,
-      mainAxisSpacing: 20,
-      childAspectRatio: 1.05,
-      children:
-          options
-              .map(
-                (option) =>
-                    _buildOptionCard(option['title']!, option['description']!),
-              )
-              .toList(),
-    );
-  }
-
-  Widget _buildOptionsColumn() {
-    final List<Map<String, String>> options = _getOptionData();
-
-    return Column(
-      children:
-          options
-              .map(
-                (option) => Column(
-                  children: [
-                    _buildOptionCard(option['title']!, option['description']!),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              )
-              .toList(),
-    );
-  }
-
-  List<Map<String, String>> _getOptionData() {
-    return [
-      {
-        'title': 'Renew your Application',
-        'description':
-            'Find out how to renew your application before it expires.',
-      },
-      {
-        'title': 'Apply for Review',
-        'description':
-            'If you disagree with your unsuccessful skills assessment outcome, you can ask for a review of the decision.',
-      },
-      {
-        'title': 'Apply for Reassessment',
-        'description':
-            'You can apply for a reassessment with a change of occupation.',
-      },
-      {
-        'title': 'Provide Feedback',
-        'description':
-            'The team at VETASSESS will gladly receive and respond to all feedback from customers in a professional, timely and respectful manner. We aim to respond to all feedback within ten business days.',
-      },
-    ];
-  }
-
-  Widget _buildOptionCard(String title, String description) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            spreadRadius: 0,
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: tealColor,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
-          ),
-          Spacer(),
-          _buildViewMoreButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildViewMoreButton() {
-    return Row(
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Column(
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.bold,
+            color: tealColor,
+          ),
+        ),
+        SizedBox(height: isMobile ? 10.0 : 12.0),
+        Flexible(
+          child: Text(
+            description,
+            style: TextStyle(
+              fontSize: descriptionFontSize,
+              height: 1.5,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        SizedBox(height: isMobile ? 12.0 : 16.0),
+        _buildViewMoreButton(
+          fontSize: buttonFontSize,
+          iconSize: iconSize,
+          containerSize: containerSize,
+          underlineWidth: underlineWidth,
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildViewMoreButton({
+  required double fontSize,
+  required double iconSize,
+  required double containerSize,
+  required double underlineWidth,
+}) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'View more',
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              color: tealColor,
+            ),
+          ),
+          Container(
+            width: underlineWidth,
+            height: 2,
+            color: tealColor,
+            margin: EdgeInsets.only(top: 3),
+          ),
+        ],
+      ),
+      const SizedBox(width: 8),
+      Container(
+        width: containerSize,
+        height: containerSize,
+        decoration: BoxDecoration(
+          color: tealColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          Icons.arrow_forward,
+          color: Colors.white,
+          size: iconSize,
+        ),
+      ),
+    ],
+  );
+}
+
+ Widget _buildFaqSection({
+  required String title,
+  required List<String> items,
+  bool isExpansionPanel = false,
+}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+      
+      // Responsive breakpoints
+      final bool isMobile = screenWidth < 768;
+      final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+      final bool isDesktop = screenWidth >= 1024;
+      
+      // Responsive values
+      final double horizontalPadding = isMobile 
+          ? 16 
+          : isTablet 
+              ? 40 
+              : screenWidth * 0.08; // 8% of screen width for desktop
+      
+      final double verticalPadding = isMobile 
+          ? 32 
+          : isTablet 
+              ? 48 
+              : 60;
+      
+      final double titleFontSize = isMobile 
+          ? 24 
+          : isTablet 
+              ? 28 
+              : 32;
+      
+      final double viewAllFontSize = isMobile 
+          ? 14 
+          : 16;
+      
+      final Color sectionColor = Color(0xFF0A594C);
+
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
+        ),
+        child: isMobile
+            ? _buildFaqMobileLayout(
+                title: title,
+                items: items,
+                isExpansionPanel: isExpansionPanel,
+                sectionColor: sectionColor,
+                titleFontSize: titleFontSize,
+                viewAllFontSize: viewAllFontSize,
+              )
+            : _buildFaqDesktopLayout(
+                title: title,
+                items: items,
+                isExpansionPanel: isExpansionPanel,
+                sectionColor: sectionColor,
+                titleFontSize: titleFontSize,
+                viewAllFontSize: viewAllFontSize,
+                isTablet: isTablet,
+              ),
+      );
+    },
+  );
+}
+
+Widget _buildFaqMobileLayout({
+  required String title,
+  required List<String> items,
+  required bool isExpansionPanel,
+  required Color sectionColor,
+  required double titleFontSize,
+  required double viewAllFontSize,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Title section
+      Text(
+        title,
+        style: TextStyle(
+          fontSize: titleFontSize,
+          fontWeight: FontWeight.w700,
+          color: sectionColor,
+          height: 1.3,
+        ),
+      ),
+      SizedBox(height: 16),
+      
+      // View all button
+      Row(
+        children: [
+          Text(
+            "View all",
+            style: TextStyle(
+              fontSize: viewAllFontSize,
+              fontWeight: FontWeight.w600,
+              color: sectionColor,
+            ),
+          ),
+          SizedBox(width: 8),
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: sectionColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+        ],
+      ),
+      
+      SizedBox(height: 24),
+      
+      // Items section
+      Column(
+        children: items.map((item) {
+          if (isExpansionPanel) {
+            return _buildExpansionItem(item, sectionColor, isMobile: true);
+          } else {
+            return _buildLinkItem(item, sectionColor, isMobile: true);
+          }
+        }).toList(),
+      ),
+    ],
+  );
+}
+
+Widget _buildFaqDesktopLayout({
+  required String title,
+  required List<String> items,
+  required bool isExpansionPanel,
+  required Color sectionColor,
+  required double titleFontSize,
+  required double viewAllFontSize,
+  required bool isTablet,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Left column - Title and View all button
+      Expanded(
+        flex: isTablet ? 2 : 1,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'View more',
+              title,
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: tealColor,
+                fontSize: titleFontSize,
+                fontWeight: FontWeight.w700,
+                color: sectionColor,
+                height: 1.3,
               ),
             ),
-            Container(
-              width: 90,
-              height: 2,
-              color: tealColor,
-              margin: EdgeInsets.only(top: 3),
-            ),
-          ],
-        ),
-        const SizedBox(width: 8),
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(color: tealColor, shape: BoxShape.circle),
-          child: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFaqSection({
-    required String title,
-    required List<String> items,
-    bool isExpansionPanel = false,
-  }) {
-    final Color sectionColor = Color(0xFF0A594C);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 60),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left column - Title and View all button
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(height: 24),
+            Row(
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: sectionColor,
-                    height: 1.3,
+                Flexible(
+                  child: Text(
+                    "View all",
+                    style: TextStyle(
+                      fontSize: viewAllFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: sectionColor,
+                    ),
                   ),
                 ),
-                SizedBox(height: 24),
-                Row(
-                  children: [
-                    Text(
-                      "View all",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: sectionColor,
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: sectionColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ],
+                SizedBox(width: 10),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: sectionColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ),
               ],
             ),
-          ),
-
-          // Right column - Expansion panels or links
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: EdgeInsets.only(top: 6),
-              child: Column(
-                children:
-                    items.map((item) {
-                      if (isExpansionPanel) {
-                        return _buildExpansionItem(item, sectionColor);
-                      } else {
-                        return _buildLinkItem(item, sectionColor);
-                      }
-                    }).toList(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpansionItem(String title, Color color) {
-    return Theme(
-      data: ThemeData(
-        dividerColor: Colors.transparent,
-        colorScheme: ColorScheme.light(
-          surfaceTint: Colors.transparent,
-          primary: color,
+          ],
         ),
       ),
-      child: Column(
-        children: [
-          ExpansionTile(
-            tilePadding: EdgeInsets.symmetric(vertical: 20, horizontal: 0),
-            expandedCrossAxisAlignment: CrossAxisAlignment.start,
-            childrenPadding: EdgeInsets.only(left: 50, bottom: 16, right: 20),
-            leading: _buildCircleIcon(Icons.add, color),
-            title: Text(
-              title,
+
+      SizedBox(width: isTablet ? 24 : 32),
+
+      // Right column - Expansion panels or links
+      Expanded(
+        flex: isTablet ? 3 : 2,
+        child: Container(
+          padding: EdgeInsets.only(top: 6),
+          child: Column(
+            children: items.map((item) {
+              if (isExpansionPanel) {
+                return _buildExpansionItem(item, sectionColor, isMobile: false);
+              } else {
+                return _buildLinkItem(item, sectionColor, isMobile: false);
+              }
+            }).toList(),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildExpansionItem(String title, Color color, {bool isMobile = false}) {
+  return Theme(
+    data: ThemeData(
+      dividerColor: Colors.transparent,
+      colorScheme: ColorScheme.light(
+        surfaceTint: Colors.transparent,
+        primary: color,
+      ),
+    ),
+    child: Column(
+      children: [
+        ExpansionTile(
+          tilePadding: EdgeInsets.symmetric(
+            vertical: isMobile ? 16 : 20,
+            horizontal: 0,
+          ),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          childrenPadding: EdgeInsets.only(
+            left: isMobile ? 32 : 50,
+            bottom: 16,
+            right: isMobile ? 16 : 20,
+          ),
+          leading: _buildCircleIcon(Icons.add, color),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: isMobile ? 16 : 18,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: isMobile ? 2 : 1,
+          ),
+          trailing: SizedBox.shrink(),
+          children: [
+            Text(
+              'This is the answer to the FAQ question.',
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: color,
+                fontSize: isMobile ? 14 : 15,
+                height: 1.5,
               ),
             ),
-            trailing: SizedBox.shrink(),
-            children: [
-              Text(
-                'This is the answer to the FAQ question.',
-                style: TextStyle(fontSize: 15, height: 1.5),
-              ),
-            ],
-          ),
-          _buildDottedLine(),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+        _buildDottedLine(color: Color(0xFFfd7e14)),
+      ],
+    ),
+  );
+}
 
-  Widget _buildLinkItem(String title, Color color) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
+Widget _buildLinkItem(String title, Color color, {bool isMobile = false}) {
+  return Column(
+    children: [
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: isMobile ? 2 : 1,
               ),
-              Icon(Icons.arrow_forward, color: color, size: 22),
+            ),
+            SizedBox(width: 8),
+            Icon(
+              Icons.arrow_forward,
+              color: color,
+              size: isMobile ? 20 : 22,
+            ),
+          ],
+        ),
+      ),
+      Container(
+        width: double.infinity,
+        height: 1,
+        child: CustomPaint(
+          painter: DottedLinePainter(color: Color(0xFFfd7e14)),
+        ),
+      ),
+    ],
+  );
+}
+
+// Helper method for circle icon (you'll need to implement this)
+Widget _buildCircleIcon(IconData icon, Color color) {
+  return Container(
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      color: color,
+      shape: BoxShape.circle,
+    ),
+    child: Icon(
+      icon,
+      color: Colors.white,
+      size: 16,
+    ),
+  );
+}
+
+// Helper method for dotted line (you'll need to implement this)
+Widget _buildDottedLine({required Color color}) {
+  return Container(
+    width: double.infinity,
+    height: 1,
+    child: CustomPaint(
+      painter: DottedLinePainter(color: color),
+    ),
+  );
+}
+
+ Widget _buildPreparingApplSection() {
+  final List<String> links = [
+    'The application process',
+    'Acceptable documents you will need',
+    'Fees & Charges',
+    'Check your occupation',
+    'FAQs',
+    'Reviews, Reassessments, Appeals,\nReissues & Feedback',
+    'Priority Processing & Urgent\nApplications',
+    'Points Test Advice',
+    'Renewals',
+  ];
+
+  return Builder(
+    builder: (context) {
+      // Get screen dimensions using MediaQuery
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+      
+      // Determine device type based on screen width
+      bool isMobile = screenWidth < 768;
+      bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+      bool isDesktop = screenWidth >= 1024;
+
+      // Responsive values based on MediaQuery
+      double horizontalPadding = _getResponsivePadding(screenWidth);
+      double titleFontSize = _getpreparingResponsiveTitleFontSize(screenWidth);
+      double descriptionFontSize = _getpreparingResponsiveDescriptionFontSize(screenWidth);
+      double linkFontSize = _getResponsiveLinkFontSize(screenWidth);
+      double iconSize = _getResponsiveIconSize(screenWidth);
+      double containerSize = _getResponsiveContainerSize(screenWidth);
+      double verticalSpacing = _getResponsiveVerticalSpacing(screenWidth);
+
+      return Container(
+        width: double.infinity,
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: isMobile
+            ? _buildMobileLayouts(
+                links: links,
+                titleFontSize: titleFontSize,
+                descriptionFontSize: descriptionFontSize,
+                linkFontSize: linkFontSize,
+                iconSize: iconSize,
+                containerSize: containerSize,
+                verticalSpacing: verticalSpacing,
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+              )
+            : _buildDesktopTabletLayout(
+                links: links,
+                titleFontSize: titleFontSize,
+                descriptionFontSize: descriptionFontSize,
+                linkFontSize: linkFontSize,
+                iconSize: iconSize,
+                containerSize: containerSize,
+                verticalSpacing: verticalSpacing,
+                isTablet: isTablet,
+                screenWidth: screenWidth,
+                screenHeight: screenHeight,
+              ),
+      );
+    },
+  );
+}
+
+// Responsive helper methods using MediaQuery values
+double _getResponsivePadding(double screenWidth) {
+  if (screenWidth < 480) return 16.0;
+  if (screenWidth < 768) return 24.0;
+  if (screenWidth < 1024) return 32.0;
+  return 50.0;
+}
+
+double _getpreparingResponsiveTitleFontSize(double screenWidth) {
+  if (screenWidth < 480) return 22.0;
+  if (screenWidth < 768) return 24.0;
+  if (screenWidth < 1024) return 26.0;
+  return 28.0;
+}
+
+double _getpreparingResponsiveDescriptionFontSize(double screenWidth) {
+  if (screenWidth < 768) return 14.0;
+  return 15.0;
+}
+
+double _getResponsiveLinkFontSize(double screenWidth) {
+  if (screenWidth < 768) return 14.0;
+  return 16.0;
+}
+
+double _getResponsiveIconSize(double screenWidth) {
+  if (screenWidth < 480) return 18.0;
+  if (screenWidth < 768) return 20.0;
+  return 22.0;
+}
+
+double _getResponsiveContainerSize(double screenWidth) {
+  if (screenWidth < 480) return 26.0;
+  if (screenWidth < 768) return 28.0;
+  if (screenWidth < 1024) return 30.0;
+  return 32.0;
+}
+
+double _getResponsiveVerticalSpacing(double screenWidth) {
+  if (screenWidth < 768) return 30.0;
+  return 40.0;
+}
+
+// Mobile layout - stacked vertically
+Widget _buildMobileLayouts({
+  required List<String> links,
+  required double titleFontSize,
+  required double descriptionFontSize,
+  required double linkFontSize,
+  required double iconSize,
+  required double containerSize,
+  required double verticalSpacing,
+  required double screenWidth,
+  required double screenHeight,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Title and description section
+      Container(
+        width: screenWidth,
+        padding: EdgeInsets.only(
+          top: verticalSpacing,
+          bottom: verticalSpacing * 0.5,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Preparing your application",
+              style: TextStyle(
+                fontSize: titleFontSize,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF0A594C),
+                height: 1.3,
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
+              style: TextStyle(
+                fontSize: descriptionFontSize,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // Links section
+      Container(
+        width: screenWidth,
+        padding: EdgeInsets.only(bottom: verticalSpacing),
+        child: Column(
+          children: links.asMap().entries.map((entry) {
+            final int index = entry.key;
+            final String link = entry.value;
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          link,
+                          style: TextStyle(
+                            fontSize: linkFontSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Container(
+                        width: containerSize,
+                        height: containerSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Color(0xFF0A594C),
+                          size: iconSize,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (index < links.length - 1)
+                  _buildDottedLine(color: Color(0xFFfd7e14)),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    ],
+  );
+}
+
+// Desktop and tablet layout - side by side
+Widget _buildDesktopTabletLayout({
+  required List<String> links,
+  required double titleFontSize,
+  required double descriptionFontSize,
+  required double linkFontSize,
+  required double iconSize,
+  required double containerSize,
+  required double verticalSpacing,
+  required bool isTablet,
+  required double screenWidth,
+  required double screenHeight,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Left column - Title and description
+      Expanded(
+        flex: 2,
+        child: Container(
+          width: screenWidth * (isTablet ? 0.55 : 0.6), // Responsive width based on screen
+          padding: EdgeInsets.only(
+            top: verticalSpacing,
+            bottom: verticalSpacing,
+            right: 20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Preparing your application",
+                style: TextStyle(
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0A594C),
+                  height: 1.3,
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
+                style: TextStyle(
+                  fontSize: descriptionFontSize,
+                  color: Colors.black87,
+                  height: 1.5,
+                ),
+              ),
             ],
           ),
         ),
-        Container(
-          width: double.infinity,
-          height: 1,
-          child: CustomPaint(
-            painter: DottedLinePainter(color: Color(0xFFfd7e14)),
+      ),
+
+      // Right column - Navigation links with dotted lines
+      Expanded(
+        flex: 1,
+        child: Container(
+          width: screenWidth * (isTablet ? 0.35 : 0.3), // Responsive width based on screen
+          padding: EdgeInsets.only(
+            top: verticalSpacing,
+            bottom: verticalSpacing,
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPreparingApplSection() {
-    final List<String> links = [
-      'The application process',
-      'Acceptable documents you will need',
-      'Fees & Charges',
-      'Check your occupation',
-      'FAQs',
-      'Reviews, Reassessments, Appeals,\nReissues & Feedback',
-      'Priority Processing & Urgent\nApplications',
-      'Points Test Advice',
-      'Renewals',
-    ];
-
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 50),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left column - Title and description
-          Expanded(
-            flex: 2,
-            child: Container(
-              width: 450,
-              padding: EdgeInsets.only(top: 40, bottom: 40, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: links.asMap().entries.map((entry) {
+              final int index = entry.key;
+              final String link = entry.value;
+              return Column(
                 children: [
-                  Text(
-                    "Preparing your application",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0A594C),
-                      height: 1.3,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'A VETASSESS Skills Assessment involves assessing both your qualifications and your employment experience. Your qualifications will be compared with the Australian Qualifications Framework (AQF) and your employment experience will be assessed to determine whether it is relevant and at an appropriate skill level.',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Right column - Navigation links with dotted lines
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: EdgeInsets.only(top: 40, bottom: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children:
-                    links.asMap().entries.map((entry) {
-                      final int index = entry.key;
-                      final String link = entry.value;
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  link,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.arrow_forward,
-                                    color: Color(0xFF0A594C),
-                                    size: 22,
-                                  ),
-                                ),
-                              ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            link,
+                            style: TextStyle(
+                              fontSize: linkFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
                             ),
                           ),
-                          if (index < links.length - 1)
-                            _buildDottedLine(color: Color(0xFFfd7e14)),
-                        ],
-                      );
-                    }).toList(),
-              ),
-            ),
+                        ),
+                        SizedBox(width: 8),
+                        Container(
+                          width: containerSize,
+                          height: containerSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            color: Color(0xFF0A594C),
+                            size: iconSize,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (index < links.length - 1)
+                    _buildDottedLine(color: Color(0xFFfd7e14)),
+                ],
+              );
+            }).toList(),
           ),
-        ],
+        ),
       ),
-    );
-  }
+    ],
+  );
+}
+
+
 
  Widget _buildApplyBanner() {
   return Center(
@@ -1019,7 +1664,7 @@ Widget _buildDesktopLayout(double fontSize, double buttonWidth) {
             ),
             color: tealColor,
             child: isMobile 
-                ? _buildMobileLayouts(screenWidth)
+                ? _buildProfessionalMobileLayouts(screenWidth)
                 : _buildDesktopLayouts(screenWidth, isTablet),
           );
         },
@@ -1028,7 +1673,7 @@ Widget _buildDesktopLayout(double fontSize, double buttonWidth) {
   );
 }
 
-Widget _buildMobileLayouts(double screenWidth) {
+Widget _buildProfessionalMobileLayouts(double screenWidth) {
   return Column(
     children: [
       // Content section
@@ -1126,31 +1771,8 @@ Widget _buildDesktopLayouts(double screenWidth, bool isTablet) {
   );
 }
 
-  // Helper methods for common UI components
-  Widget _buildCircleIcon(IconData icon, Color color) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: color, width: 3),
-      ),
-      child: Icon(icon, color: color, size: 18, weight: 700),
-    );
-  }
+  
 
-  Widget _buildDottedLine({Color? color}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        width: double.infinity,
-        height: 1,
-        child: CustomPaint(
-          painter: DottedLinePainter(color: color ?? dottedLineColor),
-        ),
-      ),
-    );
-  }
 
 Widget _buildActionButton(String text, double width) {
   return LayoutBuilder(
@@ -1223,30 +1845,34 @@ class ResponsiveHelper {
 }
 
 
-// Custom painter for dotted line
+// Custom painter for dotted line (you'll need this class)
 class DottedLinePainter extends CustomPainter {
   final Color color;
-
+  
   DottedLinePainter({required this.color});
-
+  
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = 1
-          ..strokeCap = StrokeCap.round;
-
-    const double dashWidth = 3;
-    const double dashSpace = 3;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1;
+    
+    const dashWidth = 4;
+    const dashSpace = 4;
     double startX = 0;
-
+    
     while (startX < size.width) {
-      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
+      canvas.drawLine(
+        Offset(startX, 0),
+        Offset(startX + dashWidth, 0),
+        paint,
+      );
       startX += dashWidth + dashSpace;
     }
   }
-
+  
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
+

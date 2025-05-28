@@ -85,7 +85,7 @@ class SkillsAssessmentSupport extends StatelessWidget {
 
     return Container(
       width: screenWidth,
-      height: isSmallScreen ? screenHeight * 0.35 : screenHeight * 0.45,
+      height: isSmallScreen ? screenHeight * 0.55 : screenHeight * 0.60,
       decoration: const BoxDecoration(color: tealColor),
       child: Stack(
         children: [
@@ -96,7 +96,7 @@ class SkillsAssessmentSupport extends StatelessWidget {
               child: Image.asset(
                 'assets/images/internal_page_banner.png',
                 height:
-                    isSmallScreen ? screenHeight * 0.35 : screenHeight * 0.45,
+                    isSmallScreen ? screenHeight * 0.55 : screenHeight * 0.60,
                 fit: BoxFit.fitHeight,
               ),
             ),
