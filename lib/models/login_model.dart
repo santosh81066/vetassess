@@ -26,24 +26,30 @@ class LoginRequest {
 }
 
 class LoginResponse {
-  final String message;
-  final String accessToken;
-  final String refreshToken;
+  String? message;
+  int? userId;
+  String? accessToken;
+  String? refreshToken;
 
-  LoginResponse({
-    required this.message,
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  LoginResponse({this.message, this.userId, this.accessToken, this.refreshToken});
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) {
-    return LoginResponse(
-      message: json['message'] ?? '',
-      accessToken: json['accessToken'] ?? '',
-      refreshToken: json['refreshToken'] ?? '',
-    );
+  LoginResponse.fromJson(Map<String, dynamic> json) {
+    message = json['message'];
+    userId = json['userId'];
+    accessToken = json['accessToken'];
+    refreshToken = json['refreshToken'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['message'] = this.message;
+    data['userId'] = this.userId;
+    data['accessToken'] = this.accessToken;
+    data['refreshToken'] = this.refreshToken;
+    return data;
   }
 }
+
 
 class CaptchaResponse {
   final String captcha;
@@ -90,3 +96,4 @@ class LoginState {
     );
   }
 }
+

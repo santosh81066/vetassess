@@ -12,8 +12,9 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   // Fetch captcha from API
   Future<void> fetchCaptcha() async {
+    
     state = state.copyWith(isLoadingCaptcha: true);
-
+    
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/auth/captcha'),
@@ -92,10 +93,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  Future<void> _storeTokens(String accessToken, String refreshToken) async {
+  Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', accessToken);
-    await prefs.setString('refresh_token', refreshToken);
+    await prefs.setString('access_token', accessToken!);
+    await prefs.setString('refresh_token', refreshToken!);
 
     // Store login timestamp for token expiry management
     await prefs.setInt(
