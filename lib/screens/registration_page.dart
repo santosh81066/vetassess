@@ -157,75 +157,89 @@ class _VetassessRegistrationFormState
     });
 
     return LoginPageLayout(
-      child: Container(
-        color: Colors.white,
-        margin: const EdgeInsets.symmetric(horizontal: 150, vertical: 50),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Applicant Registration',
-                style: TextStyle(
-                  fontSize: 28,
-                  color: Color(0xFF374151),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Container(
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '* Required Fields',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 14,
-                      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 768;
+
+          return Container(
+            color: Colors.white,
+            margin: EdgeInsets.symmetric(
+              horizontal: isMobile ? 16 : 150,
+              vertical: isMobile ? 20 : 50,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Applicant Registration',
+                    style: TextStyle(
+                      fontSize: isMobile ? 24 : 28,
+                      color: const Color(0xFF374151),
+                      fontWeight: FontWeight.w400,
                     ),
-                    const SizedBox(height: 25),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 200),
-                      child: Column(
-                        children: [
-                          ..._buildFormFields(),
-                          _buildCheckbox(
-                            'I agree to receive news letter from VETASSESS',
-                            formData.isAgreedToReceiveNews,
-                            (value) {
-                              ref.read(signupFormProvider.notifier).update((
-                                state,
-                              ) {
-                                state.isAgreedToReceiveNews = value ?? false;
-                                return state;
-                              });
-                            },
+                  ),
+                  const SizedBox(height: 30),
+                  Container(
+                    padding: EdgeInsets.all(isMobile ? 16 : 30),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '* Required Fields',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
                           ),
-                          const SizedBox(height: 15),
-                          _buildCaptchaSection(),
-                          const SizedBox(height: 20),
-                          _buildCookiesNotice(),
-                          const SizedBox(height: 15),
-                          _buildPrivacyPolicyCheckbox(),
-                          const SizedBox(height: 30),
-                          _buildActionButtons(),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 25),
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 0 : 200,
+                          ),
+                          child: Column(
+                            children: [
+                              ..._buildFormFields(isMobile),
+                              _buildCheckbox(
+                                'I agree to receive news letter from VETASSESS',
+                                formData.isAgreedToReceiveNews,
+                                (value) {
+                                  ref.read(signupFormProvider.notifier).update((
+                                    state,
+                                  ) {
+                                    state.isAgreedToReceiveNews =
+                                        value ?? false;
+                                    return state;
+                                  });
+                                  setState(() {});
+                                },
+                                isMobile,
+                              ),
+                              const SizedBox(height: 15),
+                              _buildCaptchaSection(isMobile),
+                              const SizedBox(height: 20),
+                              _buildCookiesNotice(),
+                              const SizedBox(height: 15),
+                              _buildPrivacyPolicyCheckbox(isMobile),
+                              const SizedBox(height: 30),
+                              _buildActionButtons(isMobile),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -236,7 +250,7 @@ class _VetassessRegistrationFormState
     ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
-  List<Widget> _buildFormFields() {
+  List<Widget> _buildFormFields(bool isMobile) {
     final fields = [
       ('Given Names', 'Given names', 'givenNames', true, false),
       ('Surname or family name', 'Surname', 'surname', true, false),
@@ -255,8 +269,14 @@ class _VetassessRegistrationFormState
 
     return fields
         .map(
-          (field) =>
-              _buildFormField(field.$1, field.$2, field.$3, field.$4, field.$5),
+          (field) => _buildFormField(
+            field.$1,
+            field.$2,
+            field.$3,
+            field.$4,
+            field.$5,
+            isMobile,
+          ),
         )
         .toList();
   }
@@ -267,7 +287,54 @@ class _VetassessRegistrationFormState
     String fieldName,
     bool isRequired,
     bool isPassword,
+    bool isMobile,
   ) {
+    if (isMobile) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+                if (isRequired)
+                  const Text(
+                    ' *',
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _controllers[fieldName],
+              obscureText: isPassword,
+              decoration: _inputDecoration(
+                hintText,
+                _errors[fieldName] != null,
+              ),
+              style: const TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _validateField(fieldName, value);
+                _revalidateConfirmationFields(fieldName);
+              },
+            ),
+            if (_errors[fieldName] != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Text(
+                  _errors[fieldName]!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -371,19 +438,28 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildCheckbox(String text, bool value, Function(bool?) onChanged) {
+  Widget _buildCheckbox(
+    String text,
+    bool value,
+    Function(bool?) onChanged,
+    bool isMobile,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(width: 220),
+          if (!isMobile) const SizedBox(width: 220),
           SizedBox(
             width: 18,
             height: 18,
             child: Checkbox(
               value: value,
               onChanged: onChanged,
+              activeColor: const Color(
+                0xFF00565B,
+              ), // Custom color when selected
+              checkColor: Colors.white, // Color of the check mark
               side: BorderSide(color: Colors.grey.shade500, width: 1),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -400,24 +476,29 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildCaptchaSection() {
+  Widget _buildCaptchaSection(bool isMobile) {
     final signupState = ref.watch(signupProvider);
 
     return Column(
       children: [
         _buildCaptchaRow(
           'Verification image',
-          _buildCaptchaImage(signupState.captchaText),
+          _buildCaptchaImage(signupState.captchaText, isMobile),
+          isMobile,
         ),
         const SizedBox(height: 15),
-        _buildCaptchaRow('Enter text shown in the image', _buildCaptchaInput()),
+        _buildCaptchaRow(
+          'Enter text shown in the image',
+          _buildCaptchaInput(isMobile),
+          isMobile,
+        ),
       ],
     );
   }
 
-  Widget _buildCaptchaImage(String captchaText) {
+  Widget _buildCaptchaImage(String captchaText, bool isMobile) {
     return Container(
-      width: 250,
+      width: isMobile ? double.infinity : 250,
       height: 40,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade400),
@@ -460,12 +541,12 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildCaptchaInput() {
+  Widget _buildCaptchaInput(bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 250,
+          width: isMobile ? double.infinity : 250,
           child: TextFormField(
             controller: _controllers['captcha'],
             decoration: _inputDecoration(
@@ -488,7 +569,29 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildCaptchaRow(String label, Widget widget) {
+  Widget _buildCaptchaRow(String label, Widget widget, bool isMobile) {
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
+              const Text(
+                ' *',
+                style: TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          widget,
+        ],
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -553,7 +656,7 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildPrivacyPolicyCheckbox() {
+  Widget _buildPrivacyPolicyCheckbox(bool isMobile) {
     final formData = ref.watch(signupFormProvider);
 
     return Column(
@@ -574,8 +677,14 @@ class _VetassessRegistrationFormState
                   });
                   if (value == true) {
                     setState(() => _errors.remove('privacyPolicy'));
+                  } else {
+                    setState(() {});
                   }
                 },
+                activeColor: const Color(
+                  0xFF00565B,
+                ), // Custom color when selected
+                checkColor: Colors.white, // Color of the check mark
                 side: BorderSide(color: Colors.grey.shade500, width: 1),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -614,7 +723,7 @@ class _VetassessRegistrationFormState
         ),
         if (_errors['privacyPolicy'] != null)
           Padding(
-            padding: const EdgeInsets.only(top: 5, left: 26),
+            padding: EdgeInsets.only(top: 5, left: isMobile ? 0 : 26),
             child: Text(
               _errors['privacyPolicy']!,
               style: const TextStyle(color: Colors.red, fontSize: 12),
@@ -624,10 +733,11 @@ class _VetassessRegistrationFormState
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(bool isMobile) {
     final signupState = ref.watch(signupProvider);
 
-    return Row(
+    return Flex(
+      direction: isMobile ? Axis.vertical : Axis.horizontal,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildButton(
@@ -635,13 +745,15 @@ class _VetassessRegistrationFormState
           const Color(0xFF00565B),
           () => Navigator.pop(context),
           false,
+          isMobile,
         ),
-        const SizedBox(width: 15),
+        SizedBox(width: isMobile ? 0 : 15, height: isMobile ? 10 : 0),
         _buildButton(
           signupState.isLoading ? 'Registering...' : 'Register',
           const Color(0xFF00565B),
           signupState.isLoading ? null : _handleSignup,
           signupState.isLoading,
+          isMobile,
         ),
       ],
     );
@@ -652,9 +764,11 @@ class _VetassessRegistrationFormState
     Color color,
     VoidCallback? onPressed,
     bool isLoading,
+    bool isMobile,
   ) {
     return SizedBox(
       height: 35,
+      width: isMobile ? double.infinity : null,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

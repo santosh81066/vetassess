@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vetassess/screens/admin_screens/user_application.dart';
+import 'package:vetassess/screens/admin_screens/users_list.dart';
 import 'package:vetassess/screens/application_forms/appli_documents_uploaded.dart';
 import 'package:vetassess/screens/application_forms/appli_general_edu.dart';
 import 'package:vetassess/screens/application_forms/appli_occupation.dart';
@@ -52,6 +54,18 @@ class VetassessApp extends StatelessWidget {
         GoRoute(
           path: '/register',
           builder: (context, state) => const VetassessRegistrationForm(),
+        ),
+        GoRoute(
+          path: '/admin_users',
+          builder: (context, state) => UsersListScreen(),
+        ),
+        GoRoute(
+          path: '/admin_user-details',
+          name: 'admin_user-details',
+          builder: (context, state) {
+            final user = state.extra as Map<String, dynamic>;
+            return UserDetailsScreen(user: user);
+          },
         ),
         GoRoute(
           path: '/application_process',
