@@ -6,7 +6,6 @@ import '../models/login_model.dart';
 import '../providers/login_provider.dart';
 import '../widgets/login_page_layout.dart';
 
-
 class Login extends ConsumerStatefulWidget {
   const Login({super.key});
 
@@ -20,15 +19,36 @@ class _LoginState extends ConsumerState<Login> {
   final TextEditingController _captchaController = TextEditingController();
 
   String _selectedRole = "applicant"; // Default role
+  bool _hasCheckedInitialAuth = false;
 
   @override
   void initState() {
     super.initState();
-    // Reset login state and fetch captcha when page loads
+    // Check if user is already logged in first
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(loginProvider.notifier).resetState();
-      ref.read(loginProvider.notifier).fetchCaptcha();
+      _checkInitialAuthState();
     });
+  }
+
+  Future<void> _checkInitialAuthState() async {
+    final loginNotifier = ref.read(loginProvider.notifier);
+    final isLoggedIn = await loginNotifier.isLoggedIn();
+    
+    if (mounted) {
+      setState(() {
+        _hasCheckedInitialAuth = true;
+      });
+      
+      if (isLoggedIn) {
+        // User is already logged in, navigate away
+        context.go('/appli_opt');
+        return;
+      }
+    }
+    
+    // Reset state and fetch captcha for fresh login
+    ref.read(loginProvider.notifier).resetState();
+    ref.read(loginProvider.notifier).fetchCaptcha();
   }
 
   // Custom input field to reduce code duplication
@@ -125,17 +145,39 @@ class _LoginState extends ConsumerState<Login> {
 
   @override
   Widget build(BuildContext context) {
+    // Show loading while checking initial authentication
+    if (!_hasCheckedInitialAuth) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     final loginState = ref.watch(loginProvider);
 
-    // Listen to login state changes
+    // Listen to login state changes for navigation
     ref.listen<LoginState>(loginProvider, (previous, next) {
-      if (next.isSuccess && next.response != null) {
-        // Login successful, navigate to next screen
-        context.go('/appli_opt');
-        _showSnackBar('Login successful!');
-      } else if (next.error != null) {
-        // Show error message
-        _showSnackBar(next.error!);
+      if (next.isSuccess && next.response != null && previous?.isSuccess != true) {
+        // Login just succeeded, navigate to app
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            context.go('/appli_opt');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        });
+      } else if (next.error != null && next.error != previous?.error) {
+        // New error occurred
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _showSnackBar(next.error!);
+          }
+        });
       }
     });
 
@@ -224,6 +266,7 @@ class _LoginState extends ConsumerState<Login> {
                               ),
                               Radio<String>(
                                 value: 'applicant',
+                                activeColor: const Color(0xFF0d5257),
                                 groupValue: _selectedRole,
                                 onChanged: (value) {
                                   setState(() {
@@ -235,6 +278,7 @@ class _LoginState extends ConsumerState<Login> {
                               const SizedBox(width: 10),
                               Radio<String>(
                                 value: 'agent',
+                                activeColor: const Color(0xFF0d5257),
                                 groupValue: _selectedRole,
                                 onChanged: (value) {
                                   setState(() {
@@ -328,38 +372,37 @@ class _LoginState extends ConsumerState<Login> {
                                   ),
                                   color: Colors.grey[100],
                                 ),
-                                child:
-                                    loginState.isLoadingCaptcha
-                                        ? const Center(
-                                          child: SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            ),
-                                          ),
-                                        )
-                                        : loginState.captcha != null
-                                        ? Center(
-                                          child: Text(
-                                            loginState.captcha!,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 4,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        )
-                                        : const Center(
-                                          child: Text(
-                                            'Failed to load captcha',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.red,
-                                            ),
+                                child: loginState.isLoadingCaptcha
+                                    ? const Center(
+                                        child: SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
                                           ),
                                         ),
+                                      )
+                                    : loginState.captcha != null
+                                        ? Center(
+                                            child: Text(
+                                              loginState.captcha!,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 4,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          )
+                                        : const Center(
+                                            child: Text(
+                                              'Failed to load captcha',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
                               ),
                             ],
                           ),
@@ -413,27 +456,26 @@ class _LoginState extends ConsumerState<Login> {
                                 ),
                                 elevation: 0,
                               ),
-                              child:
-                                  loginState.isLoading
-                                      ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                      : const Text(
-                                        'Login',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.white,
+                              child: loginState.isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          Colors.white,
                                         ),
                                       ),
+                                    )
+                                  : const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
 

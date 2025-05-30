@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; // Add this import
+import '../providers/login_provider.dart';
 
-import '../screens/application_forms/appli_personal_details.dart';
-
-class LoginHeader extends StatelessWidget {
+class LoginHeader extends ConsumerWidget {
   const LoginHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
@@ -32,6 +33,7 @@ class LoginHeader extends StatelessWidget {
           decoration: const BoxDecoration(color: Colors.white),
           child: _buildHeaderContent(
             context,
+            ref,
             isMobile,
             isTablet,
             logoSize,
@@ -47,11 +49,11 @@ class LoginHeader extends StatelessWidget {
           color: Colors.teal[700],
         ),
 
-        // Navigation bar
+        // Navigation bar with logout button
         Container(
           color: Colors.white,
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: _buildNavigationBar(context, isMobile, isTablet),
+          child: _buildNavigationBar(context, ref, isMobile, isTablet),
         ),
       ],
     );
@@ -59,6 +61,7 @@ class LoginHeader extends StatelessWidget {
 
   Widget _buildHeaderContent(
     BuildContext context,
+    WidgetRef ref,
     bool isMobile,
     bool isTablet,
     double logoSize,
@@ -120,41 +123,54 @@ class LoginHeader extends StatelessWidget {
               ),
             ),
           ),
+          // Logout button positioned on the right for tablet and desktop
+          if (!isMobile) _buildLogoutButton(context, ref, isTablet),
         ],
       );
     }
   }
 
-  Widget _buildNavigationBar(BuildContext context, bool isMobile, bool isTablet) {
+  Widget _buildNavigationBar(BuildContext context, WidgetRef ref, bool isMobile, bool isTablet) {
     final iconSize = isMobile ? 20.0 : 24.0;
     final textSize = isMobile ? 12.0 : 14.0;
     
     if (isMobile) {
-      // More compact navigation for mobile
+      // More compact navigation for mobile with logout button
       return SizedBox(
         height: 48,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color: Colors.orange[900],
-                size: iconSize,
-              ),
-              onPressed: () {},
-            ),
-            for (final item in ['Contact', 'Links', 'FAQs'])
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: Colors.orange[900],
-                    fontSize: textSize,
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.home,
+                      color: Colors.orange[900],
+                      size: iconSize,
+                    ),
+                    onPressed: () {
+                       context.go('/');
+                    },
                   ),
-                ),
+                  for (final item in ['Contact', 'Links', 'FAQs'])
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        item,
+                        style: TextStyle(
+                          color: Colors.orange[900],
+                          fontSize: textSize,
+                        ),
+                      ),
+                    ),
+                ],
               ),
+            ),
+            // Logout button for mobile
+            _buildLogoutButton(context, ref, false),
           ],
         ),
       );
@@ -184,11 +200,125 @@ class LoginHeader extends StatelessWidget {
                   ),
                 ),
               ),
-            SizedBox(width: isTablet ? 50 : 175),
+            SizedBox(width: isTablet ? 20 : 50),
           ],
         ),
       );
     }
+  }
+
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref, bool isTablet) {
+    final buttonTextSize = isTablet ? 12.0 : 14.0;
+    final buttonPadding = isTablet ? 8.0 : 12.0;
+    
+    return Container(
+      margin: const EdgeInsets.only(left: 16.0, right: 8.0),
+      child: TextButton(
+        onPressed: () {
+          _showLogoutDialog(context, ref);
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.orange[900],
+          padding: EdgeInsets.symmetric(
+            horizontal: buttonPadding,
+            vertical: 4.0,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4.0),
+            side: BorderSide(
+              color: Colors.orange[900]!,
+              width: 1.0,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.logout,
+              size: buttonTextSize + 2,
+              color: Colors.orange[900],
+            ),
+            const SizedBox(width: 4.0),
+            Text(
+              'Logout',
+              style: TextStyle(
+                fontSize: buttonTextSize,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final loginState = ref.watch(loginProvider);
+            
+            return AlertDialog(
+              title: const Text('Logout'),
+              content: loginState.isLoading 
+                ? const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Logging out...'),
+                    ],
+                  )
+                : const Text('Are you sure you want to logout?'),
+              actions: loginState.isLoading 
+                ? [] 
+                : [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        // Perform logout using the provider
+                        await ref.read(loginProvider.notifier).logout();
+                        
+                        // Close dialog first
+                        if (dialogContext.mounted) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                        
+                        // Navigate using GoRouter
+                        if (context.mounted) {
+                          // Use GoRouter to navigate and clear stack
+                          context.go('/login');
+                          
+                          // Show logout success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Successfully logged out'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+            );
+          },
+        );
+      },
+    );
   }
 
   double _getResponsiveHeight(double screenHeight, bool isMobile, bool isTablet) {

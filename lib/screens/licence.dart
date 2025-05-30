@@ -17,52 +17,66 @@ class _LicenceFormState extends State<LicenceForm> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth >= 768;
+    final isMobile = screenWidth < 600;
 
     return LoginPageLayout(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Navigation Panel - Responsive width
           Container(
-            width: MediaQuery.of(context).size.width * 0.3,
+            width: isMobile 
+                ? screenWidth * 0.25 
+                : isTablet 
+                    ? screenWidth * 0.28 
+                    : screenWidth * 0.3,
             child: Align(
               alignment: Alignment.topRight,
               child: ApplicationNav(),
             ),
           ),
+          
+          // Main Content - Flexible
           Expanded(
             child: Container(
               margin: EdgeInsets.only(
                 top: screenHeight * 0.02,
-                left: screenWidth * 0.02,
+                left: isMobile ? screenWidth * 0.01 : screenWidth * 0.02,
                 bottom: screenHeight * 0.12,
-                right: screenWidth * 0.02,
+                right: isMobile ? screenWidth * 0.01 : screenWidth * 0.02,
               ),
               color: Colors.white,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.025),
+                  padding: EdgeInsets.all(
+                    isMobile ? screenWidth * 0.015 : screenWidth * 0.025
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
-                      const Text(
+                      // Title - Responsive font size
+                      Text(
                         'Licence',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: isMobile ? 20 : 24,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF4D4D4D),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: isMobile ? 16 : 20),
 
                       // Form Container
                       Container(
+                        width: double.infinity,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(screenWidth * 0.03),
+                          padding: EdgeInsets.all(
+                            isMobile ? screenWidth * 0.02 : screenWidth * 0.03
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -77,29 +91,31 @@ class _LicenceFormState extends State<LicenceForm> {
                                     ),
                                   ),
                                   SizedBox(width: 4),
-                                  Text(
-                                    'Required Fields',
-                                    style: TextStyle(color: Colors.red),
+                                  Flexible(
+                                    child: Text(
+                                      'Required Fields',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: isMobile ? 16 : 20),
 
                               // Description text
-                              const Text(
+                              Text(
                                 'Complete details about licences / registrations / memberships.',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: isMobile ? 14 : 16,
                                   fontWeight: FontWeight.normal,
                                   color: Color(0xFF4D4D4D),
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: isMobile ? 16 : 20),
                               const Divider(
                                 height: 1,
                                 color: Color(0xFFDDDDDD),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: isMobile ? 16 : 20),
 
                               // Licence Form Fields
                               buildLabelledField(
@@ -137,74 +153,35 @@ class _LicenceFormState extends State<LicenceForm> {
                                 isRequired: true,
                               ),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: isMobile ? 16 : 20),
                               const Divider(
                                 height: 1,
                                 color: Color(0xFFDDDDDD),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: isMobile ? 16 : 20),
 
-                              // Buttons
+                              // Buttons - Responsive layout
                               Center(
-                                child: Wrap(
-                                  spacing: 15,
-                                  runSpacing: 10,
-                                  children: [
-                                    // Cancel Button
-                                    SizedBox(
-                                      height: 36,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Cancel',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
+                                child: isMobile
+                                    ? Column(
+                                        children: [
+                                          buildButton('Cancel', () {}),
+                                          const SizedBox(height: 10),
+                                          buildButton('Save & Continue', () {
+                                            context.go('/app_priority_form');
+                                          }),
+                                        ],
+                                      )
+                                    : Wrap(
+                                        spacing: 15,
+                                        runSpacing: 10,
+                                        children: [
+                                          buildButton('Cancel', () {}),
+                                          buildButton('Save & Continue', () {
+                                            context.go('/app_priority_form');
+                                          }),
+                                        ],
                                       ),
-                                    ),
-
-                                    // Save & Continue Button
-                                    SizedBox(
-                                      height: 36,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          context.go('/app_priority_form');
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Save & Continue',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ],
                           ),
@@ -221,30 +198,63 @@ class _LicenceFormState extends State<LicenceForm> {
     );
   }
 
+  Widget buildButton(String text, VoidCallback onPressed) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    
+    return SizedBox(
+      width: isMobile ? double.infinity : null,
+      height: 36,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.teal,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 24 : 16,
+          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildLabelledField(
     String label,
     Widget field, {
     bool isRequired = false,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: EdgeInsets.only(bottom: isMobile ? 16.0 : 12.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // For smaller screens, stack the label and field vertically
-          if (constraints.maxWidth < 600) {
+          // For mobile screens, always stack vertically
+          if (isMobile) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF4D4D4D),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF4D4D4D),
+                        ),
                       ),
                     ),
                     if (isRequired)
@@ -252,17 +262,19 @@ class _LicenceFormState extends State<LicenceForm> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                field,
+                SizedBox(width: double.infinity, child: field),
               ],
             );
           }
 
-          // For larger screens, use the original row layout
+          // For tablet and desktop, use row layout with flexible proportions
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: constraints.maxWidth * 0.35,
+                width: isTablet 
+                    ? constraints.maxWidth * 0.4 
+                    : constraints.maxWidth * 0.35,
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Row(
@@ -275,6 +287,7 @@ class _LicenceFormState extends State<LicenceForm> {
                             fontSize: 14,
                             color: Color(0xFF4D4D4D),
                           ),
+                          textAlign: TextAlign.right,
                         ),
                       ),
                       if (isRequired)
@@ -284,7 +297,10 @@ class _LicenceFormState extends State<LicenceForm> {
                 ),
               ),
               const SizedBox(width: 16),
-              field,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: field,
+              ),
             ],
           );
         },
@@ -293,8 +309,16 @@ class _LicenceFormState extends State<LicenceForm> {
   }
 
   Widget buildDateField() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    
     return SizedBox(
-      width: 150,
+      width: isMobile 
+          ? double.infinity 
+          : isTablet 
+              ? 150 
+              : 180, // Smaller width for date field
       height: 34,
       child: TextField(
         decoration: InputDecoration(
@@ -314,8 +338,16 @@ class _LicenceFormState extends State<LicenceForm> {
   }
 
   Widget buildTextField() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    
     return SizedBox(
-      width: 250,
+      width: isMobile 
+          ? double.infinity 
+          : isTablet 
+              ? 200 
+              : 250,
       height: 34,
       child: TextField(
         decoration: InputDecoration(
@@ -333,8 +365,16 @@ class _LicenceFormState extends State<LicenceForm> {
   }
 
   Widget buildDropdownField() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1024;
+    
     return SizedBox(
-      width: 200,
+      width: isMobile 
+          ? double.infinity 
+          : isTablet 
+              ? 160 
+              : 180, // Smaller width for dropdown field
       height: 34,
       child: Container(
         decoration: BoxDecoration(

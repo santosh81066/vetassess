@@ -14,19 +14,31 @@ class EmploymentForm extends StatefulWidget {
 
 class _EmploymentFormState extends State<EmploymentForm> {
   bool isCurrentlyEmployed = false;
+  List<TextEditingController> taskControllers = List.generate(5, (index) => TextEditingController());
+
+  @override
+  void dispose() {
+    for (var controller in taskControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final isTablet = screenWidth >= 768 && screenWidth < 1024;
+    final isMobile = screenWidth < 768;
 
     return LoginPageLayout(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Navigation sidebar
           Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            child: Align(
+            width: isMobile ? 0 : MediaQuery.of(context).size.width * 0.3,
+            child: isMobile ? const SizedBox.shrink() : Align(
               alignment: Alignment.topRight,
               child: ApplicationNav(),
             ),
@@ -37,14 +49,14 @@ class _EmploymentFormState extends State<EmploymentForm> {
             child: Container(
               margin: EdgeInsets.only(
                 top: screenHeight * 0.02,
-                left: screenWidth * 0.02,
+                left: isMobile ? screenWidth * 0.01 : screenWidth * 0.02,
                 bottom: screenHeight * 0.12,
-                right: screenWidth * 0.02,
+                right: isMobile ? screenWidth * 0.01 : screenWidth * 0.02,
               ),
               color: Colors.white,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.025),
+                  padding: EdgeInsets.all(isMobile ? screenWidth * 0.04 : screenWidth * 0.025),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -65,7 +77,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(screenWidth * 0.03),
+                          padding: EdgeInsets.all(isMobile ? screenWidth * 0.04 : screenWidth * 0.03),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -128,12 +140,12 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
                               buildLabelledField(
                                 'Business name',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
                                 'Alternate/Former name(s) of the business',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                               ),
 
                               const SizedBox(height: 24),
@@ -151,53 +163,81 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
                               buildLabelledField(
                                 'Street address',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
+                              
+                              // Multi-line street address field
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 12.0),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: screenWidth * 0.2),
-                                    Expanded(
-                                      child: TextField(
-                                        maxLines: 3,
-                                        decoration: InputDecoration(
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    if (isMobile) {
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 8),
+                                          TextField(
+                                            maxLines: 3,
+                                            decoration: InputDecoration(
+                                              contentPadding: const EdgeInsets.symmetric(
                                                 horizontal: 10,
                                                 vertical: 8,
                                               ),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                              ),
                                             ),
-                                            borderSide: BorderSide(
-                                              color: Colors.grey.shade300,
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                    
+                                    return Row(
+                                      children: [
+                                        SizedBox(width: constraints.maxWidth * 0.35 + 16),
+                                        Expanded(
+                                          child: TextField(
+                                            maxLines: 3,
+                                            decoration: InputDecoration(
+                                              contentPadding: const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 8,
+                                              ),
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey.shade300,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
+                                      ],
+                                    );
+                                  },
                                 ),
                               ),
+
                               buildLabelledField(
                                 'Suburb/City',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
                                 'State',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                               ),
                               buildLabelledField(
                                 'Post code',
-                                buildTextField(width: 150),
+                                buildTextField(width: _getFieldWidth(screenWidth, 150)),
                               ),
                               buildLabelledField(
                                 'Country',
-                                buildDropdownField(width: 250),
+                                buildDropdownField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
 
@@ -216,30 +256,30 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
                               buildLabelledField(
                                 'Name of employer/supervisor/manager',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
                                 'Daytime telephone number',
-                                buildTextField(width: 200),
+                                buildTextField(width: _getFieldWidth(screenWidth, 200)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
                                 'Fax number',
-                                buildTextField(width: 200),
+                                buildTextField(width: _getFieldWidth(screenWidth, 200)),
                               ),
                               buildLabelledField(
                                 'Mobile number',
-                                buildTextField(width: 200),
+                                buildTextField(width: _getFieldWidth(screenWidth, 200)),
                               ),
                               buildLabelledField(
                                 'Email address',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
                                 'Web address',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                               ),
 
                               const SizedBox(height: 24),
@@ -257,7 +297,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
                               buildLabelledField(
                                 'Position/Job title',
-                                buildTextField(width: 250),
+                                buildTextField(width: _getFieldWidth(screenWidth, 250)),
                                 isRequired: true,
                               ),
                               buildLabelledField(
@@ -333,16 +373,8 @@ class _EmploymentFormState extends State<EmploymentForm> {
                               ),
                               const SizedBox(height: 16),
 
-                              // Tasks table
-                              Column(
-                                children: [
-                                  buildTaskRow(1),
-                                  buildTaskRow(2),
-                                  buildTaskRow(3),
-                                  buildTaskRow(4),
-                                  buildTaskRow(5),
-                                ],
-                              ),
+                              // Tasks table with improved styling
+                              buildTasksTable(),
 
                               const SizedBox(height: 8),
                               Row(
@@ -352,8 +384,16 @@ class _EmploymentFormState extends State<EmploymentForm> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,
                                       foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 16 : 20,
+                                        vertical: isMobile ? 8 : 12,
+                                      ),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      setState(() {
+                                        taskControllers.add(TextEditingController());
+                                      });
+                                    },
                                     child: const Text('Add task'),
                                   ),
                                 ],
@@ -363,21 +403,31 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
                               // Buttons row
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: isMobile 
+                                    ? MainAxisAlignment.spaceEvenly 
+                                    : MainAxisAlignment.end,
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,
                                       foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 16 : 20,
+                                        vertical: isMobile ? 8 : 12,
+                                      ),
                                     ),
                                     onPressed: () {},
                                     child: const Text('Cancel'),
                                   ),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: isMobile ? 0 : 8),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.teal,
                                       foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 16 : 20,
+                                        vertical: isMobile ? 8 : 12,
+                                      ),
                                     ),
                                     onPressed: () {
                                       context.go('/licence_form');
@@ -401,30 +451,159 @@ class _EmploymentFormState extends State<EmploymentForm> {
     );
   }
 
+  double _getFieldWidth(double screenWidth, double defaultWidth) {
+    if (screenWidth < 768) {
+      return screenWidth * 0.8; // Mobile: 80% of screen width
+    } else if (screenWidth < 1024) {
+      return screenWidth * 0.4; // Tablet: 40% of screen width
+    } else {
+      return defaultWidth; // Desktop: fixed width
+    }
+  }
+
+  Widget buildTasksTable() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Column(
+        children: [
+          // Header row
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+            ),
+            child: Row(
+              children: const [
+                SizedBox(
+                  width: 50,
+                  child: Text(
+                    'No.',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    'Task / Duty / Responsibility',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 40), // Space for action button
+              ],
+            ),
+          ),
+          // Task rows
+          ...List.generate(taskControllers.length, (index) => buildTaskRow(index + 1, index)),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTaskRow(int number, int index) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade300,
+            width: index == taskControllers.length - 1 ? 0 : 1,
+          ),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 50,
+              child: Text(
+                number.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            Expanded(
+              child: TextFormField(
+                controller: taskControllers[index],
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: 'Task / Duty / Responsibility',
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                ),
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            SizedBox(
+              width: 40,
+              child: IconButton(
+                icon: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    taskControllers.insert(index + 1, TextEditingController());
+                  });
+                },
+                constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildLabelledField(
     String label,
     Widget field, {
     bool isRequired = false,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // For smaller screens, stack the label and field vertically
-          if (constraints.maxWidth < 600) {
+          final isMobile = constraints.maxWidth < 600;
+          
+          if (isMobile) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF4D4D4D),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF4D4D4D),
+                        ),
                       ),
                     ),
                     if (isRequired)
@@ -437,7 +616,6 @@ class _EmploymentFormState extends State<EmploymentForm> {
             );
           }
 
-          // For larger screens, use the original row layout
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -445,25 +623,30 @@ class _EmploymentFormState extends State<EmploymentForm> {
                 width: constraints.maxWidth * 0.35,
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          label,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF4D4D4D),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            label,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF4D4D4D),
+                            ),
+                            textAlign: TextAlign.right,
                           ),
                         ),
-                      ),
-                      if (isRequired)
-                        const Text(' *', style: TextStyle(color: Colors.red)),
-                    ],
+                        if (isRequired)
+                          const Text(' *', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               field,
             ],
           );
@@ -486,6 +669,10 @@ class _EmploymentFormState extends State<EmploymentForm> {
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: BorderSide(color: Colors.teal.shade400),
+          ),
         ),
       ),
     );
@@ -504,6 +691,10 @@ class _EmploymentFormState extends State<EmploymentForm> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: BorderSide(color: Colors.teal.shade400),
           ),
           hintText: 'dd/mm/yyyy',
           hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
@@ -552,6 +743,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
               if (value != null) isCurrentlyEmployed = value;
             });
           },
+          activeColor: Colors.teal,
         ),
         const Text('Yes'),
         const SizedBox(width: 20),
@@ -563,6 +755,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
               if (value != null) isCurrentlyEmployed = value;
             });
           },
+          activeColor: Colors.teal,
         ),
         const Text('No'),
       ],
@@ -571,6 +764,7 @@ class _EmploymentFormState extends State<EmploymentForm> {
 
   Widget buildNumberWithLabel(String label) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 80,
@@ -585,6 +779,10 @@ class _EmploymentFormState extends State<EmploymentForm> {
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(color: Colors.grey.shade300),
               ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: Colors.teal.shade400),
+              ),
             ),
             keyboardType: TextInputType.number,
           ),
@@ -592,50 +790,6 @@ class _EmploymentFormState extends State<EmploymentForm> {
         const SizedBox(width: 8),
         Text(label),
       ],
-    );
-  }
-
-  Widget buildTaskRow(int number) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 40,
-              child: Text(
-                number.toString(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: InputBorder.none,
-                  hintText: 'Task / Duty / Responsibility',
-                ),
-              ),
-            ),
-            IconButton(
-              icon: Container(
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: const Icon(Icons.add, color: Colors.white, size: 16),
-              ),
-              onPressed: () {},
-              constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-              padding: EdgeInsets.zero,
-              iconSize: 24,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

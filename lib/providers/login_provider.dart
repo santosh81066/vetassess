@@ -6,13 +6,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/login_model.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
-  LoginNotifier() : super(LoginState());
+  LoginNotifier() : super(LoginState()) {
+    // Check login status when provider is initialized
+    _checkInitialLoginStatus();
+  }
 
   static const String baseUrl = 'http://103.98.12.226:5100';
+  static const int tokenExpiryHours = 24;
+
+  // Check initial login status
+  Future<void> _checkInitialLoginStatus() async {
+    final isLoggedInResult = await isLoggedIn();
+    if (isLoggedInResult) {
+      // User is logged in, set success state
+      state = state.copyWith(
+        isSuccess: true,
+        isLoading: false,
+      );
+    } else {
+      // User is not logged in, ensure state reflects this
+      state = state.copyWith(
+        isSuccess: false,
+        isLoading: false,
+        response: null,
+      );
+    }
+  }
 
   // Fetch captcha from API
   Future<void> fetchCaptcha() async {
-    
     state = state.copyWith(isLoadingCaptcha: true);
     
     try {
@@ -67,6 +89,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           isLoading: false,
           isSuccess: true,
           response: loginResponse,
+          error: null, // Clear any previous errors
         );
       } else {
         // Handle different status codes
@@ -82,6 +105,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           isLoading: false,
           isSuccess: false,
           error: errorMessage,
+          response: null,
         );
       }
     } catch (e) {
@@ -89,14 +113,21 @@ class LoginNotifier extends StateNotifier<LoginState> {
         isLoading: false,
         isSuccess: false,
         error: 'Network error: ${e.toString()}',
+        response: null,
       );
     }
   }
 
   Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', accessToken!);
-    await prefs.setString('refresh_token', refreshToken!);
+    
+    if (accessToken != null && accessToken.isNotEmpty) {
+      await prefs.setString('access_token', accessToken);
+    }
+    
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      await prefs.setString('refresh_token', refreshToken);
+    }
 
     // Store login timestamp for token expiry management
     await prefs.setInt(
@@ -117,24 +148,141 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return prefs.getString('refresh_token');
   }
 
-  // Check if user is logged in
-  Future<bool> isLoggedIn() async {
-    final accessToken = await getAccessToken();
-    return accessToken != null && accessToken.isNotEmpty;
+  // Check if token has expired
+  Future<bool> _isTokenExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loginTimestamp = prefs.getInt('login_timestamp');
+    
+    if (loginTimestamp == null) return true;
+    
+    final loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
+    final expiryTime = loginTime.add(Duration(hours: tokenExpiryHours));
+    
+    return DateTime.now().isAfter(expiryTime);
   }
 
-  // Logout - clear tokens
-  Future<void> logout() async {
+  // Check if user is logged in and token is valid
+  Future<bool> isLoggedIn() async {
+    try {
+      final accessToken = await getAccessToken();
+      
+      if (accessToken == null || accessToken.isEmpty) {
+        return false;
+      }
+      
+      // Check if token has expired
+      final isExpired = await _isTokenExpired();
+      if (isExpired) {
+        // Try to refresh token
+        final refreshSuccessful = await _tryRefreshToken();
+        return refreshSuccessful;
+      }
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Try to refresh the access token
+  Future<bool> _tryRefreshToken() async {
+    try {
+      final refreshToken = await getRefreshToken();
+      
+      if (refreshToken == null || refreshToken.isEmpty) {
+        return false;
+      }
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/refresh'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'refreshToken': refreshToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final newAccessToken = responseData['accessToken'];
+        final newRefreshToken = responseData['refreshToken'];
+
+        // Store new tokens
+        await _storeTokens(newAccessToken, newRefreshToken);
+        
+        // Update state to reflect successful refresh
+        state = state.copyWith(
+          isSuccess: true,
+          isLoading: false,
+        );
+        
+        return true;
+      } else {
+        // Refresh failed, logout user
+        await _performLogout();
+        return false;
+      }
+    } catch (e) {
+      // Refresh failed, logout user
+      await _performLogout();
+      return false;
+    }
+  }
+
+  // Internal logout method that updates state
+  Future<void> _performLogout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
     await prefs.remove('refresh_token');
     await prefs.remove('login_timestamp');
 
-    state = LoginState(); // Reset state
+    // Reset state to logged out
+    state = LoginState().copyWith(
+      isSuccess: false,
+      isLoading: false,
+      response: null,
+      error: null,
+    );
   }
 
+  // Public logout method
+  Future<void> logout() async {
+    // Set loading state during logout
+    state = state.copyWith(isLoading: true);
+    
+    try {
+      // Perform the actual logout
+      await _performLogout();
+    } catch (e) {
+      // Even if there's an error, we should still log out locally
+      await _performLogout();
+    }
+  }
+
+  // Force logout without API call (for cases where user manually logs out)
+  Future<void> forceLogout() async {
+    await _performLogout();
+  }
+
+  // Clear authentication state
   void resetState() {
-    state = LoginState();
+    state = LoginState().copyWith(
+      isSuccess: false,
+      isLoading: false,
+      response: null,
+      error: null,
+    );
+  }
+
+  // Get user info from stored tokens (if needed)
+  Future<Map<String, dynamic>?> getUserInfo() async {
+    try {
+      final accessToken = await getAccessToken();
+      if (accessToken == null) return null;
+
+      // If you need to decode JWT token to get user info
+      // You can add JWT decoding logic here
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 }
 
