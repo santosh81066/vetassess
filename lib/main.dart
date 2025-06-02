@@ -47,10 +47,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Get current login state
       final loginState = ref.read(loginProvider);
       final currentPath = state.fullPath;
-      
+
       // Define login paths
-      final isLoginPath = currentPath == '/login' || currentPath == '/login_page';
-      
+      final isLoginPath =
+          currentPath == '/login' || currentPath == '/login_page';
+
       // Define protected routes
       final protectedRoutes = [
         '/appli_opt',
@@ -64,20 +65,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/doc_upload',
         '/appli_type',
       ];
-      
+
       final isProtectedRoute = protectedRoutes.contains(currentPath);
-      
+
       // If user is logged in (successful login state) and trying to access login page
       if (loginState.isSuccess && loginState.response != null && isLoginPath) {
         return '/appli_opt';
       }
-      
+
       // If user is not logged in and trying to access protected routes
       if (!loginState.isSuccess && isProtectedRoute) {
         return '/login';
       }
-      
-      return null; // No redirect needed
+
+      return null;
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
@@ -195,15 +196,12 @@ class RouterRefreshNotifier extends ChangeNotifier {
   late final ProviderSubscription _subscription;
 
   RouterRefreshNotifier(ProviderRef ref) {
-    _subscription = ref.listen(
-      loginProvider,
-      (previous, next) {
-        // Notify router to refresh when login state changes
-        if (previous?.isSuccess != next.isSuccess) {
-          notifyListeners();
-        }
-      },
-    );
+    _subscription = ref.listen(loginProvider, (previous, next) {
+      // Notify router to refresh when login state changes
+      if (previous?.isSuccess != next.isSuccess) {
+        notifyListeners();
+      }
+    });
   }
 
   @override
@@ -223,7 +221,7 @@ class VetassessApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'VETASSESS - Skills Assessment Australia',
-      routerConfig: router,      
+      routerConfig: router,
     );
   }
 }
