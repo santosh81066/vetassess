@@ -30,14 +30,22 @@ class LoginResponse {
   int? userId;
   String? accessToken;
   String? refreshToken;
+  String? role; // Add role field to response
 
-  LoginResponse({this.message, this.userId, this.accessToken, this.refreshToken});
+  LoginResponse({
+    this.message, 
+    this.userId, 
+    this.accessToken, 
+    this.refreshToken,
+    this.role, // Add role parameter
+  });
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     userId = json['userId'];
     accessToken = json['accessToken'];
     refreshToken = json['refreshToken'];
+    role = json['role']; // Parse role from response
   }
 
   Map<String, dynamic> toJson() {
@@ -46,10 +54,10 @@ class LoginResponse {
     data['userId'] = this.userId;
     data['accessToken'] = this.accessToken;
     data['refreshToken'] = this.refreshToken;
+    data['role'] = this.role; // Include role in JSON
     return data;
   }
 }
-
 
 class CaptchaResponse {
   final String captcha;
@@ -68,6 +76,7 @@ class LoginState {
   final LoginResponse? response;
   final String? captcha;
   final bool isLoadingCaptcha;
+  final String? userRole; // Add user role to state
 
   LoginState({
     this.isLoading = false,
@@ -76,6 +85,7 @@ class LoginState {
     this.response,
     this.captcha,
     this.isLoadingCaptcha = false,
+    this.userRole, // Add userRole parameter
   });
 
   LoginState copyWith({
@@ -85,6 +95,7 @@ class LoginState {
     LoginResponse? response,
     String? captcha,
     bool? isLoadingCaptcha,
+    String? userRole, // Add userRole to copyWith
   }) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
@@ -93,7 +104,7 @@ class LoginState {
       response: response ?? this.response,
       captcha: captcha ?? this.captcha,
       isLoadingCaptcha: isLoadingCaptcha ?? this.isLoadingCaptcha,
+      userRole: userRole ?? this.userRole, // Include userRole in copyWith
     );
   }
 }
-

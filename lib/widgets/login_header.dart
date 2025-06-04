@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart'; // Add this import
+import 'package:go_router/go_router.dart';
 import '../providers/login_provider.dart';
 
 class LoginHeader extends ConsumerWidget {
@@ -17,6 +17,12 @@ class LoginHeader extends ConsumerWidget {
     final isDesktop = screenWidth >= 1024;
     final isMobile = screenWidth < 768;
     
+    // Check if user is logged in and not on login screen
+    final loginState = ref.watch(loginProvider);
+    final currentRoute = GoRouterState.of(context).uri.path;
+   
+    final shouldShowLogout = (loginState.isSuccess && loginState.response != null) && currentRoute != '/login';
+    
     // Responsive values
     final headerHeight = _getResponsiveHeight(screenHeight, isMobile, isTablet);
     final logoSize = _getResponsiveLogoSize(isMobile, isTablet);
@@ -26,19 +32,31 @@ class LoginHeader extends ConsumerWidget {
     
     return Column(
       children: [
-        // Header with logo and title
+        // Header with logo, title, and logout button
         Container(
           height: headerHeight,
           width: double.infinity,
           decoration: const BoxDecoration(color: Colors.white),
-          child: _buildHeaderContent(
-            context,
-            ref,
-            isMobile,
-            isTablet,
-            logoSize,
-            titleFontSize,
-            spacingBetweenElements,
+          child: Stack(
+            children: [
+              // Main header content (logo and title)
+              _buildHeaderContent(
+                context,
+                ref,
+                isMobile,
+                isTablet,
+                logoSize,
+                titleFontSize,
+                spacingBetweenElements,
+              ),
+              // Logout button positioned in top-right corner (only if logged in and not on login screen)
+              if (shouldShowLogout)
+                Positioned(
+                  top: 8,
+                  right: horizontalPadding,
+                  child: _buildLogoutButton(context, ref, isMobile, isTablet),
+                ),
+            ],
           ),
         ),
 
@@ -49,7 +67,7 @@ class LoginHeader extends ConsumerWidget {
           color: Colors.teal[700],
         ),
 
-        // Navigation bar with logout button
+        // Navigation bar without logout button (since it's now in header)
         Container(
           color: Colors.white,
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -123,8 +141,6 @@ class LoginHeader extends ConsumerWidget {
               ),
             ),
           ),
-          // Logout button positioned on the right for tablet and desktop
-          if (!isMobile) _buildLogoutButton(context, ref, isTablet),
         ],
       );
     }
@@ -135,42 +151,33 @@ class LoginHeader extends ConsumerWidget {
     final textSize = isMobile ? 12.0 : 14.0;
     
     if (isMobile) {
-      // More compact navigation for mobile with logout button
+      // Mobile navigation without logout button (now in header)
       return SizedBox(
         height: 48,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.home,
-                      color: Colors.orange[900],
-                      size: iconSize,
-                    ),
-                    onPressed: () {
-                       context.go('/');
-                    },
-                  ),
-                  for (final item in ['Contact', 'Links', 'FAQs'])
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        item,
-                        style: TextStyle(
-                          color: Colors.orange[900],
-                          fontSize: textSize,
-                        ),
-                      ),
-                    ),
-                ],
+            IconButton(
+              icon: Icon(
+                Icons.home,
+                color: Colors.orange[900],
+                size: iconSize,
               ),
+              onPressed: () {
+                 context.go('/');
+              },
             ),
-            // Logout button for mobile
-            _buildLogoutButton(context, ref, false),
+            for (final item in ['Contact', 'Links', 'FAQs'])
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    color: Colors.orange[900],
+                    fontSize: textSize,
+                  ),
+                ),
+              ),
           ],
         ),
       );
@@ -207,12 +214,14 @@ class LoginHeader extends ConsumerWidget {
     }
   }
 
-  Widget _buildLogoutButton(BuildContext context, WidgetRef ref, bool isTablet) {
-    final buttonTextSize = isTablet ? 12.0 : 14.0;
-    final buttonPadding = isTablet ? 8.0 : 12.0;
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref, bool isMobile, bool isTablet) {
+    // Responsive button sizing
+    final buttonTextSize = isMobile ? 10.0 : (isTablet ? 11.0 : 12.0);
+    final buttonPadding = isMobile ? 6.0 : (isTablet ? 8.0 : 10.0);
+    final iconSize = isMobile ? 14.0 : (isTablet ? 16.0 : 18.0);
+    final borderRadius = isMobile ? 3.0 : 4.0;
     
     return Container(
-      margin: const EdgeInsets.only(left: 16.0, right: 8.0),
       child: TextButton(
         onPressed: () {
           _showLogoutDialog(context, ref);
@@ -221,10 +230,12 @@ class LoginHeader extends ConsumerWidget {
           foregroundColor: Colors.orange[900],
           padding: EdgeInsets.symmetric(
             horizontal: buttonPadding,
-            vertical: 4.0,
+            vertical: buttonPadding / 2,
           ),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4.0),
+            borderRadius: BorderRadius.circular(borderRadius),
             side: BorderSide(
               color: Colors.orange[900]!,
               width: 1.0,
@@ -236,10 +247,10 @@ class LoginHeader extends ConsumerWidget {
           children: [
             Icon(
               Icons.logout,
-              size: buttonTextSize + 2,
+              size: iconSize,
               color: Colors.orange[900],
             ),
-            const SizedBox(width: 4.0),
+            SizedBox(width: isMobile ? 3.0 : 4.0),
             Text(
               'Logout',
               style: TextStyle(

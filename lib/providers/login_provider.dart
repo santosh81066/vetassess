@@ -18,14 +18,21 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<void> _checkInitialLoginStatus() async {
     final isLoggedInResult = await isLoggedIn();
     if (isLoggedInResult) {
+      // Get stored user role
+      final userRole = await getUserRole();
       // User is logged in, set success state
-      state = state.copyWith(isSuccess: true, isLoading: false);
+      state = state.copyWith(
+        isSuccess: true,
+        isLoading: false,
+        userRole: userRole,
+      );
     } else {
       // User is not logged in, ensure state reflects this
       state = state.copyWith(
         isSuccess: false,
         isLoading: false,
         response: null,
+        userRole: null,
       );
     }
   }
@@ -33,7 +40,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
   // Fetch captcha from API
   Future<void> fetchCaptcha() async {
     state = state.copyWith(isLoadingCaptcha: true);
-
+    
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/auth/captcha'),
@@ -76,16 +83,21 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final loginResponse = LoginResponse.fromJson(responseData);
 
-        // Store tokens in SharedPreferences
+        // Store tokens and user role in SharedPreferences
         await _storeTokens(
           loginResponse.accessToken,
           loginResponse.refreshToken,
         );
+        
+        // Store user role (use response role or fallback to request role)
+        final userRole = loginResponse.role ?? request.role;
+        await _storeUserRole(userRole);
 
         state = state.copyWith(
           isLoading: false,
           isSuccess: true,
           response: loginResponse,
+          userRole: userRole,
           error: null, // Clear any previous errors
         );
       } else {
@@ -103,6 +115,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           isSuccess: false,
           error: errorMessage,
           response: null,
+          userRole: null,
         );
       }
     } catch (e) {
@@ -111,17 +124,18 @@ class LoginNotifier extends StateNotifier<LoginState> {
         isSuccess: false,
         error: 'Network error: ${e.toString()}',
         response: null,
+        userRole: null,
       );
     }
   }
 
   Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-
+    
     if (accessToken != null && accessToken.isNotEmpty) {
       await prefs.setString('access_token', accessToken);
     }
-
+    
     if (refreshToken != null && refreshToken.isNotEmpty) {
       await prefs.setString('refresh_token', refreshToken);
     }
@@ -131,6 +145,18 @@ class LoginNotifier extends StateNotifier<LoginState> {
       'login_timestamp',
       DateTime.now().millisecondsSinceEpoch,
     );
+  }
+
+  // Store user role
+  Future<void> _storeUserRole(String role) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_role', role);
+  }
+
+  // Get stored user role
+  Future<String?> getUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_role');
   }
 
   // Get stored access token
@@ -149,12 +175,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> _isTokenExpired() async {
     final prefs = await SharedPreferences.getInstance();
     final loginTimestamp = prefs.getInt('login_timestamp');
-
+    
     if (loginTimestamp == null) return true;
-
+    
     final loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
     final expiryTime = loginTime.add(Duration(hours: tokenExpiryHours));
-
+    
     return DateTime.now().isAfter(expiryTime);
   }
 
@@ -162,11 +188,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> isLoggedIn() async {
     try {
       final accessToken = await getAccessToken();
-
+      
       if (accessToken == null || accessToken.isEmpty) {
         return false;
       }
-
+      
       // Check if token has expired
       final isExpired = await _isTokenExpired();
       if (isExpired) {
@@ -174,7 +200,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final refreshSuccessful = await _tryRefreshToken();
         return refreshSuccessful;
       }
-
+      
       return true;
     } catch (e) {
       return false;
@@ -185,7 +211,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> _tryRefreshToken() async {
     try {
       final refreshToken = await getRefreshToken();
-
+      
       if (refreshToken == null || refreshToken.isEmpty) {
         return false;
       }
@@ -203,10 +229,15 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         // Store new tokens
         await _storeTokens(newAccessToken, newRefreshToken);
-
-        // Update state to reflect successful refresh
-        state = state.copyWith(isSuccess: true, isLoading: false);
-
+        
+        // Get stored user role and update state
+        final userRole = await getUserRole();
+        state = state.copyWith(
+          isSuccess: true,
+          isLoading: false,
+          userRole: userRole,
+        );
+        
         return true;
       } else {
         // Refresh failed, logout user
@@ -220,11 +251,13 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
+
+
   // Public logout method
   Future<void> logout() async {
     // Set loading state during logout
     state = state.copyWith(isLoading: true);
-
+    
     try {
       // Perform the actual logout
       await _performLogout();
@@ -246,6 +279,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       isLoading: false,
       response: null,
       error: null,
+      userRole: null,
     );
   }
 
@@ -253,11 +287,14 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<Map<String, dynamic>?> getUserInfo() async {
     try {
       final accessToken = await getAccessToken();
+      final userRole = await getUserRole();
+      
       if (accessToken == null) return null;
 
-      // If you need to decode JWT token to get user info
-      // You can add JWT decoding logic here
-      return null;
+      return {
+        'role': userRole,
+        'hasToken': true,
+      };
     } catch (e) {
       return null;
     }
@@ -318,16 +355,31 @@ class LoginNotifier extends StateNotifier<LoginState> {
     );
   }
 
-  // 4. Create a provider to access login provider from other widgets
-  // Add this at the bottom of providers/login_provider.dart:
-}
+  // Get navigation route based on user role
+  String getNavigationRouteForRole() {
+    final role = state.userRole;
+    switch (role) {
+      case 'admin':
+        return '/admin_users';
+      case 'applicant':
+        return '/appli_opt';
+      case 'agent':
+        return '/appli_opt'; // You can change this if agents have different route
+      default:
+        return '/appli_opt'; // Default fallback
+    }
+  }
 
-// Provider
-final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
-  return LoginNotifier();
-});
+
+}
 
 final userIdProvider = FutureProvider<int?>((ref) async {
   final loginNotifier = ref.read(loginProvider.notifier);
   return await loginNotifier.getUserId();
+});
+
+
+// Provider
+final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
+  return LoginNotifier();
 });

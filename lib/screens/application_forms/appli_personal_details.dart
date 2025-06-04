@@ -187,9 +187,10 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     
     // Update all form data to provider
     _updateProviderData();
+    
    
     // Submit the form
-    final success = await ref.read(personalDetailsProvider.notifier).submitPersonalDetails(
+    final  success = await ref.read(personalDetailsProvider.notifier).submitPersonalDetails(    
       userId:  userId, // Replace with actual user ID
     );
     

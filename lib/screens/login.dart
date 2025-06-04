@@ -40,8 +40,9 @@ class _LoginState extends ConsumerState<Login> {
       });
       
       if (isLoggedIn) {
-        // User is already logged in, navigate away
-        context.go('/appli_opt');
+        // User is already logged in, navigate to appropriate route based on role
+        final navigationRoute = loginNotifier.getNavigationRouteForRole();
+        context.go(navigationRoute);
         return;
       }
     }
@@ -159,13 +160,19 @@ class _LoginState extends ConsumerState<Login> {
     // Listen to login state changes for navigation
     ref.listen<LoginState>(loginProvider, (previous, next) {
       if (next.isSuccess && next.response != null && previous?.isSuccess != true) {
-        // Login just succeeded, navigate to app
+        // Login just succeeded, navigate based on role
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            context.go('/appli_opt');
+            final loginNotifier = ref.read(loginProvider.notifier);
+            final navigationRoute = loginNotifier.getNavigationRouteForRole();
+            context.go(navigationRoute);
+            
+            // Show success message with role info
+            final roleName = next.userRole == 'admin' ? 'Admin' : 
+                           next.userRole == 'agent' ? 'Agent' : 'Applicant';
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Login successful!'),
+              SnackBar(
+                content: Text('Login successful! Welcome $roleName'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -287,6 +294,18 @@ class _LoginState extends ConsumerState<Login> {
                                 },
                               ),
                               const Text('Agent'),
+                              const SizedBox(width: 10),
+                              Radio<String>(
+                                value: 'admin',
+                                activeColor: const Color(0xFF0d5257),
+                                groupValue: _selectedRole,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedRole = value!;
+                                  });
+                                },
+                              ),
+                              const Text('Admin'),
                             ],
                           ),
 
@@ -294,7 +313,10 @@ class _LoginState extends ConsumerState<Login> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                // Navigate to forgot password screen
+                                context.go('/forgot-password');
+                              },
                               style: TextButton.styleFrom(
                                 minimumSize: Size.zero,
                                 padding: EdgeInsets.zero,
@@ -498,7 +520,7 @@ class _LoginState extends ConsumerState<Login> {
                                   children: [
                                     TextButton(
                                       onPressed: () {
-                                        context.go('/register');
+                                        context.go('/register?role=$type');
                                       },
                                       style: TextButton.styleFrom(
                                         minimumSize: Size.zero,
@@ -519,7 +541,7 @@ class _LoginState extends ConsumerState<Login> {
                                     ),
                                     if (type == 'applicant')
                                       Text(
-                                        'or',
+                                        ' or ',
                                         style: TextStyle(
                                           color: Colors.grey[800],
                                           fontSize: 12,

@@ -10,12 +10,13 @@ import 'package:vetassess/screens/application_forms/appli_general_edu.dart';
 import 'package:vetassess/screens/application_forms/appli_occupation.dart';
 import 'package:vetassess/screens/application_forms/appli_personal_details.dart';
 import 'package:vetassess/screens/application_forms/appli_priority.dart';
+import 'package:vetassess/screens/application_forms/electronic_document_upload.dart';
 import 'package:vetassess/screens/application_process.dart';
 import 'package:vetassess/screens/application_type%20.dart';
 import 'package:vetassess/screens/applioptions.dart';
 import 'package:vetassess/screens/apply_screen.dart';
 import 'package:vetassess/screens/eligibility_criteria.dart';
-import 'package:vetassess/screens/empoyment.dart';
+import 'package:vetassess/screens/employment.dart';
 import 'package:vetassess/screens/fee_screen.dart';
 import 'package:vetassess/screens/licence.dart';
 import 'package:vetassess/screens/login.dart';
@@ -47,38 +48,62 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Get current login state
       final loginState = ref.read(loginProvider);
       final currentPath = state.fullPath;
-
+      
       // Define login paths
-      final isLoginPath =
-          currentPath == '/login' || currentPath == '/login_page';
-
-      // Define protected routes
-      final protectedRoutes = [
+      final isLoginPath = currentPath == '/login' || currentPath == '/login_page';
+      
+      // Define protected routes for applicants/agents
+      final applicantProtectedRoutes = [
         '/appli_opt',
         '/personal_form',
-        '/occupation_form',
+        '/occupation_form',            
         '/education_form',
         '/tertiary_education_form',
         '/employment_form',
-        //'/licence_form',
+        '/licence_form',
         '/app_priority_form',
         '/doc_upload',
         '/appli_type',
       ];
-
-      final isProtectedRoute = protectedRoutes.contains(currentPath);
-
-      // If user is logged in (successful login state) and trying to access login page
+      
+      // Define protected routes for admins
+      final adminProtectedRoutes = [
+        '/admin_users',
+        '/admin_user-details',
+      ];
+      
+      final isApplicantProtectedRoute = applicantProtectedRoutes.contains(currentPath);
+      final isAdminProtectedRoute = adminProtectedRoutes.contains(currentPath);
+      final isAnyProtectedRoute = isApplicantProtectedRoute || isAdminProtectedRoute;
+      
+      // If user is logged in and trying to access login page
       if (loginState.isSuccess && loginState.response != null && isLoginPath) {
-        return '/appli_opt';
+        // Navigate based on user role
+        final loginNotifier = ref.read(loginProvider.notifier);
+        return loginNotifier.getNavigationRouteForRole();
       }
-
+      
       // If user is not logged in and trying to access protected routes
-      if (!loginState.isSuccess && isProtectedRoute) {
+      if (!loginState.isSuccess && isAnyProtectedRoute) {
         return '/login';
       }
-
-      return null;
+      
+      // If user is logged in but trying to access wrong role's routes
+      if (loginState.isSuccess && loginState.userRole != null) {
+        final userRole = loginState.userRole!;
+        
+        // Admin trying to access applicant routes
+        if (userRole == 'admin' && isApplicantProtectedRoute) {
+          return '/admin_users';
+        }
+        
+        // Applicant/Agent trying to access admin routes
+        if ((userRole == 'applicant' || userRole == 'agent') && isAdminProtectedRoute) {
+          return '/appli_opt';
+        }
+      }
+      
+      return null; // No redirect needed
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
@@ -93,6 +118,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         builder: (context, state) => const VetassessRegistrationForm(),
       ),
+      
+      // Admin routes
       GoRoute(
         path: '/admin_users',
         builder: (context, state) => UsersListScreen(),
@@ -105,6 +132,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return UserDetailsScreen(user: user);
         },
       ),
+      
+      // Public routes
       GoRoute(
         path: '/application_process',
         builder: (context, state) => const ApplicationProcess(),
@@ -146,7 +175,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ApplyNowScreen(),
       ),
 
-      ///APPLICATION FORMS - These will be protected by the redirect logic
+      // Applicant/Agent application forms - Protected routes
       GoRoute(
         path: '/personal_form',
         builder: (context, state) => const PersonalDetailsForm(),
@@ -179,6 +208,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/doc_upload',
         builder: (context, state) => const DocumentUploadScreen(),
       ),
+       GoRoute(
+        path: '/vetassess_upload',
+        builder: (context, state) =>  VetassessUploadPage(),
+      ),
       GoRoute(
         path: '/appli_type',
         builder: (context, state) => const ApplicationTypeSelectionScreen(),
@@ -196,12 +229,16 @@ class RouterRefreshNotifier extends ChangeNotifier {
   late final ProviderSubscription _subscription;
 
   RouterRefreshNotifier(ProviderRef ref) {
-    _subscription = ref.listen(loginProvider, (previous, next) {
-      // Notify router to refresh when login state changes
-      if (previous?.isSuccess != next.isSuccess) {
-        notifyListeners();
-      }
-    });
+    _subscription = ref.listen(
+      loginProvider,
+      (previous, next) {
+        // Notify router to refresh when login state or role changes
+        if (previous?.isSuccess != next.isSuccess || 
+            previous?.userRole != next.userRole) {
+          notifyListeners();
+        }
+      },
+    );
   }
 
   @override
@@ -221,7 +258,7 @@ class VetassessApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'VETASSESS - Skills Assessment Australia',
-      routerConfig: router,
+      routerConfig: router,      
     );
   }
 }

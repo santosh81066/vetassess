@@ -1,23 +1,142 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vetassess/providers/educationform_provider.dart';
+import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/screens/application_forms/appli_priority.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../../widgets/application_nav.dart';
 import '../tertiary_education.dart';
 
-class EducationForm extends StatefulWidget {
+class EducationForm extends ConsumerStatefulWidget {
   const EducationForm({super.key});
 
   @override
-  State<EducationForm> createState() => _EducationFormState();
+  ConsumerState<EducationForm> createState() => _EducationFormState();
 }
 
-class _EducationFormState extends State<EducationForm> {
+class _EducationFormState extends ConsumerState<EducationForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _primaryDateStartedController = TextEditingController();
+  final TextEditingController _primaryDateFinishedController = TextEditingController();
+  final TextEditingController _primaryNumberOfYearsController = TextEditingController();
+  final TextEditingController _primaryCountryController = TextEditingController();
+  String? _primaryYearCompleted;
+
+  // Controllers for Secondary School
+  final TextEditingController _secondaryDateStartedController = TextEditingController();
+  final TextEditingController _secondaryDateFinishedController = TextEditingController();
+  final TextEditingController _secondaryNumberOfYearsController = TextEditingController();
+  final TextEditingController _secondaryCountryController = TextEditingController();
+  final TextEditingController _certificateDetailsController = TextEditingController();
+  String? _certificateYearObtained;
+
+  @override
+  void dispose() {
+    // Dispose all controllers
+    _primaryDateStartedController.dispose();
+    _primaryDateFinishedController.dispose();
+    _primaryNumberOfYearsController.dispose();
+    _primaryCountryController.dispose();
+    _secondaryDateStartedController.dispose();
+    _secondaryDateFinishedController.dispose();
+    _secondaryNumberOfYearsController.dispose();
+    _secondaryCountryController.dispose();
+    _certificateDetailsController.dispose();
+    super.dispose();
+  }
+
+  // Get user ID from login state
+  int? get _currentUserId {
+    final loginState = ref.read(loginProvider);
+    return loginState.response?.userId;
+  }
+
+  // Generate year options for dropdowns
+  List<String> get _yearOptions {
+    final currentYear = DateTime.now().year;
+    final years = <String>[];
+    for (int year = currentYear; year >= 1950; year--) {
+      years.add(year.toString());
+    }
+    return years;
+  }
+
+  // Update provider state when text fields change
+  void _updateProviderState() {
+    final provider = ref.read(educationFormProvider.notifier);
+    
+    // Update primary school data
+    provider.updatePrimarySchool(
+      dateStarted: _primaryDateStartedController.text.isNotEmpty ? _primaryDateStartedController.text : null,
+      dateFinished: _primaryDateFinishedController.text.isNotEmpty ? _primaryDateFinishedController.text : null,
+      numberOfYears: int.tryParse(_primaryNumberOfYearsController.text) ?? 0,
+      country: _primaryCountryController.text,
+      yearCompleted: int.tryParse(_primaryYearCompleted ?? '0'),
+    );
+
+    // Update secondary school data
+    provider.updateSecondarySchool(
+      dateStarted: _secondaryDateStartedController.text.isNotEmpty ? _secondaryDateStartedController.text : null,
+      dateFinished: _secondaryDateFinishedController.text.isNotEmpty ? _secondaryDateFinishedController.text : null,
+      numberOfYears: int.tryParse(_secondaryNumberOfYearsController.text) ?? 0,
+      country: _secondaryCountryController.text,
+    );
+
+    // Update highest schooling certificate data
+    provider.updateHighestSchoolingCertificate(
+      certificateDetails: _certificateDetailsController.text,
+      yearObtained: int.tryParse(_certificateYearObtained ?? '0') ?? 0,
+    );
+  }
+
+  Future<void> _continue() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Check if user ID is available
+    final userId = _currentUserId;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not logged in. Please login again.')),
+      );
+      return;
+    }
+    
+    _updateProviderState();
+    
+    // Validate form using provider
+    if (!ref.read(educationFormProvider.notifier).validateForm()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields correctly.')),
+      );
+      return;
+    }
+
+    // Submit the form
+    final success = await ref.read(educationFormProvider.notifier).submitEducationDetails(
+      userId: userId,
+    );
+    
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Education details submitted successfully!')),
+      );
+      context.go('/tertiary_education_form');
+    } else {
+      final errorMessage = ref.read(educationFormProvider).errorMessage ?? 'Failed to submit. Please try again.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final educationState = ref.watch(educationFormProvider);
 
     return LoginPageLayout(
       child: Row(
@@ -56,216 +175,237 @@ class _EducationFormState extends State<EducationForm> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Form Container
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(screenWidth * 0.03),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Required Fields
-                              Row(
-                                children: const [
-                                  Text(
-                                    '*',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Required Fields',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Primary School Section
-                              const Text(
-                                'Primary School',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                  color: Color(0xFF4D4D4D),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              const Divider(
-                                height: 1,
-                                color: Color(0xFFDDDDDD),
-                              ),
-                              const SizedBox(height: 15),
-
-                              // Primary School Form Fields
-                              buildLabelledField(
-                                'Date started',
-                                buildDateField(),
-                              ),
-                              buildLabelledField(
-                                'Date finished',
-                                buildDateField(),
-                              ),
-                              buildLabelledField(
-                                'Number of years',
-                                buildNumberField(),
-                                isRequired: true,
-                              ),
-                              buildLabelledField(
-                                'Country(s)',
-                                buildCountryField(),
-                                isRequired: true,
-                              ),
-                              buildLabelledField(
-                                'Year completed',
-                                buildYearDropdown(),
-                              ),
-
-                              const SizedBox(height: 30),
-
-                              // Secondary School Section
-                              const Text(
-                                'Secondary School',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                  color: Color(0xFF4D4D4D),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              const Divider(
-                                height: 1,
-                                color: Color(0xFFDDDDDD),
-                              ),
-                              const SizedBox(height: 15),
-
-                              // Secondary School Form Fields
-                              buildLabelledField(
-                                'Date started',
-                                buildDateField(),
-                              ),
-                              buildLabelledField(
-                                'Date finished',
-                                buildDateField(),
-                              ),
-                              buildLabelledField(
-                                'Number of years',
-                                buildNumberField(),
-                                isRequired: true,
-                              ),
-                              buildLabelledField(
-                                'Country(s)',
-                                buildCountryField(),
-                                isRequired: true,
-                              ),
-                              buildLabelledField(
-                                'Highest schooling\ncertificate obtained',
-                                buildCertificateField(),
-                                isRequired: true,
-                              ),
-                              buildLabelledField(
-                                'Year obtained',
-                                buildYearDropdown(),
-                                isRequired: true,
-                              ),
-
-                              const SizedBox(height: 30),
-
-                              // Buttons
-                              Center(
-                                child: Wrap(
-                                  spacing: 15,
-                                  runSpacing: 10,
-                                  children: [
-                                    // Back Button
-                                    SizedBox(
-                                      height: 36,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Back',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
+                      // Form Container - WRAPPED IN FORM WIDGET
+                      Form(
+                        key: _formKey,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(screenWidth * 0.03),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Required Fields
+                                Row(
+                                  children: const [
+                                    Text(
+                                      '*',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-
-                                    // Save & Exit Button
-                                    SizedBox(
-                                      height: 36,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Save & Exit',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-
-                                    // Continue Button
-                                    SizedBox(
-                                      height: 36,
-                                      child: ElevatedButton(
-                                        onPressed:
-                                            () => context.go(
-                                              '/tertiary_education_form',
-                                            ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.teal,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              4,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Continue',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Required Fields',
+                                      style: TextStyle(color: Colors.red),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 20),
+
+                                // Primary School Section
+                                const Text(
+                                  'Primary School',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color(0xFF4D4D4D),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                const Divider(
+                                  height: 1,
+                                  color: Color(0xFFDDDDDD),
+                                ),
+                                const SizedBox(height: 15),
+
+                                // Primary School Form Fields
+                                buildLabelledField(
+                                  'Date started',
+                                  buildDateField(_primaryDateStartedController),
+                                ),
+                                buildLabelledField(
+                                  'Date finished',
+                                  buildDateField(_primaryDateFinishedController),
+                                ),
+                                buildLabelledField(
+                                  'Number of years',
+                                  buildNumberField(_primaryNumberOfYearsController, isRequired: true),
+                                  isRequired: true,
+                                ),
+                                buildLabelledField(
+                                  'Country(s)',
+                                  buildCountryField(_primaryCountryController, isRequired: true),
+                                  isRequired: true,
+                                ),
+                                buildLabelledField(
+                                  'Year completed',
+                                  buildYearDropdown(
+                                    value: _primaryYearCompleted,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _primaryYearCompleted = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+
+                                const SizedBox(height: 30),
+
+                                // Secondary School Section
+                                const Text(
+                                  'Secondary School',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color(0xFF4D4D4D),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                const Divider(
+                                  height: 1,
+                                  color: Color(0xFFDDDDDD),
+                                ),
+                                const SizedBox(height: 15),
+
+                                // Secondary School Form Fields
+                                buildLabelledField(
+                                  'Date started',
+                                  buildDateField(_secondaryDateStartedController),
+                                ),
+                                buildLabelledField(
+                                  'Date finished',
+                                  buildDateField(_secondaryDateFinishedController),
+                                ),
+                                buildLabelledField(
+                                  'Number of years',
+                                  buildNumberField(_secondaryNumberOfYearsController, isRequired: true),
+                                  isRequired: true,
+                                ),
+                                buildLabelledField(
+                                  'Country(s)',
+                                  buildCountryField(_secondaryCountryController, isRequired: true),
+                                  isRequired: true,
+                                ),
+                                buildLabelledField(
+                                  'Highest schooling\ncertificate obtained',
+                                  buildCertificateField(_certificateDetailsController, isRequired: true),
+                                  isRequired: true,
+                                ),
+                                buildLabelledField(
+                                  'Year obtained',
+                                  buildYearDropdown(
+                                    value: _certificateYearObtained,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _certificateYearObtained = value;
+                                      });
+                                    },
+                                    isRequired: true,
+                                  ),
+                                  isRequired: true,
+                                ),
+
+                                const SizedBox(height: 30),
+
+                                // Buttons
+                                Center(
+                                  child: Wrap(
+                                    spacing: 15,
+                                    runSpacing: 10,
+                                    children: [
+                                      // Back Button
+                                      SizedBox(
+                                        height: 36,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            // Add your back navigation logic here
+                                            context.pop();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.teal,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          ),
+                                          child: const Text(
+                                            'Back',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Save & Exit Button
+                                      SizedBox(
+                                        height: 36,
+                                        child: ElevatedButton(
+                                          onPressed: educationState.isLoading ? null : () {
+                                            _updateProviderState();
+                                            // Add save and exit logic here
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Data saved successfully!')),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.teal,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          ),
+                                          child: const Text(
+                                            'Save & Exit',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Continue Button
+                                      SizedBox(
+                                        height: 36,
+                                        child: ElevatedButton(
+                                          onPressed: educationState.isLoading ? null : _continue,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.teal,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          ),
+                                          child: educationState.isLoading
+                                              ? const SizedBox(
+                                                  width: 16,
+                                                  height: 16,
+                                                  child: CircularProgressIndicator(
+                                                    color: Colors.white,
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Text(
+                                                  'Continue',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -285,13 +425,10 @@ class _EducationFormState extends State<EducationForm> {
     Widget field, {
     bool isRequired = false,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // For smaller screens, stack the label and field vertically
           if (constraints.maxWidth < 600) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,7 +453,6 @@ class _EducationFormState extends State<EducationForm> {
             );
           }
 
-          // For larger screens, use the original row layout
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -351,16 +487,14 @@ class _EducationFormState extends State<EducationForm> {
     );
   }
 
-  Widget buildDateField() {
+  Widget buildDateField(TextEditingController controller) {
     return SizedBox(
       width: 150,
       height: 34,
-      child: TextField(
+      child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 8,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -368,15 +502,35 @@ class _EducationFormState extends State<EducationForm> {
           hintText: 'MM/yyyy',
           hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
         ),
+        validator: (value) {
+          if (value != null && value.isNotEmpty) {
+            final regex = RegExp(r'^\d{2}/\d{4}$');
+            if (!regex.hasMatch(value)) {
+              return 'Use MM/yyyy format';
+            }
+          }
+          return null;
+        },
       ),
     );
   }
 
-  Widget buildNumberField() {
+  Widget buildNumberField(TextEditingController controller, {bool isRequired = false}) {
     return SizedBox(
       width: 80,
       height: 34,
-      child: TextField(
+      child: TextFormField( // Changed from TextField to TextFormField
+        controller: controller,
+        validator: isRequired ? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Required';
+          }
+          // Additional validation for numbers
+          if (int.tryParse(value) == null) {
+            return 'Enter valid number';
+          }
+          return null;
+        } : null,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
@@ -392,11 +546,18 @@ class _EducationFormState extends State<EducationForm> {
     );
   }
 
-  Widget buildCountryField() {
+  Widget buildCountryField(TextEditingController controller, {bool isRequired = false}) {
     return SizedBox(
       width: 250,
       height: 34,
-      child: TextField(
+      child: TextFormField( // Changed from TextField to TextFormField
+        controller: controller,
+        validator: isRequired ? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Country is required';
+          }
+          return null;
+        } : null,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
@@ -411,11 +572,18 @@ class _EducationFormState extends State<EducationForm> {
     );
   }
 
-  Widget buildCertificateField() {
+  Widget buildCertificateField(TextEditingController controller, {bool isRequired = false}) {
     return SizedBox(
       width: 250,
       height: 34,
-      child: TextField(
+      child: TextFormField( // Changed from TextField to TextFormField
+        controller: controller,
+        validator: isRequired ? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Certificate details required';
+          }
+          return null;
+        } : null,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
@@ -430,30 +598,41 @@ class _EducationFormState extends State<EducationForm> {
     );
   }
 
-  Widget buildYearDropdown() {
+  Widget buildYearDropdown({
+    String? value,
+    required Function(String?) onChanged,
+    bool isRequired = false,
+  }) {
     return SizedBox(
       width: 200,
       height: 34,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: ButtonTheme(
-            alignedDropdown: true,
-            child: DropdownButton<String>(
-              isExpanded: true,
-              hint: Text(
-                'Please pick a year',
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-              ),
-              icon: const Icon(Icons.arrow_drop_down),
-              items: const [],
-              onChanged: (value) {},
-            ),
+      child: DropdownButtonFormField<String>( // Changed to DropdownButtonFormField
+        value: value,
+        validator: isRequired ? (value) {
+          if (value == null || value.isEmpty) {
+            return 'Year is required';
+          }
+          return null;
+        } : null,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: BorderSide(color: Colors.grey.shade300),
           ),
         ),
+        hint: Text(
+          'Please pick a year',
+          style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        ),
+        icon: const Icon(Icons.arrow_drop_down),
+        items: _yearOptions.map((String year) {
+          return DropdownMenuItem<String>(
+            value: year,
+            child: Text(year),
+          );
+        }).toList(),
+        onChanged: onChanged,
       ),
     );
   }

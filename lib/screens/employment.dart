@@ -565,9 +565,14 @@ class _EmploymentFormState extends State<EmploymentForm> {
                   ),
                 ),
                 onPressed: () {
-                  setState(() {
-                    taskControllers.insert(index + 1, TextEditingController());
-                  });
+                  // Only allow deletion if there's more than one task
+                  if (taskControllers.length > 1) {
+                    setState(() {
+                      // Dispose the controller before removing it
+                      taskControllers[index].dispose();
+                      taskControllers.removeAt(index);
+                    });
+                  }
                 },
                 constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
                 padding: EdgeInsets.zero,
