@@ -30,12 +30,13 @@ class AppliOptions extends StatelessWidget {
               title: 'Continue Incomplete Application',
               icon: Icons.edit_note,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TertiaryEducationForm(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => TertiaryEducationForm(),
+                //   ),
+                // );
+                context.go('/tertiary_education_form');
               },
               color: const Color(0xFF006257),
               context: context,

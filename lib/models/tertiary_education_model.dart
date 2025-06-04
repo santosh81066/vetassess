@@ -1,5 +1,6 @@
-// models/tertiary_education_model.dart
-class TertiaryEducationRequest {
+// models/tertiary_qualification_model.dart
+
+class TertiaryQualificationRequest {
   final int userId;
   final String? studentRegistrationNumber;
   final String qualificationName;
@@ -15,20 +16,20 @@ class TertiaryEducationRequest {
   final String? postCode;
   final String institutionCountry;
   final String normalEntryRequirement;
-  final String entryBasis;
+  final String? entryBasis;
   final String courseLengthYearsOrSemesters;
   final String semesterLengthWeeksOrMonths;
   final String courseStartDate;
   final String courseEndDate;
-  final String qualificationAwardedDate;
+  final String? qualificationAwardedDate;
   final String studyMode;
   final int hoursPerWeek;
-  final int internshipWeeks;
-  final int thesisWeeks;
-  final int majorProjectWeeks;
-  final String activityDetails;
+  final int? internshipWeeks;
+  final int? thesisWeeks;
+  final int? majorProjectWeeks;
+  final String? activityDetails;
 
-  TertiaryEducationRequest({
+  TertiaryQualificationRequest({
     required this.userId,
     this.studentRegistrationNumber,
     required this.qualificationName,
@@ -44,18 +45,18 @@ class TertiaryEducationRequest {
     this.postCode,
     required this.institutionCountry,
     required this.normalEntryRequirement,
-    required this.entryBasis,
+    this.entryBasis,
     required this.courseLengthYearsOrSemesters,
     required this.semesterLengthWeeksOrMonths,
     required this.courseStartDate,
     required this.courseEndDate,
-    required this.qualificationAwardedDate,
+    this.qualificationAwardedDate,
     required this.studyMode,
     required this.hoursPerWeek,
-    required this.internshipWeeks,
-    required this.thesisWeeks,
-    required this.majorProjectWeeks,
-    required this.activityDetails,
+    this.internshipWeeks,
+    this.thesisWeeks,
+    this.majorProjectWeeks,
+    this.activityDetails,
   });
 
   Map<String, dynamic> toJson() {
@@ -91,7 +92,7 @@ class TertiaryEducationRequest {
   }
 }
 
-class TertiaryEducationQualification {
+class TertiaryQualificationData {
   final int educationId;
   final int userId;
   final String? studentRegistrationNumber;
@@ -108,20 +109,20 @@ class TertiaryEducationQualification {
   final String? postCode;
   final String institutionCountry;
   final String normalEntryRequirement;
-  final String entryBasis;
+  final String? entryBasis;
   final String courseLengthYearsOrSemesters;
   final String semesterLengthWeeksOrMonths;
   final String courseStartDate;
   final String courseEndDate;
-  final String qualificationAwardedDate;
+  final String? qualificationAwardedDate;
   final String studyMode;
   final int hoursPerWeek;
-  final int internshipWeeks;
-  final int thesisWeeks;
-  final int majorProjectWeeks;
-  final String activityDetails;
+  final int? internshipWeeks;
+  final int? thesisWeeks;
+  final int? majorProjectWeeks;
+  final String? activityDetails;
 
-  TertiaryEducationQualification({
+  TertiaryQualificationData({
     required this.educationId,
     required this.userId,
     this.studentRegistrationNumber,
@@ -138,22 +139,22 @@ class TertiaryEducationQualification {
     this.postCode,
     required this.institutionCountry,
     required this.normalEntryRequirement,
-    required this.entryBasis,
+    this.entryBasis,
     required this.courseLengthYearsOrSemesters,
     required this.semesterLengthWeeksOrMonths,
     required this.courseStartDate,
     required this.courseEndDate,
-    required this.qualificationAwardedDate,
+    this.qualificationAwardedDate,
     required this.studyMode,
     required this.hoursPerWeek,
-    required this.internshipWeeks,
-    required this.thesisWeeks,
-    required this.majorProjectWeeks,
-    required this.activityDetails,
+    this.internshipWeeks,
+    this.thesisWeeks,
+    this.majorProjectWeeks,
+    this.activityDetails,
   });
 
-  factory TertiaryEducationQualification.fromJson(Map<String, dynamic> json) {
-    return TertiaryEducationQualification(
+  factory TertiaryQualificationData.fromJson(Map<String, dynamic> json) {
+    return TertiaryQualificationData(
       educationId: json['educationId'],
       userId: json['userId'],
       studentRegistrationNumber: json['studentRegistrationNumber'],
@@ -186,183 +187,47 @@ class TertiaryEducationQualification {
   }
 }
 
-class TertiaryEducationResponse {
+class TertiaryQualificationResponse {
   final String message;
-  final TertiaryEducationQualification qualification;
+  final TertiaryQualificationData qualification;
 
-  TertiaryEducationResponse({
+  TertiaryQualificationResponse({
     required this.message,
     required this.qualification,
   });
 
-  factory TertiaryEducationResponse.fromJson(Map<String, dynamic> json) {
-    return TertiaryEducationResponse(
+  factory TertiaryQualificationResponse.fromJson(Map<String, dynamic> json) {
+    return TertiaryQualificationResponse(
       message: json['message'],
-      qualification: TertiaryEducationQualification.fromJson(
-        json['qualification'],
-      ),
+      qualification: TertiaryQualificationData.fromJson(json['qualification']),
     );
   }
 }
 
-class TertiaryEducationState {
+class TertiaryQualificationState {
   final bool isLoading;
   final bool isSuccess;
   final String? error;
-  final TertiaryEducationResponse? response;
+  final TertiaryQualificationResponse? response;
 
-  TertiaryEducationState({
+  TertiaryQualificationState({
     this.isLoading = false,
     this.isSuccess = false,
     this.error,
     this.response,
   });
 
-  TertiaryEducationState copyWith({
+  TertiaryQualificationState copyWith({
     bool? isLoading,
     bool? isSuccess,
     String? error,
-    TertiaryEducationResponse? response,
+    TertiaryQualificationResponse? response,
   }) {
-    return TertiaryEducationState(
+    return TertiaryQualificationState(
       isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
       error: error,
       response: response ?? this.response,
-    );
-  }
-}
-
-// Form field state management
-class TertiaryEducationFormData {
-  final String? studentRegistrationNumber;
-  final String qualificationName;
-  final String majorField;
-  final String awardingBodyName;
-  final String awardingBodyCountry;
-  final String? campusAttended;
-  final String institutionName;
-  final String streetAddress1;
-  final String? streetAddress2;
-  final String suburbCity;
-  final String? state;
-  final String? postCode;
-  final String institutionCountry;
-  final String normalEntryRequirement;
-  final String entryBasis;
-  final String courseLengthYears;
-  final String courseLengthSemesters;
-  final String semesterLengthWeeksOrMonths;
-  final String courseStartDate;
-  final String courseEndDate;
-  final String qualificationAwardedDate;
-  final String studyMode;
-  final String hoursPerWeek;
-  final bool hasInternship;
-  final bool hasThesis;
-  final bool hasMajorProject;
-  final String internshipWeeks;
-  final String thesisWeeks;
-  final String majorProjectWeeks;
-
-  TertiaryEducationFormData({
-    this.studentRegistrationNumber = '',
-    this.qualificationName = '',
-    this.majorField = '',
-    this.awardingBodyName = '',
-    this.awardingBodyCountry = '',
-    this.campusAttended = '',
-    this.institutionName = '',
-    this.streetAddress1 = '',
-    this.streetAddress2 = '',
-    this.suburbCity = '',
-    this.state = '',
-    this.postCode = '',
-    this.institutionCountry = '',
-    this.normalEntryRequirement = '',
-    this.entryBasis = '',
-    this.courseLengthYears = '',
-    this.courseLengthSemesters = '',
-    this.semesterLengthWeeksOrMonths = '',
-    this.courseStartDate = '',
-    this.courseEndDate = '',
-    this.qualificationAwardedDate = '',
-    this.studyMode = '',
-    this.hoursPerWeek = '',
-    this.hasInternship = false,
-    this.hasThesis = false,
-    this.hasMajorProject = false,
-    this.internshipWeeks = '0',
-    this.thesisWeeks = '0',
-    this.majorProjectWeeks = '0',
-  });
-
-  TertiaryEducationFormData copyWith({
-    String? studentRegistrationNumber,
-    String? qualificationName,
-    String? majorField,
-    String? awardingBodyName,
-    String? awardingBodyCountry,
-    String? campusAttended,
-    String? institutionName,
-    String? streetAddress1,
-    String? streetAddress2,
-    String? suburbCity,
-    String? state,
-    String? postCode,
-    String? institutionCountry,
-    String? normalEntryRequirement,
-    String? entryBasis,
-    String? courseLengthYears,
-    String? courseLengthSemesters,
-    String? semesterLengthWeeksOrMonths,
-    String? courseStartDate,
-    String? courseEndDate,
-    String? qualificationAwardedDate,
-    String? studyMode,
-    String? hoursPerWeek,
-    bool? hasInternship,
-    bool? hasThesis,
-    bool? hasMajorProject,
-    String? internshipWeeks,
-    String? thesisWeeks,
-    String? majorProjectWeeks,
-  }) {
-    return TertiaryEducationFormData(
-      studentRegistrationNumber:
-          studentRegistrationNumber ?? this.studentRegistrationNumber,
-      qualificationName: qualificationName ?? this.qualificationName,
-      majorField: majorField ?? this.majorField,
-      awardingBodyName: awardingBodyName ?? this.awardingBodyName,
-      awardingBodyCountry: awardingBodyCountry ?? this.awardingBodyCountry,
-      campusAttended: campusAttended ?? this.campusAttended,
-      institutionName: institutionName ?? this.institutionName,
-      streetAddress1: streetAddress1 ?? this.streetAddress1,
-      streetAddress2: streetAddress2 ?? this.streetAddress2,
-      suburbCity: suburbCity ?? this.suburbCity,
-      state: state ?? this.state,
-      postCode: postCode ?? this.postCode,
-      institutionCountry: institutionCountry ?? this.institutionCountry,
-      normalEntryRequirement:
-          normalEntryRequirement ?? this.normalEntryRequirement,
-      entryBasis: entryBasis ?? this.entryBasis,
-      courseLengthYears: courseLengthYears ?? this.courseLengthYears,
-      courseLengthSemesters:
-          courseLengthSemesters ?? this.courseLengthSemesters,
-      semesterLengthWeeksOrMonths:
-          semesterLengthWeeksOrMonths ?? this.semesterLengthWeeksOrMonths,
-      courseStartDate: courseStartDate ?? this.courseStartDate,
-      courseEndDate: courseEndDate ?? this.courseEndDate,
-      qualificationAwardedDate:
-          qualificationAwardedDate ?? this.qualificationAwardedDate,
-      studyMode: studyMode ?? this.studyMode,
-      hoursPerWeek: hoursPerWeek ?? this.hoursPerWeek,
-      hasInternship: hasInternship ?? this.hasInternship,
-      hasThesis: hasThesis ?? this.hasThesis,
-      hasMajorProject: hasMajorProject ?? this.hasMajorProject,
-      internshipWeeks: internshipWeeks ?? this.internshipWeeks,
-      thesisWeeks: thesisWeeks ?? this.thesisWeeks,
-      majorProjectWeeks: majorProjectWeeks ?? this.majorProjectWeeks,
     );
   }
 }

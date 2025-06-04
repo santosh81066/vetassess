@@ -733,6 +733,7 @@ class _VetassessRegistrationFormState
     );
   }
 
+  // action buttons
   Widget _buildActionButtons(bool isMobile) {
     final signupState = ref.watch(signupProvider);
 

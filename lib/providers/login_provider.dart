@@ -19,10 +19,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     final isLoggedInResult = await isLoggedIn();
     if (isLoggedInResult) {
       // User is logged in, set success state
-      state = state.copyWith(
-        isSuccess: true,
-        isLoading: false,
-      );
+      state = state.copyWith(isSuccess: true, isLoading: false);
     } else {
       // User is not logged in, ensure state reflects this
       state = state.copyWith(
@@ -36,7 +33,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
   // Fetch captcha from API
   Future<void> fetchCaptcha() async {
     state = state.copyWith(isLoadingCaptcha: true);
-    
+
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/auth/captcha'),
@@ -120,11 +117,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     if (accessToken != null && accessToken.isNotEmpty) {
       await prefs.setString('access_token', accessToken);
     }
-    
+
     if (refreshToken != null && refreshToken.isNotEmpty) {
       await prefs.setString('refresh_token', refreshToken);
     }
@@ -152,12 +149,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> _isTokenExpired() async {
     final prefs = await SharedPreferences.getInstance();
     final loginTimestamp = prefs.getInt('login_timestamp');
-    
+
     if (loginTimestamp == null) return true;
-    
+
     final loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
     final expiryTime = loginTime.add(Duration(hours: tokenExpiryHours));
-    
+
     return DateTime.now().isAfter(expiryTime);
   }
 
@@ -165,11 +162,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> isLoggedIn() async {
     try {
       final accessToken = await getAccessToken();
-      
+
       if (accessToken == null || accessToken.isEmpty) {
         return false;
       }
-      
+
       // Check if token has expired
       final isExpired = await _isTokenExpired();
       if (isExpired) {
@@ -177,7 +174,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final refreshSuccessful = await _tryRefreshToken();
         return refreshSuccessful;
       }
-      
+
       return true;
     } catch (e) {
       return false;
@@ -188,7 +185,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> _tryRefreshToken() async {
     try {
       final refreshToken = await getRefreshToken();
-      
+
       if (refreshToken == null || refreshToken.isEmpty) {
         return false;
       }
@@ -206,13 +203,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         // Store new tokens
         await _storeTokens(newAccessToken, newRefreshToken);
-        
+
         // Update state to reflect successful refresh
-        state = state.copyWith(
-          isSuccess: true,
-          isLoading: false,
-        );
-        
+        state = state.copyWith(isSuccess: true, isLoading: false);
+
         return true;
       } else {
         // Refresh failed, logout user
@@ -226,27 +220,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  // Internal logout method that updates state
-  Future<void> _performLogout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
-    await prefs.remove('refresh_token');
-    await prefs.remove('login_timestamp');
-
-    // Reset state to logged out
-    state = LoginState().copyWith(
-      isSuccess: false,
-      isLoading: false,
-      response: null,
-      error: null,
-    );
-  }
-
   // Public logout method
   Future<void> logout() async {
     // Set loading state during logout
     state = state.copyWith(isLoading: true);
-    
+
     try {
       // Perform the actual logout
       await _performLogout();
@@ -284,9 +262,72 @@ class LoginNotifier extends StateNotifier<LoginState> {
       return null;
     }
   }
+
+  //user id
+  Future _storeUserData(LoginResponse loginResponse) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (loginResponse.accessToken != null &&
+        loginResponse.accessToken!.isNotEmpty) {
+      await prefs.setString('access_token', loginResponse.accessToken!);
+    }
+
+    if (loginResponse.refreshToken != null &&
+        loginResponse.refreshToken!.isNotEmpty) {
+      await prefs.setString('refresh_token', loginResponse.refreshToken!);
+    }
+
+    // Store userId
+    if (loginResponse.userId != null) {
+      await prefs.setInt('user_id', loginResponse.userId!);
+    }
+
+    // Store login timestamp for token expiry management
+    await prefs.setInt(
+      'login_timestamp',
+      DateTime.now().millisecondsSinceEpoch,
+    );
+  }
+
+  // Add method to get userId
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id');
+  }
+
+  // 2. Replace the existing _storeTokens method call in login method
+  // In the login method, replace this line:
+  // await _storeTokens(loginResponse.accessToken, loginResponse.refreshToken);
+  // With:
+  // await _storeUserData(loginResponse);
+
+  // 3. Update the _performLogout method to clear userId
+  Future _performLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('access_token');
+    await prefs.remove('refresh_token');
+    await prefs.remove('login_timestamp');
+    await prefs.remove('user_id'); // Add this line
+
+    // Reset state to logged out
+    state = LoginState().copyWith(
+      isSuccess: false,
+      isLoading: false,
+      response: null,
+      error: null,
+    );
+  }
+
+  // 4. Create a provider to access login provider from other widgets
+  // Add this at the bottom of providers/login_provider.dart:
 }
 
 // Provider
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   return LoginNotifier();
+});
+
+final userIdProvider = FutureProvider<int?>((ref) async {
+  final loginNotifier = ref.read(loginProvider.notifier);
+  return await loginNotifier.getUserId();
 });
