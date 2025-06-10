@@ -211,10 +211,10 @@ class ApplyNowScreen extends StatelessWidget {
     return Column(
       children: [
         // Logo image without container
-        Image.asset(
+        SvgPicture.asset(
           'assets/images/icon-logo_3.svg',
-          width: 64,
-          height: 64,
+          width: 34,
+          height: 34,
           fit: BoxFit.contain,
         ),
         const SizedBox(height: 16),

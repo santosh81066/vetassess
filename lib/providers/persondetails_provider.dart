@@ -4,6 +4,8 @@ import 'package:vetassess/models/personaldetails.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
+
 class PersondetailsProvider extends StateNotifier<PersonalDetails> {
   PersondetailsProvider() : super(PersonalDetails());
 
@@ -93,8 +95,8 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
     );
   }
 
-  // Submit personal details to API
-  Future<bool> submitPersonalDetails({required int userId}) async {
+  // Submit personal details to API - now returns SubmissionResult
+  Future<SubmissionResult> submitPersonalDetails({required int userId}) async {
     try {
       print('personaldetails....$userId,${state.currentPassportNumber}');
       const String apiUrl = 'http://103.98.12.226:5100';
@@ -132,7 +134,10 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
         headers = await AuthService.getAuthHeaders();
       } catch (e) {
         print('Error getting auth headers: $e');
-        return false;
+        return SubmissionResult(
+          success: false,
+          errorMessage: 'Authentication failed: $e',
+        );
       }
 
       // Ensure content-type is set correctly
@@ -158,29 +163,55 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
       
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Personal details submitted successfully');
-        return true;
+        return SubmissionResult(success: true);
       } else {
         print('Error submitting personal details: ${response.statusCode}');
         print('Response body: ${response.body}');
         
         // Try to parse error response
+        Map<String, dynamic>? errorDetails;
+        String errorMessage = 'Failed to submit personal details';
+        
         try {
-          final errorResponse = json.decode(response.body);
-          print('Parsed error response: $errorResponse');
+          errorDetails = json.decode(response.body);
+          print('Parsed error response: $errorDetails');
+          
+          // Extract error message from response if available
+          if (errorDetails != null) {
+            if (errorDetails.containsKey('message')) {
+              errorMessage = errorDetails['message'];
+            } else if (errorDetails.containsKey('error')) {
+              errorMessage = errorDetails['error'];
+            } else if (errorDetails.containsKey('detail')) {
+              errorMessage = errorDetails['detail'];
+            } else {
+              // If no specific error message, show the full response
+              errorMessage = response.body;
+            }
+          }
         } catch (e) {
           print('Could not parse error response: $e');
+          // If we can't parse JSON, show the raw response
+          errorMessage = response.body.isNotEmpty ? response.body : 'HTTP ${response.statusCode}: Unknown error';
         }
         
-        return false;
+        return SubmissionResult(
+          success: false,
+          errorMessage: errorMessage,
+          errorDetails: errorDetails,
+        );
       }
     } catch (e) {
       print('Exception occurred while submitting personal details: $e');
-      return false;
+      return SubmissionResult(
+        success: false,
+        errorMessage: 'Network error: $e',
+      );
     }
   }
 
-  // Save as draft (optional)
-  Future<bool> saveAsDraft({required int userId}) async {
+  // Save as draft - also updated to return SubmissionResult
+  Future<SubmissionResult> saveAsDraft({required int userId}) async {
     try {
       const String apiUrl = 'http://103.98.12.226:5100';
       
@@ -217,7 +248,10 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
         headers = await AuthService.getAuthHeaders();
       } catch (e) {
         print('Error getting auth headers for draft: $e');
-        return false;
+        return SubmissionResult(
+          success: false,
+          errorMessage: 'Authentication failed: $e',
+        );
       }
 
       // Ensure content-type is set correctly
@@ -239,24 +273,50 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Draft saved successfully');
-        return true;
+        return SubmissionResult(success: true);
       } else {
         print('Error saving draft: ${response.statusCode}');
         print('Response body: ${response.body}');
         
         // Try to parse error response
+        Map<String, dynamic>? errorDetails;
+        String errorMessage = 'Failed to save draft';
+        
         try {
-          final errorResponse = json.decode(response.body);
-          print('Parsed draft error response: $errorResponse');
+          errorDetails = json.decode(response.body);
+          print('Parsed draft error response: $errorDetails');
+          
+          // Extract error message from response if available
+          if (errorDetails != null) {
+            if (errorDetails.containsKey('message')) {
+              errorMessage = errorDetails['message'];
+            } else if (errorDetails.containsKey('error')) {
+              errorMessage = errorDetails['error'];
+            } else if (errorDetails.containsKey('detail')) {
+              errorMessage = errorDetails['detail'];
+            } else {
+              // If no specific error message, show the full response
+              errorMessage = response.body;
+            }
+          }
         } catch (e) {
           print('Could not parse draft error response: $e');
+          // If we can't parse JSON, show the raw response
+          errorMessage = response.body.isNotEmpty ? response.body : 'HTTP ${response.statusCode}: Unknown error';
         }
         
-        return false;
+        return SubmissionResult(
+          success: false,
+          errorMessage: errorMessage,
+          errorDetails: errorDetails,
+        );
       }
     } catch (e) {
       print('Exception occurred while saving draft: $e');
-      return false;
+      return SubmissionResult(
+        success: false,
+        errorMessage: 'Network error: $e',
+      );
     }
   }
 }

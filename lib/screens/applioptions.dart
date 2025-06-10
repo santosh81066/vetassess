@@ -55,7 +55,7 @@ class AppliOptions extends StatelessWidget {
                 //     builder: (context) => TertiaryEducationForm(),
                 //   ),
                 // );
-                      context.go('/tertiary_education_form');        
+                      context.go('/vetassess_upload');        
               },
               color: const Color(0xFF006257),
               context: context,

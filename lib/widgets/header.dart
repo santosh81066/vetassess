@@ -250,86 +250,90 @@ class _HeaderState extends State<Header> {
     bool isMobile,
     double topBarHeight,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        // Flexible spacer
-        if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
-
-        // Top navigation items with responsive sizing
-        if (isDesktop || isTablet) ...[
-          _buildLanguageSelector(),
-          SizedBox(
-            width: ResponsiveUtils.getResponsiveValue(
-              context: context,
-              mobile: 12.0,
-              tablet: 16.0,
-              desktop: 24.0,
+    return Flexible(
+      child: Row(
+       // mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Flexible spacer
+          if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
+      
+          // Top navigation items with responsive sizing
+          if (isDesktop || isTablet) ...[
+            _buildLanguageSelector(),
+            SizedBox(
+              width: ResponsiveUtils.getResponsiveValue(
+                context: context,
+                mobile: 12.0,
+                tablet: 16.0,
+                desktop: 24.0,
+              ),
             ),
-          ),
-
-          // Desktop-only links
-          if (isDesktop) ...[
-            const _TopLink(text: "About"),
-            const SizedBox(width: 24),
-            const _TopLink(text: "Resources"),
-            const SizedBox(width: 24),
-            const _TopLink(text: "News & Updates"),
-            const SizedBox(width: 24),
+      
+            // Desktop-only links
+            if (isDesktop) ...[
+              _TopLink(text: "About",onTap: () => context.go('/maintenance'),),
+              SizedBox(width: 24),
+               _TopLink(text: "Resources",onTap: () => context.go('/maintenance'),),
+              const SizedBox(width: 24),
+               _TopLink(text: "News & Updates",onTap: () => context.go('/maintenance'),),
+              const SizedBox(width: 24),
+            ],
+      
+            _buildLoginSection(),
+            SizedBox(
+              width: ResponsiveUtils.getResponsiveValue(
+                context: context,
+                mobile: 8.0,
+                tablet: 12.0,
+                desktop: 16.0,
+              ),
+            ),
           ],
-
-          _buildLoginSection(),
-          SizedBox(
-            width: ResponsiveUtils.getResponsiveValue(
-              context: context,
-              mobile: 8.0,
-              tablet: 12.0,
-              desktop: 16.0,
+      
+          // Apply Now Button with responsive sizing
+          Flexible(
+            child: Container(
+              height: topBarHeight * 0.8,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.go('/apply_now');
+                  
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFFA000),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveUtils.getResponsiveValue(
+                      context: context,
+                      mobile: 8.0,
+                      tablet: 10.0,
+                      desktop: 12.0,
+                    ),
+                    vertical: 0,
+                  ),
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: ResponsiveUtils.getResponsiveValue(
+                      context: context,
+                      mobile: 10.0,
+                      tablet: 11.0,
+                      desktop: 13.0,
+                    ),
+                  ),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: const Text(
+                  "Apply Now",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
             ),
           ),
         ],
-
-        // Apply Now Button with responsive sizing
-        Container(
-          height: topBarHeight * 0.8,
-          child: ElevatedButton(
-            onPressed: () {
-              context.go('/apply_now');
-              
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFA000),
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: EdgeInsets.symmetric(
-                horizontal: ResponsiveUtils.getResponsiveValue(
-                  context: context,
-                  mobile: 10.0,
-                  tablet: 12.0,
-                  desktop: 14.0,
-                ),
-                vertical: 0,
-              ),
-              textStyle: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: ResponsiveUtils.getResponsiveValue(
-                  context: context,
-                  mobile: 11.0,
-                  tablet: 12.0,
-                  desktop: 14.0,
-                ),
-              ),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-              ),
-            ),
-            child: const Text(
-              "Apply Now",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -504,7 +508,7 @@ class _HeaderState extends State<Header> {
                 _NavItem(
                   title: "Contact",
                   fontSize: fontSize,
-                  onTap: () => context.go('/admin_users'),
+                 // onTap: () => context.go('/admin_users'),
                 ),
                 SizedBox(width: sideMargin),
 
@@ -620,9 +624,9 @@ class _HeaderState extends State<Header> {
                 _buildMobileMenuItem("Business and Industry"),
                 _buildMobileMenuItem("Contact"),
                 const Divider(),
-                _buildMobileMenuItem("About"),
-                _buildMobileMenuItem("Resources"),
-                _buildMobileMenuItem("News & Updates"),
+                 _buildMobileMenuItem("About", onTap: () => context.go('/maintenance')),
+                _buildMobileMenuItem("Resources", onTap: () => context.go('/maintenance')),
+                _buildMobileMenuItem("News & Updates", onTap: () => context.go('/maintenance')),
                 _buildMobileMenuItem("Login"),
               ],
             ),
@@ -632,7 +636,7 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildMobileMenuItem(String title) {
+  Widget _buildMobileMenuItem(String title,{VoidCallback? onTap}) {
     return ListTile(
       title: Text(
         title,
@@ -652,22 +656,26 @@ class _HeaderState extends State<Header> {
 
 class _TopLink extends StatelessWidget {
   final String text;
+  final VoidCallback? onTap;
 
-  const _TopLink({required this.text});
+  const _TopLink({required this.text,this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: ResponsiveUtils.getResponsiveValue(
-          context: context,
-          mobile: 12.0,
-          tablet: 12.5,
-          desktop: 13.0,
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: ResponsiveUtils.getResponsiveValue(
+            context: context,
+            mobile: 12.0,
+            tablet: 12.5,
+            desktop: 13.0,
+          ),
+          color: Colors.black54,
+          fontWeight: FontWeight.w500,
         ),
-        color: Colors.black54,
-        fontWeight: FontWeight.w500,
       ),
     );
   }

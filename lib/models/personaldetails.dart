@@ -187,3 +187,15 @@ class PersonalDetails {
       isAgentAuthorized.hashCode;
   }
 }
+// Create a result class to hold both success status and error message
+class SubmissionResult {
+  final bool success;
+  final String? errorMessage;
+  final Map<String, dynamic>? errorDetails;
+
+  SubmissionResult({
+    required this.success,
+    this.errorMessage,
+    this.errorDetails,
+  });
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vetassess/providers/login_provider.dart';
@@ -136,78 +137,131 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     personalDetails.copyPostalToHome();
   }
 
-  Future<void> _saveAndExit() async {
-    if (!_formKey.currentState!.validate()) return;
+ Future<void> _saveAndExit() async {
+  if (!_formKey.currentState!.validate()) return;
 
-      // Check if user ID is available
-    final userId = _currentUserId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in. Please login again.')),
-      );
-      return;
-    }
-    
-    setState(() => _isLoading = true);
-    
-    // Update all form data to provider
-    _updateProviderData();
-    
-    // Save as draft
-    final success = await ref.read(personalDetailsProvider.notifier).saveAsDraft(
-      userId: userId, // Replace with actual user ID
+  // Check if user ID is available
+  final userId = _currentUserId;
+  if (userId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User not logged in. Please login again.')),
     );
-    
-    setState(() => _isLoading = false);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Draft saved successfully!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save draft. Please try again.')),
-      );
-    }
+    return;
   }
-
-  Future<void> _continue() async {
-    if (!_formKey.currentState!.validate()) return;
-
-     // Check if user ID is available
-    final userId = _currentUserId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in. Please login again.')),
-      );
-      return;
-    }
-    
-    setState(() => _isLoading = true);
-    
-    // Update all form data to provider
-    _updateProviderData();
-    
-   
-    // Submit the form
-    final  success = await ref.read(personalDetailsProvider.notifier).submitPersonalDetails(    
-      userId:  userId, // Replace with actual user ID
+  
+  setState(() => _isLoading = true);
+  
+  // Update all form data to provider
+  _updateProviderData();
+  
+  // Save as draft - now returns SubmissionResult
+  final result = await ref.read(personalDetailsProvider.notifier).saveAsDraft(
+    userId: userId,
+  );
+  
+  setState(() => _isLoading = false);
+  
+  if (result.success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Draft saved successfully!'),
+        backgroundColor: Colors.green,
+      ),
     );
-    
-    setState(() => _isLoading = false);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Personal details submitted successfully!')),
-      );
-      context.go('/occupation_form');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to submit. Please try again.')),
-      );
-    }
+  } else {
+    // Show the actual error response
+    _showErrorDialog(
+      title: 'Failed to Save Draft',
+      message: result.errorMessage ?? 'Unknown error occurred',
+    );
   }
+}
 
+Future<void> _continue() async {
+  if (!_formKey.currentState!.validate()) return;
+
+  // Check if user ID is available
+  final userId = _currentUserId;
+  if (userId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User not logged in. Please login again.')),
+    );
+    return;
+  }
+  
+  setState(() => _isLoading = true);
+  
+  // Update all form data to provider
+  _updateProviderData();
+  
+  // Submit the form - now returns SubmissionResult
+  final result = await ref.read(personalDetailsProvider.notifier).submitPersonalDetails(
+    userId: userId,
+  );
+  
+  setState(() => _isLoading = false);
+  
+  if (result.success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Personal details submitted successfully!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+    context.go('/occupation_form');
+  } else {
+    // Show the actual error response
+    _showErrorDialog(
+      title: 'Submission Failed',
+      message: result.errorMessage ?? 'Unknown error occurred',
+    );
+  }
+}
+
+// Add this new method to show error dialog with actual API response
+void _showErrorDialog({required String title, required String message}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.red.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.4,
+          ),
+          child: SingleChildScrollView(
+            child: SelectableText(
+              message,
+              style: TextStyle(
+                fontSize: _isMobile(context) ? 12 : 14,
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.teal,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+         
+        ],
+      );
+    },
+  );
+}
   void _updateProviderData() {
     final personalDetailsNotifier = ref.read(personalDetailsProvider.notifier);
     final currentState = ref.read(personalDetailsProvider);

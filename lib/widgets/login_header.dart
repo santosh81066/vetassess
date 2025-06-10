@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vetassess/screens/home_screen.dart';
 import '../providers/login_provider.dart';
 
 class LoginHeader extends ConsumerWidget {
@@ -119,11 +120,20 @@ class LoginHeader extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/images/vetassess_logo.png',
-            height: logoSize,
-            fit: BoxFit.contain,
+          GestureDetector(
+             onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+                  },
+            child: Image.asset(
+              'assets/images/vetassess_logo.png',
+              height: logoSize,
+              fit: BoxFit.contain,
+            ),
           ),
+          
           SizedBox(width: spacing),
           Flexible(
             child: Padding(
@@ -157,15 +167,18 @@ class LoginHeader extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color: Colors.orange[900],
-                size: iconSize,
+            GestureDetector(
+              
+              child: IconButton(
+                icon: Icon(
+                  Icons.home,
+                  color: Colors.orange[900],
+                  size: iconSize,
+                ),
+                onPressed: () {
+                   
+                },
               ),
-              onPressed: () {
-                 context.go('/');
-              },
             ),
             for (final item in ['Contact', 'Links', 'FAQs'])
               TextButton(
