@@ -396,7 +396,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         _buildField('Previous surname or family name', _buildTextField(_previousSurnameController)),
         _buildField('Previous given names', _buildTextField(_previousGivenNamesController)),
         _buildField(
-          'Date of birth (dd/mm/yyyy)',
+          'Date of birth (yyy-mm-dd)',
           _buildTextField(_dateOfBirthController, _getFieldWidth()),
           required: true,
         ),
@@ -436,7 +436,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
           required: true,
         ),
         _buildField('Current passport number', _buildTextField(_passportNumberController)),
-        _buildField('Date passport issued', _buildTextField(_passportIssuedDateController, _getFieldWidth())),
+        _buildField('Date passport issued (dd/mm/yyyy)', _buildTextField(_passportIssuedDateController, _getFieldWidth())),
       ]),
 
       _buildDivider(),

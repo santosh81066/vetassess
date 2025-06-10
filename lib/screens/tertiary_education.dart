@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vetassess/models/tertiary_education_model.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
-import '../models/tertiary_education_model.dart';
 import '../providers/login_provider.dart';
 import '../providers/tertiary_education_provider.dart';
 import '../widgets/application_nav.dart';
-
 
 class TertiaryEducationForm extends ConsumerStatefulWidget {
   const TertiaryEducationForm({super.key});
@@ -46,6 +45,11 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
     'activityDetails': TextEditingController(),
   };
 
+  int? get _currentUserId {
+    final loginState = ref.read(loginProvider);
+    return loginState.response?.userId;
+  }
+
   // Dropdown values and checkbox states
   String? awardingBodyCountry, institutionCountry, studyMode;
   bool internshipChecked = false,
@@ -55,23 +59,14 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   bool get anyCheckboxSelected =>
       internshipChecked || thesisChecked || majorProjectChecked;
 
-  @override
-  void initState() {
-    super.initState();
-    // Listen to provider state changes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.listen<TertiaryQualificationState>(tertiaryQualificationProvider, (
-        previous,
-        next,
-      ) {
-        if (next.isSuccess && previous?.isSuccess != true) {
-          _showSuccessDialog();
-        } else if (next.error != null && previous?.error != next.error) {
-          _showErrorDialog(next.error!);
-        }
-      });
-    });
-  }
+ @override
+void initState() {
+  super.initState();
+  // Clear any previous state when entering the form
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    ref.read(tertiaryEducationProvider.notifier).resetState();
+  });
+}
 
   @override
   void dispose() {
@@ -159,111 +154,86 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
     return true;
   }
 
-  TertiaryQualificationRequest _createRequest(int userId) {
-    String? _getTextOrNull(String key) =>
-        _controllers[key]!.text.trim().isEmpty
-            ? null
-            : _controllers[key]!.text.trim();
-    int? _getIntOrNull(String key) =>
-        int.tryParse(_controllers[key]!.text.trim());
-
-    return TertiaryQualificationRequest(
-      userId: userId, // Use the passed userId instead of hardcoded value
-      studentRegistrationNumber: _getTextOrNull('studentRegistration'),
-      qualificationName: _controllers['qualificationName']!.text.trim(),
-      majorField: _controllers['majorField']!.text.trim(),
-      awardingBodyName: _controllers['awardingBodyName']!.text.trim(),
-      awardingBodyCountry: awardingBodyCountry!,
-      campusAttended: _getTextOrNull('campusAttended'),
-      institutionName: _controllers['institutionName']!.text.trim(),
-      streetAddress1: _controllers['streetAddress1']!.text.trim(),
-      streetAddress2: _getTextOrNull('streetAddress2'),
-      suburbCity: _controllers['suburbCity']!.text.trim(),
-      state: _getTextOrNull('state'),
-      postCode: _getTextOrNull('postCode'),
-      institutionCountry: institutionCountry!,
-      normalEntryRequirement:
-          _controllers['normalEntryRequirement']!.text.trim(),
-      entryBasis: _getTextOrNull('entryBasis'),
-      courseLengthYearsOrSemesters:
-          _controllers['courseLengthYears']!.text.trim().isNotEmpty
-              ? _controllers['courseLengthYears']!.text.trim()
-              : _controllers['courseLengthSemesters']!.text.trim(),
-      semesterLengthWeeksOrMonths: "24",
-      courseStartDate: _controllers['courseStartDate']!.text.trim(),
-      courseEndDate: _controllers['courseEndDate']!.text.trim(),
-      qualificationAwardedDate: _getTextOrNull('qualificationAwardedDate'),
-      studyMode: studyMode!,
-      hoursPerWeek: _getIntOrNull('hoursPerWeek') ?? 0,
-      internshipWeeks:
-          internshipChecked ? _getIntOrNull('internshipWeeks') : null,
-      thesisWeeks: thesisChecked ? _getIntOrNull('thesisWeeks') : null,
-      majorProjectWeeks:
-          majorProjectChecked ? _getIntOrNull('majorProjectWeeks') : null,
-      activityDetails:
-          anyCheckboxSelected
-              ? _controllers['activityDetails']!.text.trim()
-              : null,
-    );
+  Map<String, dynamic> _createFormData() {
+    final formData = <String, dynamic>{};
+    
+    // Add all text field values
+    _controllers.forEach((key, controller) {
+      formData[key] = controller.text.trim();
+    });
+    
+    // Add dropdown values
+    formData['awardingBodyCountry'] = awardingBodyCountry;
+    formData['institutionCountry'] = institutionCountry;
+    formData['studyMode'] = studyMode;
+    
+    // Add checkbox states
+    formData['internshipChecked'] = internshipChecked;
+    formData['thesisChecked'] = thesisChecked;
+    formData['majorProjectChecked'] = majorProjectChecked;
+    
+    return formData;
   }
 
   Future<void> _submitForm() async {
     if (!_validateForm()) return;
 
-    final userIdAsync = ref.read(userIdProvider);
+    final userId = _currentUserId;
+    if (userId == null) {
+      _showErrorDialog('User session expired. Please login again.');
+      return;
+    }
 
-    userIdAsync.when(
-      data: (userId) async {
-        if (userId == null) {
-          _showErrorDialog('User session expired. Please login again.');
-          return;
-        }
-
-        final request = _createRequest(userId);
-        await ref
-            .read(tertiaryQualificationProvider.notifier)
-            .saveTertiaryQualification(request);
-      },
-      loading: () {
-        // Handle loading state if needed
-      },
-      error: (error, stack) {
-        _showErrorDialog(
-          'Error retrieving user information. Please try again.',
-        );
-      },
+    final formData = _createFormData();
+    await ref.read(tertiaryEducationProvider.notifier).submitTertiaryEducation(
+      userId: userId,
+      formData: formData,
     );
   }
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 28),
-              SizedBox(width: 8),
-              Text('Success'),
-            ],
-          ),
-          content: const Text(
-            'Tertiary qualification has been saved successfully!',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                context.go('/employment_form');
-              },
-              child: const Text('Continue'),
-            ),
+void _showSuccessDialog() {
+  print('_showSuccessDialog called');
+  
+  if (!mounted) {
+    print('Widget not mounted, skipping dialog');
+    return;
+  }
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 28),
+            SizedBox(width: 8),
+            Text('Success'),
           ],
-        );
-      },
-    );
-  }
+        ),
+        content: const Text(
+          'Tertiary qualification has been saved successfully!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              print('Continue button pressed');
+              Navigator.of(context).pop(); // Close dialog
+              
+              // Clear the provider state before navigation
+              ref.read(tertiaryEducationProvider.notifier).resetState();
+              
+              // Navigate to next page
+              print('Navigating to /doc_upload');
+              context.go('/doc_upload');
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -282,7 +252,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                ref.read(tertiaryQualificationProvider.notifier).clearError();
+                ref.read(tertiaryEducationProvider.notifier).clearError();
               },
               child: const Text('OK'),
             ),
@@ -294,7 +264,27 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
 
   @override
   Widget build(BuildContext context) {
-    final providerState = ref.watch(tertiaryQualificationProvider);
+    
+    ref.listen<TertiaryEducationState>(tertiaryEducationProvider, (previous, next) {
+    
+    // Check for success transition
+    if (next.isSuccess && (previous?.isSuccess != true)) {
+      print('Triggering success dialog');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showSuccessDialog();
+      });
+    } 
+    // Check for error
+    else if (next.errorMessage != null && 
+             next.errorMessage!.isNotEmpty && 
+             previous?.errorMessage != next.errorMessage) {
+      print('Triggering error dialog');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showErrorDialog(next.errorMessage!);
+      });
+    }
+  });
+    final providerState = ref.watch(tertiaryEducationProvider);
 
     return LoginPageLayout(
       child: Stack(
@@ -371,22 +361,20 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'qualificationName',
                                   350,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Qualification name',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Qualification name',
+                                  ),
                                 ),
                                 _buildField(
                                   'Major field of study',
                                   'majorField',
                                   350,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Major field',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Major field',
+                                  ),
                                 ),
                               ]),
                               _buildSection('Awarding Body Details', [
@@ -395,17 +383,15 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'awardingBodyName',
                                   350,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Awarding body name',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Awarding body name',
+                                  ),
                                 ),
                                 _buildDropdownField(
                                   'Awarding Body Country',
                                   awardingBodyCountry,
-                                  (v) =>
-                                      setState(() => awardingBodyCountry = v),
+                                  (v) => setState(() => awardingBodyCountry = v),
                                   350,
                                   required: true,
                                 ),
@@ -419,22 +405,20 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'institutionName',
                                   350,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Institution name',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Institution name',
+                                  ),
                                 ),
                                 _buildField(
                                   'Street address',
                                   'streetAddress1',
                                   280,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Street address',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Street address',
+                                  ),
                                 ),
                                 _buildField(
                                   'Street address second line',
@@ -446,11 +430,10 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'suburbCity',
                                   180,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Suburb/City',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Suburb/City',
+                                  ),
                                 ),
                                 _buildField('State', 'state', 180),
                                 _buildField('Post code', 'postCode', 180),
@@ -468,11 +451,10 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'normalEntryRequirement',
                                   250,
                                   required: true,
-                                  validator:
-                                      (value) => _validateRequired(
-                                        value,
-                                        'Normal entry requirement',
-                                      ),
+                                  validator: (value) => _validateRequired(
+                                    value,
+                                    'Normal entry requirement',
+                                  ),
                                 ),
                                 _buildField(
                                   'If different, what was the basis of your entry into\nthe course?',
@@ -507,11 +489,10 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                                   'hoursPerWeek',
                                   180,
                                   required: true,
-                                  validator:
-                                      (value) => _validateNumber(
-                                        value,
-                                        'Hours per week',
-                                      ),
+                                  validator: (value) => _validateNumber(
+                                    value,
+                                    'Hours per week',
+                                  ),
                                 ),
                               ]),
                               _buildAdditionalRequirementsSection(),
@@ -634,10 +615,9 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
     bool required = false,
     bool isStudyMode = false,
   }) {
-    final items =
-        isStudyMode
-            ? ['Full-time', 'Part-time', 'Other']
-            : ['India', 'USA', 'UK', 'Australia', 'Canada'];
+    final items = isStudyMode
+        ? ['Full-time', 'Part-time', 'Other']
+        : ['India', 'USA', 'UK', 'Australia', 'Canada'];
 
     return _buildLabelledField(
       label,
@@ -648,12 +628,11 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
           value: value,
           decoration: _inputDecoration(),
           hint: const Text('Select one'),
-          items:
-              items
-                  .map(
-                    (item) => DropdownMenuItem(value: item, child: Text(item)),
-                  )
-                  .toList(),
+          items: items
+              .map(
+                (item) => DropdownMenuItem(value: item, child: Text(item)),
+              )
+              .toList(),
           onChanged: onChanged,
         ),
       ),
@@ -768,11 +747,9 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                 controller: _controllers['activityDetails'],
                 maxLines: 5,
                 decoration: _inputDecoration(),
-                validator:
-                    anyCheckboxSelected
-                        ? (value) =>
-                            _validateRequired(value, 'Activity details')
-                        : null,
+                validator: anyCheckboxSelected
+                    ? (value) => _validateRequired(value, 'Activity details')
+                    : null,
               ),
             ),
             isRequired: true,
@@ -803,10 +780,9 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
               controller: _controllers[weeksKey],
               decoration: _inputDecoration(),
               keyboardType: TextInputType.number,
-              validator:
-                  value
-                      ? (val) => _validateNumber(val, 'Number of weeks')
-                      : null,
+              validator: value
+                  ? (val) => _validateNumber(val, 'Number of weeks')
+                  : null,
             ),
           ),
           const SizedBox(width: 16),
@@ -821,7 +797,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   }
 
   Widget _buildButtons() {
-    final providerState = ref.watch(tertiaryQualificationProvider);
+    final providerState = ref.watch(tertiaryEducationProvider);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -832,16 +808,13 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
             foregroundColor: Colors.teal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
-          onPressed:
-              providerState.isLoading
-                  ? null
-                  : () {
-                    // Reset form or navigate back
-                    ref
-                        .read(tertiaryQualificationProvider.notifier)
-                        .resetState();
-                    context.pop();
-                  },
+          onPressed: providerState.isLoading
+              ? null
+              : () {
+                  // Reset form or navigate back
+                  ref.read(tertiaryEducationProvider.notifier).resetState();
+                  context.pop();
+                },
           child: const Text('Cancel'),
         ),
         const SizedBox(width: 8),
@@ -852,17 +825,16 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
           onPressed: providerState.isLoading ? null : _submitForm,
-          child:
-              providerState.isLoading
-                  ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                  : const Text('Save & Continue'),
+          child: providerState.isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text('Save & Continue'),
         ),
       ],
     );

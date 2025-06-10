@@ -37,6 +37,13 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
     return visaState.selectedVisaType?.id;
   }
 
+   int? get _occupationId {
+    final visaState = ref.read(occupationtypeProvider);
+    return visaState.occupations?.first.id;
+  }
+
+
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +77,7 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
       );
       return;
     }
+
      final visaid = _visaId;
       if (visaid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,12 +85,22 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
       );
       return;
     }
+
+    final occupationid = _occupationId;
+      if (occupationid == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('occupationid not get')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     
     // Submit the form
     final  success = await ref.read(occupationtypeProvider.notifier).submitOccupations(    
       userId:  userId,
-      visaId: visaid
+      visaId: visaid ,
+      occupationId:occupationid
     );
     
     setState(() => _isLoading = false);
