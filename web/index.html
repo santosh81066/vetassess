@@ -1,38 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="vetassess">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-
   <title>vetassess</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+<script src="flutter_bootstrap.js" async></script>
+
+<!-- Cashfree SDK -->
+<script src="https://sdk.cashfree.com/js/checkout/checkout.js"></script>
+
+<script>
+  console.log('Loading Cashfree integration...');
+
+  // Simple message-based payment system
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'start_cashfree_payment') {
+      console.log('Starting Cashfree payment...');
+
+      const paymentData = event.data.data;
+      const callbackName = paymentData.callbackName;
+
+      // Create payment configuration
+      const config = {
+        appId: paymentData.appId,
+        orderId: paymentData.orderId,
+        orderAmount: paymentData.amount,
+        orderCurrency: "INR",
+        customerName: paymentData.customerName,
+        customerEmail: paymentData.customerEmail,
+        customerPhone: paymentData.customerPhone,
+        customerId: 'CUST_' + Date.now(),
+        environment: paymentData.environment,
+        returnUrl: window.location.origin,
+        paymentModes: "cc,dc,nb,upi,wallet",
+
+        // Success callback
+        onSuccess: function(result) {
+          console.log('Payment Success:', result);
+
+          // Call the Dart callback
+          if (window[callbackName]) {
+            window[callbackName]({
+              status: 'SUCCESS',
+              orderId: result.orderId || paymentData.orderId,
+              paymentId: result.paymentId,
+              signature: result.signature
+            });
+          }
+        },
+
+        // Failure callback
+        onFailure: function(result) {
+          console.log('Payment Failed:', result);
+
+          // Call the Dart callback
+          if (window[callbackName]) {
+            window[callbackName]({
+              status: 'FAILED',
+              message: result.message || 'Payment failed'
+            });
+          }
+        }
+      };
+
+      // Try to use Cashfree checkout
+      if (typeof CashfreeCheckout === 'function') {
+        console.log('Using CashfreeCheckout');
+        try {
+          CashfreeCheckout(config);
+        } catch (error) {
+          console.error('CashfreeCheckout error:', error);
+          if (window[callbackName]) {
+            window[callbackName]({
+              status: 'FAILED',
+              message: 'Payment system error: ' + error.message
+            });
+          }
+        }
+      } else {
+        console.error('CashfreeCheckout not available');
+        if (window[callbackName]) {
+          window[callbackName]({
+            status: 'FAILED',
+            message: 'Payment system not loaded. Please refresh and try again.'
+          });
+        }
+      }
+    }
+  });
+
+  // Debug function
+  window.debugCashfree = function() {
+    console.log('=== Cashfree Debug ===');
+    console.log('CashfreeCheckout available:', typeof CashfreeCheckout === 'function');
+  };
+
+  // Check when page loads
+  window.addEventListener('load', function() {
+    console.log('Page loaded, checking Cashfree...');
+    setTimeout(() => {
+      window.debugCashfree();
+    }, 1000);
+  });
+
+</script>
 </body>
 </html>

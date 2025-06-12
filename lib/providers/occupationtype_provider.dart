@@ -1,23 +1,24 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:vetassess/Service/auth_service.dart';
+import 'package:vetassess/services/auth_service.dart';
 import 'package:vetassess/models/getoccupationtype_model.dart';
+
+import '../utils/vetassess_api.dart';
 
 class OccupationtypeProvider extends StateNotifier<OccupationTypeModel> {
   OccupationtypeProvider() : super(OccupationTypeModel.initial());
-  
+
   Future<void> fetchDocumentCategories() async {
     try {
       final headers = await AuthService.getAuthHeaders();
-      const String apiUrl = 'http://103.98.12.226:5100';
-      final response = await http.get(
-        Uri.parse('$apiUrl/admin/occupations'),
-        headers: headers,
-      );
+      const url = VetassessApi.form_occutype;
+      final response = await http.get(Uri.parse(url), headers: headers);
 
       if (response.statusCode == 200) {
-        print("Select occupations fetched successfully....${response.statusCode}");
+        print(
+          "Select occupations fetched successfully....${response.statusCode}",
+        );
         print("Select occupations fetched successfully....${response.body}");
         final jsonData = json.decode(response.body);
         final documentTypes = OccupationTypeModel.fromJson(jsonData);
@@ -25,7 +26,9 @@ class OccupationtypeProvider extends StateNotifier<OccupationTypeModel> {
       } else if (response.statusCode == 401) {
         throw Exception('Unauthorized: Please login again');
       } else {
-        throw Exception('Failed to load occupation Types: ${response.statusCode}');
+        throw Exception(
+          'Failed to load occupation Types: ${response.statusCode}',
+        );
       }
     } catch (e) {
       print('Error fetching occupation Types: $e');
@@ -37,24 +40,24 @@ class OccupationtypeProvider extends StateNotifier<OccupationTypeModel> {
   Future<bool> submitOccupations({
     required int userId,
     required int visaId,
-    required int occupationId
+    required int occupationId,
   }) async {
     try {
       final Map<String, dynamic> requestBody = {
         "userId": userId,
         "visaId": visaId,
-        "occupationId": occupationId
+        "occupationId": occupationId,
       };
 
       final headers = await AuthService.getAuthHeaders();
-      const String apiUrl = 'http://103.98.12.226:5100';
-      
-      print('Sending request to: $apiUrl/admin/submit-selection');
+      const url = VetassessApi.form_occupation;
+
+      print('Sending request to: $url');
       print('Request body: $requestBody');
       print('Headers: $headers');
 
       final response = await http.post(
-        Uri.parse('$apiUrl/admin/submit-selection'),
+        Uri.parse(url),
         headers: headers,
         body: jsonEncode(requestBody),
       );
@@ -65,17 +68,18 @@ class OccupationtypeProvider extends StateNotifier<OccupationTypeModel> {
       // Check for successful status codes (200, 201, etc.)
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print("✅ Occupation submission successful!");
-        
+
         // Optionally parse the response to get more details
         try {
           final responseData = json.decode(response.body);
-          if (responseData is Map<String, dynamic> && responseData.containsKey('message')) {
+          if (responseData is Map<String, dynamic> &&
+              responseData.containsKey('message')) {
             print("Server message: ${responseData['message']}");
           }
         } catch (e) {
           print("Response parsing error (but submission was successful): $e");
         }
-        
+
         return true;
       } else if (response.statusCode == 401) {
         print("❌ Unauthorized: Please login again");
@@ -92,6 +96,7 @@ class OccupationtypeProvider extends StateNotifier<OccupationTypeModel> {
   }
 }
 
-final occupationtypeProvider = StateNotifierProvider<OccupationtypeProvider, OccupationTypeModel>((ref) {
-  return OccupationtypeProvider();
-});
+final occupationtypeProvider =
+    StateNotifierProvider<OccupationtypeProvider, OccupationTypeModel>((ref) {
+      return OccupationtypeProvider();
+    });

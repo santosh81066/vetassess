@@ -74,7 +74,7 @@ class ApplyNowScreen extends StatelessWidget {
                               const SizedBox(height: 32),
                               _buildInfoColumn(
                                 'EXPLORE PRIORITY PROCESSING',
-                                'Priority Processing is a service that fast tracks application assessments but is only available for professional and general occupations. To use this service, you\'ll need to apply for it before you lodge a skills assessment application.',
+                                'Priority Processing is a services that fast tracks application assessments but is only available for professional and general occupations. To use this services, you\'ll need to apply for it before you lodge a skills assessment application.',
                               ),
                             ],
                           );
@@ -100,7 +100,7 @@ class ApplyNowScreen extends StatelessWidget {
                               Expanded(
                                 child: _buildInfoColumn(
                                   'EXPLORE PRIORITY PROCESSING',
-                                  'Priority Processing is a service that fast tracks application assessments but is only available for professional and general occupations. To use this service, you\'ll need to apply for it before you lodge a skills assessment application.',
+                                  'Priority Processing is a services that fast tracks application assessments but is only available for professional and general occupations. To use this services, you\'ll need to apply for it before you lodge a skills assessment application.',
                                 ),
                               ),
                             ],

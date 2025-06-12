@@ -280,8 +280,8 @@ class _ApplicationPriorityProcessingState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ...[
-                            'VETASSESS offer a Priority Processing service for General and Professional occupations.',
-                            'This service gives you an opportunity to fast-track the assessment of your application.',
+                            'VETASSESS offer a Priority Processing services for General and Professional occupations.',
+                            'This services gives you an opportunity to fast-track the assessment of your application.',
                             'Your Priority Processing request will be considered after you submit your application, because we only accept applications that we can assess within 10 business days.',
                           ].map(
                             (text) => Padding(
@@ -300,7 +300,7 @@ class _ApplicationPriorityProcessingState
                           Wrap(
                             children: [
                               Text(
-                                'There is an additional cost for this service. Please see further details on ',
+                                'There is an additional cost for this services. Please see further details on ',
                                 style: TextStyle(
                                   fontSize: contentFontSize,
                                   color: const Color(0xFF4A4A4A),

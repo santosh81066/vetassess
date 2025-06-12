@@ -1,21 +1,22 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:vetassess/Service/auth_service.dart';
+import 'package:vetassess/services/auth_service.dart';
 import 'package:vetassess/models/employment_model.dart';
+import 'package:vetassess/utils/vetassess_api.dart';
 
-// Employment Service Class
+// Employment services Class
 class EmploymentService {
-  static const String baseUrl = 'http://103.98.12.226:5100';
-  static const String employmentEndpoint = '/user/employment';
+  static const String _url = VetassessApi.form_employment;
 
-  Future<Map<String, dynamic>> submitEmployment(EmploymentModel employment) async {
+  Future<Map<String, dynamic>> submitEmployment(
+    EmploymentModel employment,
+  ) async {
     try {
-      final url = Uri.parse('$baseUrl$employmentEndpoint');
-      
+      final url = Uri.parse(_url);
 
       final headers = await AuthService.getAuthHeaders();
-      
+
       final response = await http.post(
         url,
         headers: headers,
@@ -31,7 +32,8 @@ class EmploymentService {
       } else {
         return {
           'success': false,
-          'error': 'Failed to submit employment data. Status: ${response.statusCode}',
+          'error':
+              'Failed to submit employment data. Status: ${response.statusCode}',
           'message': response.body,
         };
       }
@@ -156,21 +158,21 @@ class EmploymentProvider extends StateNotifier<EmploymentModel> {
 
     try {
       final result = await _employmentService.submitEmployment(state);
-      
+
       if (result['success']) {
         state = state.copyWith(isLoading: false, error: null);
         return true;
       } else {
         state = state.copyWith(
-          isLoading: false, 
-          error: result['error'] ?? 'Failed to submit employment data'
+          isLoading: false,
+          error: result['error'] ?? 'Failed to submit employment data',
         );
         return false;
       }
     } catch (e) {
       state = state.copyWith(
-        isLoading: false, 
-        error: 'An unexpected error occurred: ${e.toString()}'
+        isLoading: false,
+        error: 'An unexpected error occurred: ${e.toString()}',
       );
       return false;
     }
@@ -186,6 +188,7 @@ class EmploymentProvider extends StateNotifier<EmploymentModel> {
 }
 
 // Provider Instance
-final employmentProvider = StateNotifierProvider<EmploymentProvider, EmploymentModel>((ref) {
-  return EmploymentProvider();
-});
+final employmentProvider =
+    StateNotifierProvider<EmploymentProvider, EmploymentModel>((ref) {
+      return EmploymentProvider();
+    });

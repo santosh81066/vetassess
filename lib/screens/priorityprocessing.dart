@@ -258,12 +258,12 @@ Widget _buildBreadcrumbs(BuildContext context) {
       const SizedBox(height: 15),
       _buildText('Once the assessment is made, you can download your assessment outcome letter within 48 hours.'),
       const SizedBox(height: 15),
-      _buildText('There is an additional cost of \$806, excluding GST, for this service. You must lodge your application online.'),
+      _buildText('There is an additional cost of \$806, excluding GST, for this services. You must lodge your application online.'),
     ];
   }
 
   List<Widget> _costContent() => [
-    _buildText('There is an additional cost of \$806, excluding GST, for this service.'),
+    _buildText('There is an additional cost of \$806, excluding GST, for this services.'),
     const SizedBox(height: 10),
     _buildTaxOfficeFootnote(),
   ];
@@ -321,7 +321,7 @@ Widget _buildMobileLayout(double screenWidth, double titleFontSize, double bodyF
             ),
             SizedBox(height: 16),
             Text(
-              'If you''re in a hurry and would like to fast track your application, we offer a priority service where we will assess your application in 10 business days for an extra cost of \$806.',
+              'If you''re in a hurry and would like to fast track your application, we offer a priority services where we will assess your application in 10 business days for an extra cost of \$806.',
               style: TextStyle(
                 fontSize: bodyFontSize,
                 height: 1.5,
@@ -380,7 +380,7 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
               ),
               SizedBox(height: 20),
               Text(
-                'If you''re in a hurry and would like to fast track your application, we offer a priority service where we will assess your application in 10 business days for an extra cost of \$806.',
+                'If you''re in a hurry and would like to fast track your application, we offer a priority services where we will assess your application in 10 business days for an extra cost of \$806.',
                 style: TextStyle(
                   fontSize: bodyFontSize,
                   height: 1.5,
@@ -633,7 +633,7 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
     final faqTitles = [
       'How can VETASSESS be sure it can process my application in 10 business days?',
       'What if my application for Priority Processing is not accepted?',
-      'I\'ve applied for the standard service. Can I change to Priority Processing?',
+      'I\'ve applied for the standard services. Can I change to Priority Processing?',
       'Once my application for Priority Processing is accepted, can I change my occupation?',
       'What happens if you cannot process my priority processing application within 10 business days?',
       "What happens if my occupation is removed from the Australian Government's Department of Home Affairs list of eligible occupations during Priority Processing?",

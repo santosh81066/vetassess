@@ -25,9 +25,10 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       bottom: size.height * 0.1,
       right: isSmallScreen ? 20 : (isMediumScreen ? 60 : 125),
     );
-    final buttonWidth = isSmallScreen 
-        ? size.width * 0.9 
-        : (isMediumScreen ? size.width * 0.6 : size.width * 0.35);
+    final buttonWidth =
+        isSmallScreen
+            ? size.width * 0.9
+            : (isMediumScreen ? size.width * 0.6 : size.width * 0.35);
 
     return LoginPageLayout(
       child: Row(
@@ -93,7 +94,11 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
         children: [
           _buildInfoRow('Reference number:', ''),
           _buildInfoRow('Applicant\'s name:', 'GCD Designers'),
-          _buildInfoRow('Application Record:', 'Click to download', isLink: true),
+          _buildInfoRow(
+            'Application Record:',
+            'Click to download',
+            isLink: true,
+          ),
         ],
       ),
     ),
@@ -141,7 +146,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     color: const Color(0xFFFFF9E6),
     border: const Color(0xFFFFEBC8),
     child: const Text(
-      'All documents must be high quality colour scans of the original document/s. If your documents are not issued in the English language, you must submit scans of both the original language documents as well as the English translations made by a Registered Translation Service.',
+      'All documents must be high quality colour scans of the original document/s. If your documents are not issued in the English language, you must submit scans of both the original language documents as well as the English translations made by a Registered Translation services.',
       style: TextStyle(color: Color(0xFF8A6D3B)),
     ),
   );
@@ -166,19 +171,24 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
         ' to get additional support for submitting an assessment-ready application.',
       ]),
       const SizedBox(height: 8),
-      _buildRichText([
-        'Download and print the ',
-        ('Applicant Declaration', Colors.orange, true),
-      ], const Color(0xFF444444), FontWeight.bold),
+      _buildRichText(
+        [
+          'Download and print the ',
+          ('Applicant Declaration', Colors.orange, true),
+        ],
+        const Color(0xFF444444),
+        FontWeight.bold,
+      ),
       Padding(
         padding: const EdgeInsets.only(left: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            'Sign by hand the \'Declaration\' section (mandatory)',
-            'Sign by hand the \'Agent/Representative Signature\' section by the agent/ representative (if applicable)',
-            'Upload the signed copy of the Applicant Declaration under Identification Documents',
-          ].map(_buildCircleBulletText).toList(),
+          children:
+              [
+                'Sign by hand the \'Declaration\' section (mandatory)',
+                'Sign by hand the \'Agent/Representative Signature\' section by the agent/ representative (if applicable)',
+                'Upload the signed copy of the Applicant Declaration under Identification Documents',
+              ].map(_buildCircleBulletText).toList(),
         ),
       ),
     ],
@@ -199,13 +209,19 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       ...[
         ('Identification Documents', Icons.person, null),
         ('Qualification Documents', Icons.school, 'Intermediate - TSBIE'),
-        ('Employment Documents', Icons.work, 'Flutter Developer - Go Code Designers'),
+        (
+          'Employment Documents',
+          Icons.work,
+          'Flutter Developer - Go Code Designers',
+        ),
         ('Licence Documents', Icons.card_membership, '1234567899 - Primary'),
         ('Fees and Payment Documents', Icons.receipt, null),
-      ].map((data) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: _buildDocumentSection(data.$1, data.$2, subtitle: data.$3),
-      )),
+      ].map(
+        (data) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: _buildDocumentSection(data.$1, data.$2, subtitle: data.$3),
+        ),
+      ),
     ],
   );
 
@@ -234,77 +250,89 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       child: Flex(
         direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          'Back',
-          'Save & Exit',
-          'Continue',
-        ].asMap().entries.map((entry) {
-          final isLast = entry.key == 2;
-          return [
-            ElevatedButton(
-              onPressed: isLast ? () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DocumentUploadScreen()),
-              ) : () {},
-              style: _buttonStyle(padding: EdgeInsets.symmetric(
-                horizontal: isSmallScreen ? 12 : 20,
-                vertical: isSmallScreen ? 8 : 10,
-              )),
-              child: Text(entry.value),
-            ),
-            if (!isLast) SizedBox(
-              width: isSmallScreen ? 0 : 15,
-              height: isSmallScreen ? 10 : 0,
-            ),
-          ];
-        }).expand((x) => x).toList(),
+        children:
+            ['Back', 'Save & Exit', 'Continue']
+                .asMap()
+                .entries
+                .map((entry) {
+                  final isLast = entry.key == 2;
+                  return [
+                    ElevatedButton(
+                      onPressed:
+                          isLast
+                              ? () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => const DocumentUploadScreen(),
+                                ),
+                              )
+                              : () {},
+                      style: _buttonStyle(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 12 : 20,
+                          vertical: isSmallScreen ? 8 : 10,
+                        ),
+                      ),
+                      child: Text(entry.value),
+                    ),
+                    if (!isLast)
+                      SizedBox(
+                        width: isSmallScreen ? 0 : 15,
+                        height: isSmallScreen ? 10 : 0,
+                      ),
+                  ];
+                })
+                .expand((x) => x)
+                .toList(),
       ),
     ),
   );
 
   // Helper methods
-  Widget _buildCard({
-    required Widget child,
-    Color? color,
-    Color? border,
-  }) => Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(8),
-      border: border != null ? Border.all(color: border) : null,
-    ),
-    padding: const EdgeInsets.all(16),
-    child: color == Colors.white ? Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [child],
-    ) : child,
-  );
+  Widget _buildCard({required Widget child, Color? color, Color? border}) =>
+      Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+          border: border != null ? Border.all(color: border) : null,
+        ),
+        padding: const EdgeInsets.all(16),
+        child:
+            color == Colors.white
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [child],
+                )
+                : child,
+      );
 
-  Widget _buildInfoRow(String label, String value, {bool isLink = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      children: [
-        SizedBox(
-          width: 150,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF444444),
+  Widget _buildInfoRow(String label, String value, {bool isLink = false}) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 150,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF444444),
+                ),
+              ),
             ),
-          ),
+            Text(
+              value,
+              style: TextStyle(
+                color: isLink ? Colors.orange : const Color(0xFF444444),
+                decoration: isLink ? TextDecoration.underline : null,
+              ),
+            ),
+          ],
         ),
-        Text(
-          value,
-          style: TextStyle(
-            color: isLink ? Colors.orange : const Color(0xFF444444),
-            decoration: isLink ? TextDecoration.underline : null,
-          ),
-        ),
-      ],
-    ),
-  );
+      );
 
   Widget _buildBulletPoint(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -312,7 +340,9 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('• ', style: TextStyle(color: Color(0xFF31708F))),
-        Expanded(child: Text(text, style: const TextStyle(color: Color(0xFF31708F)))),
+        Expanded(
+          child: Text(text, style: const TextStyle(color: Color(0xFF31708F))),
+        ),
       ],
     ),
   );
@@ -323,36 +353,43 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('○ ', style: TextStyle(color: Color(0xFF444444))),
-        Expanded(child: Text(text, style: const TextStyle(color: Color(0xFF444444)))),
+        Expanded(
+          child: Text(text, style: const TextStyle(color: Color(0xFF444444))),
+        ),
       ],
     ),
   );
 
   Widget _buildRichText(
-    List<dynamic> parts, 
-    [Color baseColor = const Color(0xFF444444), 
-    FontWeight? fontWeight]
-  ) => RichText(
+    List<dynamic> parts, [
+    Color baseColor = const Color(0xFF444444),
+    FontWeight? fontWeight,
+  ]) => RichText(
     text: TextSpan(
       style: TextStyle(color: baseColor, fontWeight: fontWeight),
-      children: parts.map((part) {
-        if (part is String) {
-          return TextSpan(text: part);
-        } else if (part is (String, Color, bool)) {
-          return TextSpan(
-            text: part.$1,
-            style: TextStyle(
-              color: part.$2,
-              decoration: part.$3 ? TextDecoration.underline : null,
-            ),
-          );
-        }
-        return const TextSpan();
-      }).toList(),
+      children:
+          parts.map((part) {
+            if (part is String) {
+              return TextSpan(text: part);
+            } else if (part is (String, Color, bool)) {
+              return TextSpan(
+                text: part.$1,
+                style: TextStyle(
+                  color: part.$2,
+                  decoration: part.$3 ? TextDecoration.underline : null,
+                ),
+              );
+            }
+            return const TextSpan();
+          }).toList(),
     ),
   );
 
-  Widget _buildDocumentSection(String title, IconData icon, {String? subtitle}) => Container(
+  Widget _buildDocumentSection(
+    String title,
+    IconData icon, {
+    String? subtitle,
+  }) => Container(
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(8),
@@ -370,19 +407,25 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             children: [
               Icon(icon, color: Colors.grey.shade600, size: 18),
               const SizedBox(width: 8),
-              Text(title, style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade700,
-              )),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade700,
+                ),
+              ),
               const Spacer(),
               CircleAvatar(
                 radius: 12,
                 backgroundColor: Colors.grey.shade200,
-                child: Text('0', style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                )),
+                child: Text(
+                  '0',
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -395,10 +438,13 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
               children: [
                 const Icon(Icons.remove, size: 18, color: Colors.grey),
                 const SizedBox(width: 8),
-                Text(subtitle, style: const TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
-                )),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -433,7 +479,7 @@ final List<String> requiredDocuments = [
   'Signed Applicant Declaration',
   'Qualification [Intermediate] – Transcript / Diploma Supplement',
   'Qualification [Intermediate] – Award Certificate',
-  'Employment [Flutter Developer - Go Code Designers] – Statement of Service',
+  'Employment [Flutter Developer - Go Code Designers] – Statement of services',
   'Employment [Flutter Developer - Go Code Designers] – Payment Evidence',
   'Licence / Professional Membership [1234567899 - Primary]',
 ];

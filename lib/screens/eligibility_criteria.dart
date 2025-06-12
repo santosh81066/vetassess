@@ -312,7 +312,7 @@ class EligibilityCriteria extends StatelessWidget {
     
     const stepText = 'We provide skills assessments \nfor the largest range of \noccupations in Australia.';
     const description =
-        "The Australian Government has authorised us to provide skills assessments for 341 professional and other non-trade occupations. If you're a professional needing a skills assessment to migrate to Australia, we can offer you a service that understands and can assess your experience and qualifications.";
+        "The Australian Government has authorised us to provide skills assessments for 341 professional and other non-trade occupations. If you're a professional needing a skills assessment to migrate to Australia, we can offer you a services that understands and can assess your experience and qualifications.";
 
     final stepInfoColumn = Container(
       width: isMobile(context) 
@@ -668,7 +668,7 @@ class EligibilityCriteria extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                "All documents must be high quality colour scans of the original documents. If your documents are not issued in English, you must submit scans of both the original language documents and English translations made by a registered translation service.",
+                "All documents must be high quality colour scans of the original documents. If your documents are not issued in English, you must submit scans of both the original language documents and English translations made by a registered translation services.",
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.black87,

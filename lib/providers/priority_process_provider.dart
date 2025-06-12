@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import '../models/priority_process_model.dart';
+import '../utils/vetassess_api.dart';
 import 'login_provider.dart'; // Import your login provider
 
-// API Service
+// API services
 class PriorityProcessService {
-  static const String _baseUrl = 'http://103.98.12.226:5100';
+  final url = VetassessApi.form_priorityprocess;
   final Ref ref;
 
   PriorityProcessService(this.ref);
@@ -29,7 +30,7 @@ class PriorityProcessService {
       }
 
       final response = await http.post(
-        Uri.parse('$_baseUrl/user/priority-process'),
+        Uri.parse(url),
         headers: headers,
         body: jsonEncode(request.toJson()),
       );
@@ -57,7 +58,7 @@ class PriorityProcessService {
   }
 }
 
-// Updated Service Provider - now passes ref to service
+// Updated services Provider - now passes ref to services
 final priorityProcessServiceProvider = Provider<PriorityProcessService>((ref) {
   return PriorityProcessService(ref);
 });

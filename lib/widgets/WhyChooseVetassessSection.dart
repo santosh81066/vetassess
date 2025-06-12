@@ -66,7 +66,7 @@ class WhyChooseVetassessSection extends StatelessWidget {
                 iconPath: 'assets/images/icon-logo_3.svg',
                 title: "GET HELPFUL CUSTOMER SUPPORT",
                 description:
-                "Our dedicated customer service and assessment teams help you navigate the skills assessment process, every step of the way.",
+                "Our dedicated customer services and assessment teams help you navigate the skills assessment process, every step of the way.",
               ),
             ],
           ),

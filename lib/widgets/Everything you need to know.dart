@@ -50,7 +50,7 @@ class EverythingYouNeedToKnow extends StatelessWidget {
                       'Understand the Assessment Process',
                       'Renew my assessment',
                       'Required Documents',
-                      'Skills Assessment Support Service',
+                      'Skills Assessment Support services',
                     ],
                     buttonText:
                     'View all information about Professional Occupations',

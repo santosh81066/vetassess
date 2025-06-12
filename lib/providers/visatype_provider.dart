@@ -1,16 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:vetassess/Service/auth_service.dart';
+import 'package:vetassess/services/auth_service.dart';
 import 'dart:convert';
 import 'package:vetassess/models/getvisatype_model.dart';
+import 'package:vetassess/utils/vetassess_api.dart';
 
 // State class to hold visa types and loading state
-
 
 class VisatypeProvider extends StateNotifier<VisaTypeState> {
   VisatypeProvider() : super(VisaTypeState());
 
-  static const String baseUrl = 'http://103.98.12.226:5100';
+  static const String baseUrl = VetassessApi.baseUrl;
 
   Future<void> fetchVisaTypes(String category) async {
     // Don't fetch if we're already loading the same category
@@ -19,7 +19,7 @@ class VisatypeProvider extends StateNotifier<VisaTypeState> {
     }
 
     state = state.copyWith(
-      isLoading: true, 
+      isLoading: true,
       error: null,
       currentCategory: category,
       // Clear selected visa type when changing categories
@@ -28,49 +28,49 @@ class VisatypeProvider extends StateNotifier<VisaTypeState> {
 
     try {
       final headers = await AuthService.getAuthHeaders();
-      
+
       // URL encode the category parameter to handle spaces properly
       final encodedCategory = Uri.encodeComponent(category);
       final url = '$baseUrl/admin/visa-types?category=$encodedCategory';
-      
+
       print('Fetching visa types for category: $category');
       print('Request URL: $url');
-      
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      );
+
+      final response = await http.get(Uri.parse(url), headers: headers);
 
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-        
+
         // Parse and filter visa types
-        List<VisaTypeModel> allVisaTypes = jsonData
-            .map((json) => VisaTypeModel.fromJson(json))
-            .toList();
+        List<VisaTypeModel> allVisaTypes =
+            jsonData.map((json) => VisaTypeModel.fromJson(json)).toList();
 
         // Additional client-side filtering to ensure we only get the requested category
-        List<VisaTypeModel> filteredVisaTypes = allVisaTypes
-            .where((visaType) => visaType.category?.trim() == category.trim())
-            .toList();
+        List<VisaTypeModel> filteredVisaTypes =
+            allVisaTypes
+                .where(
+                  (visaType) => visaType.category?.trim() == category.trim(),
+                )
+                .toList();
 
         print('Total visa types received: ${allVisaTypes.length}');
-        print('Filtered visa types for "$category": ${filteredVisaTypes.length}');
+        print(
+          'Filtered visa types for "$category": ${filteredVisaTypes.length}',
+        );
 
         // Log the categories we received for debugging
-        final receivedCategories = allVisaTypes
-            .map((v) => v.category)
-            .toSet()
-            .toList();
+        final receivedCategories =
+            allVisaTypes.map((v) => v.category).toSet().toList();
         print('Received categories: $receivedCategories');
 
         state = state.copyWith(
           visaTypes: filteredVisaTypes,
           isLoading: false,
-          selectedVisaType: filteredVisaTypes.isNotEmpty ? filteredVisaTypes.first : null,
+          selectedVisaType:
+              filteredVisaTypes.isNotEmpty ? filteredVisaTypes.first : null,
         );
       } else {
         state = state.copyWith(
@@ -108,11 +108,14 @@ class VisatypeProvider extends StateNotifier<VisaTypeState> {
 
   // Method to check if a category has visa types
   bool hasCategoryData(String category) {
-    return state.visaTypes.any((visaType) => visaType.category?.trim() == category.trim());
+    return state.visaTypes.any(
+      (visaType) => visaType.category?.trim() == category.trim(),
+    );
   }
 }
 
-final visatypeProvider = StateNotifierProvider<VisatypeProvider, VisaTypeState>((ref) {
-  return VisatypeProvider();
-});
-
+final visatypeProvider = StateNotifierProvider<VisatypeProvider, VisaTypeState>(
+  (ref) {
+    return VisatypeProvider();
+  },
+);

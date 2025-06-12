@@ -130,7 +130,7 @@ class BusinessIndustryDropdownPanel extends StatelessWidget {
                           const SizedBox(height: 12),
                           _buildLink(
                             context,
-                            "International Qualifications Assessment Service",
+                            "International Qualifications Assessment services",
                           ),
                           const SizedBox(height: 12),
                           _buildLink(context, "Pioneering global initiatives"),

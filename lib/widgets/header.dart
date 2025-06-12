@@ -252,11 +252,11 @@ class _HeaderState extends State<Header> {
   ) {
     return Flexible(
       child: Row(
-       // mainAxisAlignment: MainAxisAlignment.end,
+        // mainAxisAlignment: MainAxisAlignment.end,
         children: [
           // Flexible spacer
           if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
-      
+
           // Top navigation items with responsive sizing
           if (isDesktop || isTablet) ...[
             _buildLanguageSelector(),
@@ -268,17 +268,23 @@ class _HeaderState extends State<Header> {
                 desktop: 24.0,
               ),
             ),
-      
+
             // Desktop-only links
             if (isDesktop) ...[
-              _TopLink(text: "About",onTap: () => context.go('/maintenance'),),
+              _TopLink(text: "About", onTap: () => context.go('/maintenance')),
               SizedBox(width: 24),
-               _TopLink(text: "Resources",onTap: () => context.go('/maintenance'),),
+              _TopLink(
+                text: "Resources",
+                onTap: () => context.go('/maintenance'),
+              ),
               const SizedBox(width: 24),
-               _TopLink(text: "News & Updates",onTap: () => context.go('/maintenance'),),
+              _TopLink(
+                text: "News & Updates",
+                onTap: () => context.go('/maintenance'),
+              ),
               const SizedBox(width: 24),
             ],
-      
+
             _buildLoginSection(),
             SizedBox(
               width: ResponsiveUtils.getResponsiveValue(
@@ -289,7 +295,7 @@ class _HeaderState extends State<Header> {
               ),
             ),
           ],
-      
+
           // Apply Now Button with responsive sizing
           Flexible(
             child: Container(
@@ -297,7 +303,6 @@ class _HeaderState extends State<Header> {
               child: ElevatedButton(
                 onPressed: () {
                   context.go('/apply_now');
-                  
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFFA000),
@@ -508,7 +513,7 @@ class _HeaderState extends State<Header> {
                 _NavItem(
                   title: "Contact",
                   fontSize: fontSize,
-                 // onTap: () => context.go('/admin_users'),
+                  onTap: () => context.go('/payment_screen'),
                 ),
                 SizedBox(width: sideMargin),
 
@@ -624,9 +629,18 @@ class _HeaderState extends State<Header> {
                 _buildMobileMenuItem("Business and Industry"),
                 _buildMobileMenuItem("Contact"),
                 const Divider(),
-                 _buildMobileMenuItem("About", onTap: () => context.go('/maintenance')),
-                _buildMobileMenuItem("Resources", onTap: () => context.go('/maintenance')),
-                _buildMobileMenuItem("News & Updates", onTap: () => context.go('/maintenance')),
+                _buildMobileMenuItem(
+                  "About",
+                  onTap: () => context.go('/maintenance'),
+                ),
+                _buildMobileMenuItem(
+                  "Resources",
+                  onTap: () => context.go('/maintenance'),
+                ),
+                _buildMobileMenuItem(
+                  "News & Updates",
+                  onTap: () => context.go('/maintenance'),
+                ),
                 _buildMobileMenuItem("Login"),
               ],
             ),
@@ -636,7 +650,7 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildMobileMenuItem(String title,{VoidCallback? onTap}) {
+  Widget _buildMobileMenuItem(String title, {VoidCallback? onTap}) {
     return ListTile(
       title: Text(
         title,
@@ -658,7 +672,7 @@ class _TopLink extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
 
-  const _TopLink({required this.text,this.onTap});
+  const _TopLink({required this.text, this.onTap});
 
   @override
   Widget build(BuildContext context) {

@@ -23,6 +23,7 @@ import 'package:vetassess/screens/login.dart';
 import 'package:vetassess/screens/login_page.dart';
 import 'package:vetassess/screens/nominate_an_occupation.dart';
 import 'package:vetassess/screens/not_found_screen.dart';
+import 'package:vetassess/screens/payment_screen.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
 import 'package:vetassess/screens/profissional_viewall.dart';
 import 'package:vetassess/screens/registration_page.dart';
@@ -48,15 +49,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Get current login state
       final loginState = ref.read(loginProvider);
       final currentPath = state.fullPath;
-      
+
       // Define login paths
-      final isLoginPath = currentPath == '/login' || currentPath == '/login_page';
-      
+      final isLoginPath =
+          currentPath == '/login' || currentPath == '/login_page';
+
       // Define protected routes for applicants/agents
       final applicantProtectedRoutes = [
         '/appli_opt',
         '/personal_form',
-        '/occupation_form',            
+        '/occupation_form',
         '/education_form',
         '/tertiary_education_form',
         '/employment_form',
@@ -65,44 +67,45 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/doc_upload',
         '/appli_type',
       ];
-      
+
       // Define protected routes for admins
-      final adminProtectedRoutes = [
-        '/admin_users',
-        '/admin_user-details',
-      ];
-      
-      final isApplicantProtectedRoute = applicantProtectedRoutes.contains(currentPath);
+      final adminProtectedRoutes = ['/admin_users', '/admin_user-details'];
+
+      final isApplicantProtectedRoute = applicantProtectedRoutes.contains(
+        currentPath,
+      );
       final isAdminProtectedRoute = adminProtectedRoutes.contains(currentPath);
-      final isAnyProtectedRoute = isApplicantProtectedRoute || isAdminProtectedRoute;
-      
+      final isAnyProtectedRoute =
+          isApplicantProtectedRoute || isAdminProtectedRoute;
+
       // If user is logged in and trying to access login page
       if (loginState.isSuccess && loginState.response != null && isLoginPath) {
         // Navigate based on user role
         final loginNotifier = ref.read(loginProvider.notifier);
         return loginNotifier.getNavigationRouteForRole();
       }
-      
+
       // If user is not logged in and trying to access protected routes
       if (!loginState.isSuccess && isAnyProtectedRoute) {
         return '/login';
       }
-      
+
       // If user is logged in but trying to access wrong role's routes
       if (loginState.isSuccess && loginState.userRole != null) {
         final userRole = loginState.userRole!;
-        
+
         // Admin trying to access applicant routes
         if (userRole == 'admin' && isApplicantProtectedRoute) {
           return '/admin_users';
         }
-        
+
         // Applicant/Agent trying to access admin routes
-        if ((userRole == 'applicant' || userRole == 'agent') && isAdminProtectedRoute) {
+        if ((userRole == 'applicant' || userRole == 'agent') &&
+            isAdminProtectedRoute) {
           return '/appli_opt';
         }
       }
-      
+
       return null; // No redirect needed
     },
     routes: [
@@ -118,7 +121,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         builder: (context, state) => const VetassessRegistrationForm(),
       ),
-      
+
       // Admin routes
       GoRoute(
         path: '/admin_users',
@@ -132,7 +135,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           return UserDetailsScreen(user: user);
         },
       ),
-      
+      GoRoute(
+        path: '/payment_screen',
+        builder: (context, state) => const PaymentScreen(),
+      ),
+
       // Public routes
       GoRoute(
         path: '/application_process',
@@ -208,9 +215,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/doc_upload',
         builder: (context, state) => const DocumentUploadScreen(),
       ),
-       GoRoute(
+      GoRoute(
         path: '/vetassess_upload',
-        builder: (context, state) =>  VetassessUploadPage(),
+        builder: (context, state) => VetassessUploadPage(),
       ),
       GoRoute(
         path: '/appli_type',
@@ -229,16 +236,13 @@ class RouterRefreshNotifier extends ChangeNotifier {
   late final ProviderSubscription _subscription;
 
   RouterRefreshNotifier(ProviderRef ref) {
-    _subscription = ref.listen(
-      loginProvider,
-      (previous, next) {
-        // Notify router to refresh when login state or role changes
-        if (previous?.isSuccess != next.isSuccess || 
-            previous?.userRole != next.userRole) {
-          notifyListeners();
-        }
-      },
-    );
+    _subscription = ref.listen(loginProvider, (previous, next) {
+      // Notify router to refresh when login state or role changes
+      if (previous?.isSuccess != next.isSuccess ||
+          previous?.userRole != next.userRole) {
+        notifyListeners();
+      }
+    });
   }
 
   @override
@@ -258,7 +262,7 @@ class VetassessApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'VETASSESS - Skills Assessment Australia',
-      routerConfig: router,      
+      routerConfig: router,
     );
   }
 }

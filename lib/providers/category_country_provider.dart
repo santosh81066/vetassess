@@ -2,7 +2,9 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:vetassess/main.dart';
 import '../models/category_country_models.dart';
+import '../utils/vetassess_api.dart';
 import 'login_provider.dart'; // Import your existing login provider
 
 class CategoriesNotifier extends StateNotifier<CategoriesState> {
@@ -10,10 +12,9 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
 
   CategoriesNotifier(this.ref) : super(CategoriesState());
 
-  static const String baseUrl = 'http://103.98.12.226:5100';
-
   Future<void> fetchCategories() async {
     state = state.copyWith(isLoading: true, error: null);
+    const url = VetassessApi.form_cat;
 
     try {
       // Get access token from login provider
@@ -29,7 +30,7 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/user/categories'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
@@ -91,7 +92,7 @@ class CountriesNotifier extends StateNotifier<CountriesState> {
 
   CountriesNotifier(this.ref) : super(CountriesState());
 
-  static const String baseUrl = 'http://103.98.12.226:5100';
+  final url = VetassessApi.form_country;
 
   Future<void> fetchCountries() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -110,7 +111,7 @@ class CountriesNotifier extends StateNotifier<CountriesState> {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/user/countries'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',

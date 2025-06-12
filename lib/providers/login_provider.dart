@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vetassess/utils/vetassess_api.dart';
 import '../models/login_model.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
@@ -11,7 +12,6 @@ class LoginNotifier extends StateNotifier<LoginState> {
     _checkInitialLoginStatus();
   }
 
-  static const String baseUrl = 'http://103.98.12.226:5100';
   static const int tokenExpiryHours = 24;
 
   // Check initial login status
@@ -40,10 +40,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
   // Fetch captcha from API
   Future<void> fetchCaptcha() async {
     state = state.copyWith(isLoadingCaptcha: true);
-    
+    const url = VetassessApi.captcha;
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/auth/captcha'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -71,10 +71,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> login(LoginRequest request) async {
     state = state.copyWith(isLoading: true, error: null);
-
+    const url = VetassessApi.login;
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(request.toJson()),
       );
@@ -88,7 +88,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           loginResponse.accessToken,
           loginResponse.refreshToken,
         );
-        
+
         // Store user role (use response role or fallback to request role)
         final userRole = loginResponse.role ?? request.role;
         await _storeUserRole(userRole);
@@ -131,11 +131,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     if (accessToken != null && accessToken.isNotEmpty) {
       await prefs.setString('access_token', accessToken);
     }
-    
+
     if (refreshToken != null && refreshToken.isNotEmpty) {
       await prefs.setString('refresh_token', refreshToken);
     }
@@ -175,12 +175,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> _isTokenExpired() async {
     final prefs = await SharedPreferences.getInstance();
     final loginTimestamp = prefs.getInt('login_timestamp');
-    
+
     if (loginTimestamp == null) return true;
-    
+
     final loginTime = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
     final expiryTime = loginTime.add(Duration(hours: tokenExpiryHours));
-    
+
     return DateTime.now().isAfter(expiryTime);
   }
 
@@ -188,11 +188,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<bool> isLoggedIn() async {
     try {
       final accessToken = await getAccessToken();
-      
+
       if (accessToken == null || accessToken.isEmpty) {
         return false;
       }
-      
+
       // Check if token has expired
       final isExpired = await _isTokenExpired();
       if (isExpired) {
@@ -200,7 +200,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final refreshSuccessful = await _tryRefreshToken();
         return refreshSuccessful;
       }
-      
+
       return true;
     } catch (e) {
       return false;
@@ -209,15 +209,17 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   // Try to refresh the access token
   Future<bool> _tryRefreshToken() async {
+    const url = VetassessApi.auth_refresh;
+
     try {
       final refreshToken = await getRefreshToken();
-      
+
       if (refreshToken == null || refreshToken.isEmpty) {
         return false;
       }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/refresh'),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'refreshToken': refreshToken}),
       );
@@ -229,7 +231,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         // Store new tokens
         await _storeTokens(newAccessToken, newRefreshToken);
-        
+
         // Get stored user role and update state
         final userRole = await getUserRole();
         state = state.copyWith(
@@ -237,7 +239,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
           isLoading: false,
           userRole: userRole,
         );
-        
+
         return true;
       } else {
         // Refresh failed, logout user
@@ -251,13 +253,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-
-
   // Public logout method
   Future<void> logout() async {
     // Set loading state during logout
     state = state.copyWith(isLoading: true);
-    
+
     try {
       // Perform the actual logout
       await _performLogout();
@@ -288,13 +288,10 @@ class LoginNotifier extends StateNotifier<LoginState> {
     try {
       final accessToken = await getAccessToken();
       final userRole = await getUserRole();
-      
+
       if (accessToken == null) return null;
 
-      return {
-        'role': userRole,
-        'hasToken': true,
-      };
+      return {'role': userRole, 'hasToken': true};
     } catch (e) {
       return null;
     }
@@ -369,15 +366,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
         return '/appli_opt'; // Default fallback
     }
   }
-
-
 }
 
 final userIdProvider = FutureProvider<int?>((ref) async {
   final loginNotifier = ref.read(loginProvider.notifier);
   return await loginNotifier.getUserId();
 });
-
 
 // Provider
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
