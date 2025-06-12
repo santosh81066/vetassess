@@ -18,28 +18,40 @@ class HeroSection extends StatelessWidget {
       height: isMobile ? height * 0.9 : 675,
       decoration: BoxDecoration(
         color: const Color(0xFF0d5257),
-        image: width >= 600
-            ? const DecorationImage(
-                image: AssetImage('assets/images/hero-img.png'),
-                alignment: Alignment.centerLeft,
-                fit: BoxFit.contain,
-              )
-            : null,
+        image:
+            width >= 600
+                ? const DecorationImage(
+                  image: AssetImage('assets/images/hero-img.png'),
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.contain,
+                )
+                : null,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final isMobile = width < 600;
           final isTablet = width >= 600 && width < 1024;
-      
+
           return Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 16 : isTablet ? 40 : 100,
-              vertical: isMobile ? 24 : isTablet ? 60 : 100,
+              horizontal:
+                  isMobile
+                      ? 16
+                      : isTablet
+                      ? 40
+                      : 100,
+              vertical:
+                  isMobile
+                      ? 24
+                      : isTablet
+                      ? 60
+                      : 100,
             ),
-            child: isMobile
-                ? _buildMobileLayout(context)
-                : _buildDesktopLayout(context, width, isTablet),
+            child:
+                isMobile
+                    ? _buildMobileLayout(context)
+                    : _buildDesktopLayout(context, width, isTablet),
           );
         },
       ),
@@ -58,7 +70,11 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopLayout(BuildContext context, double width, bool isTablet) {
+  Widget _buildDesktopLayout(
+    BuildContext context,
+    double width,
+    bool isTablet,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -75,15 +91,25 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildContent(BuildContext context, double screenWidth, bool isMobile, bool isTablet) {
+  List<Widget> _buildContent(
+    BuildContext context,
+    double screenWidth,
+    bool isMobile,
+    bool isTablet,
+  ) {
     return [
       // Add some top padding for desktop to center content vertically
       if (!isMobile) const SizedBox(height: 80),
-      
+
       Text(
-        "Australia's largest skills\nassessment service.",
+        "Australia's largest skills\nassessment services.",
         style: GoogleFonts.poppins(
-          fontSize: isMobile ? 24 : isTablet ? 32 : 40,
+          fontSize:
+              isMobile
+                  ? 24
+                  : isTablet
+                  ? 32
+                  : 40,
           height: isMobile ? 1.3 : 1.4,
           fontWeight: FontWeight.w700,
           color: Colors.white,
@@ -93,7 +119,12 @@ class HeroSection extends StatelessWidget {
       Text(
         "Check your occupation",
         style: GoogleFonts.poppins(
-          fontSize: isMobile ? 18 : isTablet ? 24 : 30,
+          fontSize:
+              isMobile
+                  ? 18
+                  : isTablet
+                  ? 24
+                  : 30,
           fontWeight: FontWeight.w600,
           color: const Color(0xFFFFA000),
         ),
@@ -109,7 +140,7 @@ class HeroSection extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 24),
-      
+
       // Constrained search bar to prevent overflow
       ConstrainedBox(
         constraints: BoxConstraints(
@@ -117,7 +148,7 @@ class HeroSection extends StatelessWidget {
         ),
         child: const _SearchBar(),
       ),
-      
+
       const SizedBox(height: 28),
       Text(
         "QUICK LINKS",
@@ -129,7 +160,7 @@ class HeroSection extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 8),
-      
+
       // Constrained quick link to prevent overflow
       ConstrainedBox(
         constraints: BoxConstraints(
@@ -162,7 +193,7 @@ class HeroSection extends StatelessWidget {
           ),
         ),
       ),
-      
+
       // Add bottom padding for mobile
       if (isMobile) const SizedBox(height: 40),
     ];
@@ -224,9 +255,7 @@ class _SearchBar extends StatelessWidget {
             child: TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 16 : 20,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 20),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),

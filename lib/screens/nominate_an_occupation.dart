@@ -17,8 +17,8 @@ class NominateScreen extends StatelessWidget {
     return BasePageLayout(
       child: Column(
         children: [
-        
-          _buildResponsiveHeaderBanner(),_buildResponsiveBreadcrumbs() ,
+          _buildResponsiveHeaderBanner(),
+          _buildResponsiveBreadcrumbs(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 35.0),
             child: Column(
@@ -273,7 +273,7 @@ class NominateScreen extends StatelessWidget {
                     ),
                     _buildSpacing(10),
                     _buildBulletPoints(
-                      'Major Group 4 Community and Personal Service Workers ',
+                      'Major Group 4 Community and Personal services Workers ',
                     ),
                     _buildSpacing(10),
                     _buildBulletPoints(
@@ -349,7 +349,7 @@ class NominateScreen extends StatelessWidget {
                     _buildSpacing(20),
                     _buildLinkText(
                       context,
-                      'You need to decide which occupation to nominate before submitting an application for assessment with VETASSESS. If you are unsure about which occupation may be best suited to your credentials, you may consider using our Skills Assessment Support (SAS) consultation service. You can read more about the SAS consultation service by clicking',
+                      'You need to decide which occupation to nominate before submitting an application for assessment with VETASSESS. If you are unsure about which occupation may be best suited to your credentials, you may consider using our Skills Assessment Support (SAS) consultation services. You can read more about the SAS consultation services by clicking',
                       ' here ',
                       '',
                     ),
@@ -599,105 +599,87 @@ class NominateScreen extends StatelessWidget {
       ),
     );
   }
-List<Widget> _buildProcessSteps(double screenWidth, double screenHeight) {
-  // Determine if we're on a mobile device
-  bool isMobile = screenWidth < 768;
-  bool isTablet = screenWidth >= 768 && screenWidth < 1024;
-  bool isDesktop = screenWidth >= 1024;
-  
-  // Calculate responsive dimensions
-  double horizontalPadding = screenWidth * (isMobile ? 0.05 : isTablet ? 0.08 : 0.1);
-  double verticalPadding = screenHeight * (isMobile ? 0.02 : 0.03);
-  
-  // Responsive font sizes
-  double titleFontSize = isMobile ? 18 : isTablet ? 22 : 24;
-  double bodyFontSize = isMobile ? 14 : 16;
-  
-  // Image dimensions
-  double imageHeight = isMobile ? 250 : isTablet ? 300 : 400;
-  double imageWidth = isMobile ? screenWidth * 0.9 : isTablet ? 600 : 800;
-  
-  return [
-    Container(
-      color: AppColors.color12,
-      width: screenWidth,
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      child: isMobile 
-        ? _buildMobileLayout(screenWidth, titleFontSize, bodyFontSize, imageHeight, imageWidth)
-        : _buildDesktopLayout(screenWidth, titleFontSize, bodyFontSize, imageHeight, imageWidth),
-    ),
-  ];
-}
 
-Widget _buildMobileLayout(double screenWidth, double titleFontSize, double bodyFontSize, double imageHeight, double imageWidth) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Text content first on mobile
+  List<Widget> _buildProcessSteps(double screenWidth, double screenHeight) {
+    // Determine if we're on a mobile device
+    bool isMobile = screenWidth < 768;
+    bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+    bool isDesktop = screenWidth >= 1024;
+
+    // Calculate responsive dimensions
+    double horizontalPadding =
+        screenWidth *
+        (isMobile
+            ? 0.05
+            : isTablet
+            ? 0.08
+            : 0.1);
+    double verticalPadding = screenHeight * (isMobile ? 0.02 : 0.03);
+
+    // Responsive font sizes
+    double titleFontSize =
+        isMobile
+            ? 18
+            : isTablet
+            ? 22
+            : 24;
+    double bodyFontSize = isMobile ? 14 : 16;
+
+    // Image dimensions
+    double imageHeight =
+        isMobile
+            ? 250
+            : isTablet
+            ? 300
+            : 400;
+    double imageWidth =
+        isMobile
+            ? screenWidth * 0.9
+            : isTablet
+            ? 600
+            : 800;
+
+    return [
       Container(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'You will need to nominate an occupation when you apply for a Skills Assessment',
-              style: TextStyle(
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF006064),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Generally, for a Skills Assessment application lodged under either ENS, GSM, RSMS or SID visa categories, applicants are required to hold a qualification that is at the educational level required and which is in a highly relevant field to the nominated occupation.',
-              style: TextStyle(
-                fontSize: bodyFontSize,
-                height: 1.5,
-                letterSpacing: 0.3,
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'In addition to the qualification requirements you also have to provide evidence of having at least one year of highly relevant employment performed at the required skill level within the last five years, from the date of lodging your application.',
-              style: TextStyle(
-                fontSize: bodyFontSize,
-                height: 1.5,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ],
+        color: AppColors.color12,
+        width: screenWidth,
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
         ),
+        child:
+            isMobile
+                ? _buildMobileLayout(
+                  screenWidth,
+                  titleFontSize,
+                  bodyFontSize,
+                  imageHeight,
+                  imageWidth,
+                )
+                : _buildDesktopLayout(
+                  screenWidth,
+                  titleFontSize,
+                  bodyFontSize,
+                  imageHeight,
+                  imageWidth,
+                ),
       ),
-      SizedBox(height: 24),
-      // Image below text on mobile
-      Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.asset(
-            'assets/images/blog_metropolis.jpg',
-            height: imageHeight,
-            width: imageWidth,
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    ],
-  );
-}
+    ];
+  }
 
-Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double bodyFontSize, double imageHeight, double imageWidth) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      // Text content
-      Expanded(
-        flex: 5,
-        child: Container(
-          padding: const EdgeInsets.only(right: 32),
+  Widget _buildMobileLayout(
+    double screenWidth,
+    double titleFontSize,
+    double bodyFontSize,
+    double imageHeight,
+    double imageWidth,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Text content first on mobile
+        Container(
+          width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -709,7 +691,7 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
                   color: const Color(0xFF006064),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               Text(
                 'Generally, for a Skills Assessment application lodged under either ENS, GSM, RSMS or SID visa categories, applicants are required to hold a qualification that is at the educational level required and which is in a highly relevant field to the nominated occupation.',
                 style: TextStyle(
@@ -718,7 +700,7 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
                   letterSpacing: 0.3,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               Text(
                 'In addition to the qualification requirements you also have to provide evidence of having at least one year of highly relevant employment performed at the required skill level within the last five years, from the date of lodging your application.',
                 style: TextStyle(
@@ -730,23 +712,89 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
             ],
           ),
         ),
-      ),
-      // Image
-      Expanded(
-        flex: 4,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.asset(
-            'assets/images/blog_metropolis.jpg',
-            height: imageHeight,
-            width: imageWidth,
-            fit: BoxFit.cover,
+        SizedBox(height: 24),
+        // Image below text on mobile
+        Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/blog_metropolis.jpg',
+              height: imageHeight,
+              width: imageWidth,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
+
+  Widget _buildDesktopLayout(
+    double screenWidth,
+    double titleFontSize,
+    double bodyFontSize,
+    double imageHeight,
+    double imageWidth,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Text content
+        Expanded(
+          flex: 5,
+          child: Container(
+            padding: const EdgeInsets.only(right: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'You will need to nominate an occupation when you apply for a Skills Assessment',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF006064),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Generally, for a Skills Assessment application lodged under either ENS, GSM, RSMS or SID visa categories, applicants are required to hold a qualification that is at the educational level required and which is in a highly relevant field to the nominated occupation.',
+                  style: TextStyle(
+                    fontSize: bodyFontSize,
+                    height: 1.5,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'In addition to the qualification requirements you also have to provide evidence of having at least one year of highly relevant employment performed at the required skill level within the last five years, from the date of lodging your application.',
+                  style: TextStyle(
+                    fontSize: bodyFontSize,
+                    height: 1.5,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Image
+        Expanded(
+          flex: 4,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/blog_metropolis.jpg',
+              height: imageHeight,
+              width: imageWidth,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // Content widgets for the first section
   List<Widget> _buildContentWidgets(BuildContext context) {
     return [
@@ -861,8 +909,8 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
 
       _buildLinkText(
         context,
-        'We offer an optional service of a customised consultation for professional and other non-trade occupations. Click ',
-        'here to find out more about our Skills Assessment Support (SAS) service',
+        'We offer an optional services of a customised consultation for professional and other non-trade occupations. Click ',
+        'here to find out more about our Skills Assessment Support (SAS) services',
         '.',
       ),
     ];
@@ -880,166 +928,183 @@ Widget _buildDesktopLayout(double screenWidth, double titleFontSize, double body
     ];
   }
 
- // Add this helper method to determine device type
-bool _isMobile(double width) => width < 600;
-bool _isTablet(double width) => width >= 600 && width < 1024;
-bool _isDesktop(double width) => width >= 1024;
+  // Add this helper method to determine device type
+  bool _isMobile(double width) => width < 600;
+  bool _isTablet(double width) => width >= 600 && width < 1024;
+  bool _isDesktop(double width) => width >= 1024;
 
-Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
-  final isMobile = _isMobile(screenWidth);
-  final isTablet = _isTablet(screenWidth);
-  
-  return Container(
-    width: screenWidth,
-    height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
-    decoration: const BoxDecoration(color: tealColor),
-    child: Stack(
-      children: [
-        // Background image - responsive positioning
-        Positioned(
-          right: 0,
-          child: Image.asset(
-            'assets/images/internal_page_banner.png',
-            height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
-            fit: BoxFit.fitHeight,
-          ),
-        ),
-        
-        // Content container - responsive width and padding
-        Container(
-          width: isMobile 
-              ? screenWidth * 0.95 
-              : isTablet 
-                  ? screenWidth * 0.8 
-                  : screenWidth * 0.66,
-          padding: EdgeInsets.only(
-            top: isMobile ? 60 : isTablet ? 80 : 100,
-            left: isMobile ? 20 : isTablet ? 40 : 170,
-            right: isMobile ? 20 : 0,
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: isMobile 
-                  ? MainAxisAlignment.center 
-                  : MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Nominate an Occupation",
-                  style: TextStyle(
-                    color: const Color(0xFFFFA000),
-                    fontSize: isMobile ? 28 : isTablet ? 36 : 42,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                SizedBox(height: isMobile ? 20 : 30),
-                Text(
-                  isMobile
-                      ? "The process begins by nominating the occupation that is most relevant to your qualification/s and employment."
-                      : "The process begins by nominating the occupation that is most relevant to your \nqualification/s and employment.",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isMobile ? 14 : 16,
-                    height: 1.5,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
+  Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
+    final isMobile = _isMobile(screenWidth);
+    final isTablet = _isTablet(screenWidth);
+
+    return Container(
+      width: screenWidth,
+      height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
+      decoration: const BoxDecoration(color: tealColor),
+      child: Stack(
+        children: [
+          // Background image - responsive positioning
+          Positioned(
+            right: 0,
+            child: Image.asset(
+              'assets/images/internal_page_banner.png',
+              height: isMobile ? screenHeight * 0.50 : screenHeight * 0.60,
+              fit: BoxFit.fitHeight,
             ),
+          ),
+
+          // Content container - responsive width and padding
+          Container(
+            width:
+                isMobile
+                    ? screenWidth * 0.95
+                    : isTablet
+                    ? screenWidth * 0.8
+                    : screenWidth * 0.66,
+            padding: EdgeInsets.only(
+              top:
+                  isMobile
+                      ? 60
+                      : isTablet
+                      ? 80
+                      : 100,
+              left:
+                  isMobile
+                      ? 20
+                      : isTablet
+                      ? 40
+                      : 170,
+              right: isMobile ? 20 : 0,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment:
+                    isMobile
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Nominate an Occupation",
+                    style: TextStyle(
+                      color: const Color(0xFFFFA000),
+                      fontSize:
+                          isMobile
+                              ? 28
+                              : isTablet
+                              ? 36
+                              : 42,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  SizedBox(height: isMobile ? 20 : 30),
+                  Text(
+                    isMobile
+                        ? "The process begins by nominating the occupation that is most relevant to your qualification/s and employment."
+                        : "The process begins by nominating the occupation that is most relevant to your \nqualification/s and employment.",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isMobile ? 14 : 16,
+                      height: 1.5,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBreadcrumbs(double screenWidth) {
+    final isMobile = _isMobile(screenWidth);
+    final isTablet = _isTablet(screenWidth);
+
+    const TextStyle linkStyle = TextStyle(
+      fontSize: 14,
+      color: tealColor,
+      fontWeight: FontWeight.bold,
+      decoration: TextDecoration.underline,
+    );
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 12,
+        horizontal:
+            isMobile
+                ? 20
+                : isTablet
+                ? 40
+                : 150,
+      ),
+      child:
+          isMobile
+              ? _buildMobileBreadcrumbs(linkStyle)
+              : _buildDesktopBreadcrumbs(linkStyle),
+    );
+  }
+
+  // Mobile breadcrumbs - stacked vertically for better readability
+  Widget _buildMobileBreadcrumbs(TextStyle linkStyle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextButton(
+          onPressed: () {},
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text('Home', style: linkStyle),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Application process for a professional or general skills application',
+          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  // Desktop breadcrumbs - horizontal layout
+  Widget _buildDesktopBreadcrumbs(TextStyle linkStyle) {
+    return Row(
+      children: [
+        TextButton(onPressed: () {}, child: Text('Home', style: linkStyle)),
+        const Text(' / ', style: TextStyle(color: Colors.grey)),
+        Flexible(
+          child: Text(
+            'Application process for a professional or general skills application',
+            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildBreadcrumbs(double screenWidth) {
-  final isMobile = _isMobile(screenWidth);
-  final isTablet = _isTablet(screenWidth);
-  
-  const TextStyle linkStyle = TextStyle(
-    fontSize: 14,
-    color: tealColor,
-    fontWeight: FontWeight.bold,
-    decoration: TextDecoration.underline,
-  );
+  // Alternative approach using LayoutBuilder for more precise control
+  Widget _buildResponsiveHeaderBanner() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final screenHeight = MediaQuery.of(context).size.height;
 
-  return Container(
-    padding: EdgeInsets.symmetric(
-      vertical: 12,
-      horizontal: isMobile ? 20 : isTablet ? 40 : 150,
-    ),
-    child: isMobile 
-        ? _buildMobileBreadcrumbs(linkStyle)
-        : _buildDesktopBreadcrumbs(linkStyle),
-  );
-}
+        return _buildHeaderBanner(screenHeight, screenWidth);
+      },
+    );
+  }
 
-// Mobile breadcrumbs - stacked vertically for better readability
-Widget _buildMobileBreadcrumbs(TextStyle linkStyle) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      TextButton(
-        onPressed: () {},
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        child: Text('Home', style: linkStyle),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        'Application process for a professional or general skills application',
-        style: TextStyle(
-          color: Colors.grey[600], 
-          fontSize: 12,
-        ),
-      ),
-    ],
-  );
-}
-
-// Desktop breadcrumbs - horizontal layout
-Widget _buildDesktopBreadcrumbs(TextStyle linkStyle) {
-  return Row(
-    children: [
-      TextButton(
-        onPressed: () {},
-        child: Text('Home', style: linkStyle),
-      ),
-      const Text(' / ', style: TextStyle(color: Colors.grey)),
-      Flexible(
-        child: Text(
-          'Application process for a professional or general skills application',
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ],
-  );
-}
-
-// Alternative approach using LayoutBuilder for more precise control
-Widget _buildResponsiveHeaderBanner() {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = constraints.maxWidth;
-      final screenHeight = MediaQuery.of(context).size.height;
-      
-      return _buildHeaderBanner(screenHeight, screenWidth);
-    },
-  );
-}
-
-Widget _buildResponsiveBreadcrumbs() {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      return _buildBreadcrumbs(constraints.maxWidth);
-    },
-  );
-}
+  Widget _buildResponsiveBreadcrumbs() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return _buildBreadcrumbs(constraints.maxWidth);
+      },
+    );
+  }
 }

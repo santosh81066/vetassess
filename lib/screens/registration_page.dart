@@ -639,7 +639,7 @@ class _VetassessRegistrationFormState
             children: [
               TextSpan(
                 text:
-                    'This website uses Cookies which are used to allow us to track the number of people visiting the site, the pages that they visit and how long they stay on each page. This information allows us to continually develop and improve the service we offer our website visitors, and to ensure that we are meeting our key priority of keeping you informed. Find out more about our ',
+                    'This website uses Cookies which are used to allow us to track the number of people visiting the site, the pages that they visit and how long they stay on each page. This information allows us to continually develop and improve the services we offer our website visitors, and to ensure that we are meeting our key priority of keeping you informed. Find out more about our ',
               ),
               TextSpan(
                 text: 'Privacy Policy',

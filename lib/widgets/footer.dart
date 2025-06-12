@@ -95,7 +95,7 @@ class Footer extends StatelessWidget {
           'Professional Occupation Information Sheets',
           'Fees – Professional Occupations',
           'Required Documents',
-          'Chinese Qualifications Verification Service',
+          'Chinese Qualifications Verification services',
         ],
       ),
 
@@ -108,7 +108,7 @@ class Footer extends StatelessWidget {
           'Refund Policy',
           'Complaints',
           'Feedback',
-          'Customer Service Charter',
+          'Customer services Charter',
           'Careers',
         ],
       ),

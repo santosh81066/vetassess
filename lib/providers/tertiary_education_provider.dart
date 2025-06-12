@@ -1,17 +1,15 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:vetassess/Service/auth_service.dart';
+import 'package:vetassess/services/auth_service.dart';
 import 'package:vetassess/models/tertiary_education_model.dart';
-
-
+import 'package:vetassess/utils/vetassess_api.dart';
 
 class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
   TertiaryEducationProvider() : super(const TertiaryEducationState());
 
   // Replace with your actual API endpoint
-  static const String _baseUrl = 'http://103.98.12.226:5100';
-  static const String _endpoint = '/user/tertiary-qualification';
+  static const String url = VetassessApi.form_tertedu;
 
   Future<bool> submitTertiaryEducation({
     required int userId,
@@ -19,7 +17,11 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
   }) async {
     try {
       // Set loading state
-      state = state.copyWith(isLoading: true, errorMessage: null, isSuccess: false);
+      state = state.copyWith(
+        isLoading: true,
+        errorMessage: null,
+        isSuccess: false,
+      );
 
       // Prepare the API payload
       final payload = _preparePayload(userId, formData);
@@ -30,8 +32,8 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
 
       // Make API call
       final response = await http.post(
-        Uri.parse('$_baseUrl$_endpoint'),
-      headers: headers,
+        Uri.parse(url),
+        headers: headers,
         body: jsonEncode(payload),
       );
 
@@ -59,12 +61,13 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
         String errorMessage = 'Failed to save tertiary education data';
         try {
           final errorData = jsonDecode(response.body);
-          errorMessage = errorData['message'] ?? errorData['error'] ?? errorMessage;
+          errorMessage =
+              errorData['message'] ?? errorData['error'] ?? errorMessage;
         } catch (e) {
           // If error response is not JSON, use status code
           errorMessage = 'Server error: ${response.statusCode}';
         }
-        
+
         state = state.copyWith(
           isLoading: false,
           isSuccess: false,
@@ -83,14 +86,16 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
       return false;
     }
   }
-  
 
-  Map<String, dynamic> _preparePayload(int userId, Map<String, dynamic> formData) {
+  Map<String, dynamic> _preparePayload(
+    int userId,
+    Map<String, dynamic> formData,
+  ) {
     // Helper function to safely get string values
     String? getStringValue(String key) {
       final value = formData[key];
-      return (value != null && value.toString().trim().isNotEmpty) 
-          ? value.toString().trim() 
+      return (value != null && value.toString().trim().isNotEmpty)
+          ? value.toString().trim()
           : null;
     }
 
@@ -107,7 +112,7 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
     String? courseLengthYearsOrSemesters;
     final years = getStringValue('courseLengthYears');
     final semesters = getStringValue('courseLengthSemesters');
-    
+
     if (years != null) {
       courseLengthYearsOrSemesters = '$years years';
     } else if (semesters != null) {
@@ -123,9 +128,7 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
     }
 
     // Build the payload matching your API structure
-    final payload = <String, dynamic>{
-      'userId': userId,
-    };
+    final payload = <String, dynamic>{'userId': userId};
 
     // Add optional fields only if they have values
     final stringFields = {
@@ -217,6 +220,9 @@ class TertiaryEducationProvider extends StateNotifier<TertiaryEducationState> {
   }
 }
 
-final tertiaryEducationProvider = StateNotifierProvider<TertiaryEducationProvider, TertiaryEducationState>((ref) {
-  return TertiaryEducationProvider();
-});
+final tertiaryEducationProvider =
+    StateNotifierProvider<TertiaryEducationProvider, TertiaryEducationState>((
+      ref,
+    ) {
+      return TertiaryEducationProvider();
+    });

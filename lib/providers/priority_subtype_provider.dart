@@ -6,14 +6,17 @@ import 'package:http/http.dart' as http;
 import 'package:vetassess/models/priority_subtype_model.dart';
 import 'package:vetassess/providers/login_provider.dart';
 
-// Service class for API calls
+import '../utils/vetassess_api.dart';
+
+// services class for API calls
 class PrioritySubtypeService {
-  static const String baseUrl = 'http://103.98.12.226:5100';
   final Ref ref;
 
   PrioritySubtypeService(this.ref);
 
   Future<PrioritySubtypeResponse> fetchPrioritySubtypes() async {
+    const url = VetassessApi.form_priority_subtypes;
+
     try {
       // Get the access token from login provider
       final loginNotifier = ref.read(loginProvider.notifier);
@@ -24,7 +27,7 @@ class PrioritySubtypeService {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/user/priority-subtypes'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
@@ -41,7 +44,7 @@ class PrioritySubtypeService {
           // Token was refreshed, retry the request
           final newAccessToken = await loginNotifier.getAccessToken();
           final retryResponse = await http.get(
-            Uri.parse('$baseUrl/user/priority-subtypes'),
+            Uri.parse(url),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $newAccessToken',
@@ -75,6 +78,7 @@ class PrioritySubtypeService {
     String method = 'GET',
     Map<String, dynamic>? body,
   }) async {
+    const baseUrl = VetassessApi.baseUrl;
     final loginNotifier = ref.read(loginProvider.notifier);
     final accessToken = await loginNotifier.getAccessToken();
 
@@ -112,7 +116,7 @@ class PrioritySubtypeService {
   }
 }
 
-// Provider for the service - now passes ref to the service
+// Provider for the services - now passes ref to the services
 final prioritySubtypeServiceProvider = Provider<PrioritySubtypeService>((ref) {
   return PrioritySubtypeService(ref);
 });

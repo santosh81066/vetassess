@@ -30,7 +30,7 @@ class SkillsAssessmentSupport extends StatelessWidget {
         "image": "assets/images/trades_assessment.png",
         "title": "For Applicants",
         "description":
-            "This service provides tailored information via a 30-minute phone consultation about the VETASSESS Skills Assessment criteria for professional occupational classifications. We provide separate services for migration agents/lawyers and for applicants.",
+            "This services provides tailored information via a 30-minute phone consultation about the VETASSESS Skills Assessment criteria for professional occupational classifications. We provide separate services for migration agents/lawyers and for applicants.",
         "link": "Learn More",
         "buttonIcon": Icons.arrow_forward,
       },
@@ -38,7 +38,7 @@ class SkillsAssessmentSupport extends StatelessWidget {
         "image": "assets/images/professional_general.png",
         "title": "For Migration Agents",
         "description":
-            "The Skills Assessment Support (SAS) Consultation Service for Migration Agents and practising legal professionals provides a customised 30-minute guided phone discussion about the Skills Assessment process and criteria that apply to professional occupational classifications that we assess.",
+            "The Skills Assessment Support (SAS) Consultation services for Migration Agents and practising legal professionals provides a customised 30-minute guided phone discussion about the Skills Assessment process and criteria that apply to professional occupational classifications that we assess.",
         "link": "Learn More",
         "buttonIcon": Icons.arrow_forward,
       },
@@ -46,7 +46,7 @@ class SkillsAssessmentSupport extends StatelessWidget {
         "image": "assets/images/application_status.jpg",
         "title": "Document Checks",
         "description":
-            "This service checks whether the documentation you are planning to provide for a skills assessment will be sufficient for a Skills Assessment application.",
+            "This services checks whether the documentation you are planning to provide for a skills assessment will be sufficient for a Skills Assessment application.",
         "link": "Learn More",
         "buttonIcon": Icons.arrow_forward,
       },

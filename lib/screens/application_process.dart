@@ -52,7 +52,7 @@ class ApplicationProcess extends StatelessWidget {
             items: [
               'How can VETASSESS be sure it can process my application in 10 business days?',
               'What if my application for Priority Processing is not accepted?',
-              "I've applied for the standard service. Can I change to Priority Processing?",
+              "I've applied for the standard services. Can I change to Priority Processing?",
               'Once my application for Priority Processing is accepted, can I change my occupation?',
               'What happens if you cannot process my priority processing application within 10 business days?',
               "What happens if my occupation is removed from the Australian Government's Department of Home Affairs list of eligible occupations during Priority Processing?",

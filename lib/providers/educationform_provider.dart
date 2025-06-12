@@ -2,8 +2,10 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:vetassess/Service/auth_service.dart';
-import 'package:vetassess/models/educationform_model.dart'; // Import your models
+import 'package:vetassess/services/auth_service.dart';
+import 'package:vetassess/models/educationform_model.dart';
+
+import '../utils/vetassess_api.dart'; // Import your models
 
 class EducationFormProvider extends StateNotifier<EducationFormData> {
   EducationFormProvider() : super(EducationFormData.empty());
@@ -11,7 +13,7 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
   // Helper method to convert MM/yyyy format to a proper date string
   String? _convertDateFormat(String? dateText) {
     if (dateText == null || dateText.isEmpty) return null;
-    
+
     // Assuming the input is in MM/yyyy format
     if (dateText.contains('/')) {
       final parts = dateText.split('/');
@@ -74,10 +76,10 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
   // Submit education details with new format
   Future<bool> submitEducationDetails({required int userId}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
-    
+
     try {
       print('Submitting education details for user: $userId');
-      const String apiUrl = 'http://103.98.12.226:5100';
+      const url = VetassessApi.form_genedu;
 
       // Create educations array with the new format
       List<Map<String, dynamic>> educations = [];
@@ -87,10 +89,16 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
         "levelId": 1,
         "dateStarted": _convertDateFormat(state.primarySchool.dateStarted),
         "dateFinished": _convertDateFormat(state.primarySchool.dateFinished),
-        "numberOfYears": state.primarySchool.numberOfYears > 0 ? state.primarySchool.numberOfYears : null,
-        "country": state.primarySchool.country.isNotEmpty ? state.primarySchool.country : null,
+        "numberOfYears":
+            state.primarySchool.numberOfYears > 0
+                ? state.primarySchool.numberOfYears
+                : null,
+        "country":
+            state.primarySchool.country.isNotEmpty
+                ? state.primarySchool.country
+                : null,
         "yearCompleted": state.primarySchool.yearCompleted?.toString(),
-        "certificateDetails": null
+        "certificateDetails": null,
       });
 
       // Secondary School (levelId: 2)
@@ -98,16 +106,28 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
         "levelId": 2,
         "dateStarted": _convertDateFormat(state.secondarySchool.dateStarted),
         "dateFinished": _convertDateFormat(state.secondarySchool.dateFinished),
-        "numberOfYears": state.secondarySchool.numberOfYears > 0 ? state.secondarySchool.numberOfYears : null,
-        "country": state.secondarySchool.country.isNotEmpty ? state.secondarySchool.country : null,
-        "yearCompleted": state.highestSchoolingCertificate.yearObtained > 0 ? state.highestSchoolingCertificate.yearObtained.toString() : null,
-        "certificateDetails": state.highestSchoolingCertificate.certificateDetails.isNotEmpty ? state.highestSchoolingCertificate.certificateDetails : null
+        "numberOfYears":
+            state.secondarySchool.numberOfYears > 0
+                ? state.secondarySchool.numberOfYears
+                : null,
+        "country":
+            state.secondarySchool.country.isNotEmpty
+                ? state.secondarySchool.country
+                : null,
+        "yearCompleted":
+            state.highestSchoolingCertificate.yearObtained > 0
+                ? state.highestSchoolingCertificate.yearObtained.toString()
+                : null,
+        "certificateDetails":
+            state.highestSchoolingCertificate.certificateDetails.isNotEmpty
+                ? state.highestSchoolingCertificate.certificateDetails
+                : null,
       });
 
       // Create request body with new format
       final Map<String, dynamic> requestBody = {
         "userId": userId,
-        "educations": educations
+        "educations": educations,
       };
 
       // Get headers with authentication token
@@ -116,7 +136,7 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
       print('Request body: $requestBody');
 
       final response = await http.post(
-        Uri.parse('$apiUrl/api/education/'),
+        Uri.parse(url),
         headers: headers,
         body: json.encode(requestBody),
       );
@@ -125,14 +145,16 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
         state = state.copyWith(isLoading: false);
         return true;
       } else {
-        final errorMessage = 'Error submitting education details: ${response.statusCode}';
+        final errorMessage =
+            'Error submitting education details: ${response.statusCode}';
         print(errorMessage);
         print('Response body: ${response.body}');
         state = state.copyWith(isLoading: false, errorMessage: errorMessage);
         return false;
       }
     } catch (e) {
-      final errorMessage = 'Exception occurred while submitting education details: $e';
+      final errorMessage =
+          'Exception occurred while submitting education details: $e';
       print(errorMessage);
       state = state.copyWith(isLoading: false, errorMessage: errorMessage);
       return false;
@@ -146,9 +168,10 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
     if (state.primarySchool.country.isEmpty) return false;
     if (state.secondarySchool.numberOfYears <= 0) return false;
     if (state.secondarySchool.country.isEmpty) return false;
-    if (state.highestSchoolingCertificate.certificateDetails.isEmpty) return false;
+    if (state.highestSchoolingCertificate.certificateDetails.isEmpty)
+      return false;
     if (state.highestSchoolingCertificate.yearObtained <= 0) return false;
-    
+
     return true;
   }
 
@@ -158,6 +181,7 @@ class EducationFormProvider extends StateNotifier<EducationFormData> {
   }
 }
 
-final educationFormProvider = StateNotifierProvider<EducationFormProvider, EducationFormData>((ref) {
-  return EducationFormProvider();
-});
+final educationFormProvider =
+    StateNotifierProvider<EducationFormProvider, EducationFormData>((ref) {
+      return EducationFormProvider();
+    });

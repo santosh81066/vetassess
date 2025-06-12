@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:vetassess/Service/auth_service.dart';
+import 'package:vetassess/services/auth_service.dart';
 import 'package:vetassess/models/personaldetails.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
+import '../utils/vetassess_api.dart';
 
 class PersondetailsProvider extends StateNotifier<PersonalDetails> {
   PersondetailsProvider() : super(PersonalDetails());
@@ -99,8 +99,8 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
   Future<SubmissionResult> submitPersonalDetails({required int userId}) async {
     try {
       print('personaldetails....$userId,${state.currentPassportNumber}');
-      const String apiUrl = 'http://103.98.12.226:5100';
-      
+      const url = VetassessApi.form_personaldetails;
+
       // Create request body with proper null handling
       final Map<String, dynamic> requestBody = {
         "userId": userId,
@@ -142,40 +142,42 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
 
       // Ensure content-type is set correctly
       headers['Content-Type'] = 'application/json';
-      
-      print('Request headers: $headers');
-      print('API URL: $apiUrl/personal-details/');
 
-      final response = await http.post(
-        Uri.parse('$apiUrl/personal-details/'),
-        headers: headers,
-        body: json.encode(requestBody),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Request timeout');
-        },
-      );
-      
+      print('Request headers: $headers');
+      print('API URL: $url');
+
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: headers,
+            body: json.encode(requestBody),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception('Request timeout');
+            },
+          );
+
       print('Response status code: ${response.statusCode}');
       print('Response headers: ${response.headers}');
       print('Response body: ${response.body}');
-      
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('Personal details submitted successfully');
         return SubmissionResult(success: true);
       } else {
         print('Error submitting personal details: ${response.statusCode}');
         print('Response body: ${response.body}');
-        
+
         // Try to parse error response
         Map<String, dynamic>? errorDetails;
         String errorMessage = 'Failed to submit personal details';
-        
+
         try {
           errorDetails = json.decode(response.body);
           print('Parsed error response: $errorDetails');
-          
+
           // Extract error message from response if available
           if (errorDetails != null) {
             if (errorDetails.containsKey('message')) {
@@ -192,9 +194,12 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
         } catch (e) {
           print('Could not parse error response: $e');
           // If we can't parse JSON, show the raw response
-          errorMessage = response.body.isNotEmpty ? response.body : 'HTTP ${response.statusCode}: Unknown error';
+          errorMessage =
+              response.body.isNotEmpty
+                  ? response.body
+                  : 'HTTP ${response.statusCode}: Unknown error';
         }
-        
+
         return SubmissionResult(
           success: false,
           errorMessage: errorMessage,
@@ -213,8 +218,8 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
   // Save as draft - also updated to return SubmissionResult
   Future<SubmissionResult> saveAsDraft({required int userId}) async {
     try {
-      const String apiUrl = 'http://103.98.12.226:5100';
-      
+      const url = VetassessApi.form_personaldetails;
+
       // Create request body with proper null handling
       final Map<String, dynamic> requestBody = {
         "userId": userId,
@@ -257,16 +262,18 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
       // Ensure content-type is set correctly
       headers['Content-Type'] = 'application/json';
 
-      final response = await http.post(
-        Uri.parse('$apiUrl/personal-details/'),
-        headers: headers,
-        body: json.encode(requestBody),
-      ).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Request timeout');
-        },
-      );
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: headers,
+            body: json.encode(requestBody),
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception('Request timeout');
+            },
+          );
 
       print('Draft response status: ${response.statusCode}');
       print('Draft response body: ${response.body}');
@@ -277,15 +284,15 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
       } else {
         print('Error saving draft: ${response.statusCode}');
         print('Response body: ${response.body}');
-        
+
         // Try to parse error response
         Map<String, dynamic>? errorDetails;
         String errorMessage = 'Failed to save draft';
-        
+
         try {
           errorDetails = json.decode(response.body);
           print('Parsed draft error response: $errorDetails');
-          
+
           // Extract error message from response if available
           if (errorDetails != null) {
             if (errorDetails.containsKey('message')) {
@@ -302,9 +309,12 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
         } catch (e) {
           print('Could not parse draft error response: $e');
           // If we can't parse JSON, show the raw response
-          errorMessage = response.body.isNotEmpty ? response.body : 'HTTP ${response.statusCode}: Unknown error';
+          errorMessage =
+              response.body.isNotEmpty
+                  ? response.body
+                  : 'HTTP ${response.statusCode}: Unknown error';
         }
-        
+
         return SubmissionResult(
           success: false,
           errorMessage: errorMessage,
@@ -321,6 +331,7 @@ class PersondetailsProvider extends StateNotifier<PersonalDetails> {
   }
 }
 
-final personalDetailsProvider = StateNotifierProvider<PersondetailsProvider, PersonalDetails>((ref) {
-  return PersondetailsProvider();
-});
+final personalDetailsProvider =
+    StateNotifierProvider<PersondetailsProvider, PersonalDetails>((ref) {
+      return PersondetailsProvider();
+    });

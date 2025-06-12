@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:vetassess/utils/vetassess_api.dart';
 import '../models/registration_model.dart';
 
 class SignupRepository {
-  static const String baseUrl = 'http://103.98.12.226:5100';
+  static const String baseUrl = VetassessApi.baseUrl;
   static const String signupEndpoint = '/auth/signup/applicant';
   static const String captchaEndpoint = '/auth/captcha';
 

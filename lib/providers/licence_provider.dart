@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:vetassess/utils/vetassess_api.dart';
 import '../models/licence_models.dart';
 import 'login_provider.dart';
 
@@ -11,7 +12,7 @@ class LicenceNotifier extends StateNotifier<LicenceState> {
 
   LicenceNotifier(this.ref) : super(LicenceState());
 
-  static const String baseUrl = 'http://103.98.12.226:5100';
+  static const String url = VetassessApi.formadd_licence;
 
   Future<void> addLicence(LicenceRequest request) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -30,7 +31,7 @@ class LicenceNotifier extends StateNotifier<LicenceState> {
       }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/user/add-licence'),
+        Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
