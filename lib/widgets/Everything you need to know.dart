@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:vetassess/screens/application_process.dart';
+import 'package:vetassess/screens/eligibility_criteria.dart';
+import 'package:vetassess/screens/fee_screen.dart';
+import 'package:vetassess/screens/skills_assessment_support.dart';
+import 'package:vetassess/widgets/under_maintenance.dart';
 
 class EverythingYouNeedToKnow extends StatelessWidget {
   const EverythingYouNeedToKnow({super.key});
@@ -39,34 +45,89 @@ class EverythingYouNeedToKnow extends StatelessWidget {
             SizedBox(
               height: 600, // give it enough height for content
               child: TabBarView(
-                children: [
+               children: [
                   _TabContent(
                     title: 'For professional skilled migration',
                     description:
-                    'Browse the resources below to help you understand the professional skills migration assessment journey. They have essential information about the process, what fees you may need to pay and frequently asked questions.',
-                    links: [
-                      'Fees',
-                      'Check my eligibility',
-                      'Understand the Assessment Process',
-                      'Renew my assessment',
-                      'Required Documents',
-                      'Skills Assessment Support Service',
+                        'Browse the resources below to help you understand the professional skills migration assessment journey. They have essential information about the process, what fees you may need to pay and frequently asked questions.',
+                    linkData: [
+                      {
+                        'text': 'Fees',
+                        'onTap': () {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => FeeScreen(),));
+                        }
+                      },
+                      {
+                        'text': 'Check my eligibility',
+                        'onTap': () {
+                        Navigator.push(context, MaterialPageRoute(builder:(context) => EligibilityCriteria(),));
+                        }
+                      },
+                      {
+                        'text': 'Understand the Assessment Process',
+                        'onTap': () {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
+                      {
+                        'text': 'Renew my assessment',
+                        'onTap': () {
+                         Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
+                      {
+                        'text': 'Required Documents',
+                        'onTap': () {
+                         Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
+                      {
+                        'text': 'Skills Assessment Support Service',
+                        'onTap': () {
+                        Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
                     ],
-                    buttonText:
-                    'View all information about Professional Occupations',
+                    buttonText: 'View all information about Professional Occupations',
+                    buttonOnTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    },
                     imageAsset: 'assets/images/EverythingYouNeedToKnow.png',
                   ),
                   _TabContent(
                     title: 'For trades skilled migration',
                     description:
-                    'Browse resources below to understand the trades skills migration assessment process. This includes assessment fees, eligibility criteria, required documents and FAQs.',
-                    links: [
-                      'Fees',
-                      'Assessment Locations',
-                      'Required Documents',
-                      'Understand the Assessment Process',
+                        'Browse resources below to understand the trades skills migration assessment process. This includes assessment fees, eligibility criteria, required documents and FAQs.',
+                    linkData: [
+                      {
+                        'text': 'Fees',
+                        'onTap': () {
+                         Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
+                      {
+                        'text': 'Assessment Locations',
+                        'onTap': () {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
+                      {
+                        'text': 'Required Documents',
+                        'onTap': () {
+                         Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage()),);
+                        }
+                      },
+                      {
+                        'text': 'Understand the Assessment Process',
+                        'onTap': () {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                        }
+                      },
                     ],
                     buttonText: 'View all information about Trade Occupations',
+                    buttonOnTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    },
                     imageAsset: 'assets/images/EverythingYouNeedToKnow2.png',
                   ),
                 ],
@@ -82,16 +143,18 @@ class EverythingYouNeedToKnow extends StatelessWidget {
 class _TabContent extends StatelessWidget {
   final String title;
   final String description;
-  final List<String> links;
+  final List<Map<String, dynamic>> linkData;
   final String buttonText;
   final String imageAsset;
+  final VoidCallback buttonOnTap;
 
   const _TabContent({
     required this.title,
     required this.description,
-    required this.links,
+   required this.linkData,
     required this.buttonText,
     required this.imageAsset,
+     required this.buttonOnTap,
   });
 
   @override
@@ -111,8 +174,10 @@ class _TabContent extends StatelessWidget {
                   child: _LeftContent(
                     title: title,
                     description: description,
-                    links: links,
+                    linkData: linkData,
+                    
                     buttonText: buttonText,
+                    buttonOnTap: buttonOnTap,
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -126,11 +191,12 @@ class _TabContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _LeftContent(
-                  title: title,
-                  description: description,
-                  links: links,
-                  buttonText: buttonText,
-                ),
+                   title: title,
+                    description: description,
+                    linkData: linkData,
+                    buttonText: buttonText,
+                    buttonOnTap: buttonOnTap,
+                  ),
                 const SizedBox(height: 20),
                 Image.asset(imageAsset),
               ],
@@ -145,14 +211,16 @@ class _TabContent extends StatelessWidget {
 class _LeftContent extends StatelessWidget {
   final String title;
   final String description;
-  final List<String> links;
+ final List<Map<String, dynamic>> linkData;
   final String buttonText;
+  final VoidCallback buttonOnTap;
 
   const _LeftContent({
     required this.title,
     required this.description,
-    required this.links,
+    required this.linkData,
     required this.buttonText,
+    required this.buttonOnTap,
   });
 
   @override
@@ -182,45 +250,47 @@ class _LeftContent extends StatelessWidget {
             shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           
-              children: links.map(
-                (link) => InkWell(
-                  onTap: () {},
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
+              children: linkData.map((linkItem) {
+            final linkText = linkItem['text'] as String;
+            final linkOnTap = linkItem['onTap'] as VoidCallback;
+            
+            return InkWell(
+              onTap: linkOnTap,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    alignment: Alignment.bottomLeft,
                     children: [
-                      Stack(
-                        alignment: Alignment.bottomLeft,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 4), // Gap between text and underline
-                            child: Text(
-                              link,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF004D40),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          linkText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF004D40),
+                            fontWeight: FontWeight.w600,
                           ),
-                          Container(
-                            height: 2.5, // Thicker underline
-                            width: link.length * 8.5, // Dynamic underline width (tweak if needed)
-                            color: const Color(0xFF004D40),
-                          ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(width: 6), // Tighter space between text and arrow
-                      const Icon(
-                        Icons.arrow_forward,
-                        size: 18,
-                        color: Color(0xFF004D40),
+                      Container(
+                        height: 2.5,
+                        width: linkText.length * 8.5,
+                        color: const Color(0xFF004D40),
                       ),
                     ],
                   ),
-                ),
-              ).toList(),
-
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 18,
+                    color: Color(0xFF004D40),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
         const SizedBox(height: 24),
         ElevatedButton(

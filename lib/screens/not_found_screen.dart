@@ -16,7 +16,7 @@ class NotFoundScreen extends StatelessWidget {
               Icon(Icons.error_outline, color: Colors.blue[800], size: 80),
               const SizedBox(height: 24),
               Text(
-                'Page Not Found',
+                'Page Under Mainta',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/screens/eligibility_criteria.dart';
+import 'package:vetassess/screens/login_page.dart';
+import 'package:vetassess/widgets/under_maintenance.dart';
 
 class SkillsMatchSection extends StatelessWidget {
   const SkillsMatchSection({super.key});
@@ -26,6 +29,9 @@ class SkillsMatchSection extends StatelessWidget {
             "Check your visa subclass, occupation and other requirements before you begin.",
         "link": "Find out if you are eligible",
         "buttonIcon": Icons.arrow_forward,
+        "onTap":(){
+        Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+        }
       },
       {
         "image": "assets/images/professional_general.png",
@@ -34,6 +40,9 @@ class SkillsMatchSection extends StatelessWidget {
             "Find out if your occupation is a professional or general occupation with VETASSESS.",
         "link": "Find out more",
         "buttonIcon": Icons.arrow_forward,
+         "onTap":(){
+           Navigator.push(context, MaterialPageRoute(builder:(context) => EligibilityCriteria(),));
+        }
       },
       {
         "image": "assets/images/application_status.jpg",
@@ -42,6 +51,9 @@ class SkillsMatchSection extends StatelessWidget {
             "Check the progress of your application via our online portal.",
         "link": "View your application status",
         "buttonIcon": Icons.arrow_forward,
+         "onTap":(){
+           Navigator.push(context, MaterialPageRoute(builder:(context) => LoginPage(),));
+        }
       },
     ];
 
@@ -144,6 +156,7 @@ class SkillsMatchSection extends StatelessWidget {
                 description: card["description"],
                 link: card["link"],
                 buttonIcon: card["buttonIcon"],
+                 onTap: card["onTap"],
                 isSmallScreen: isSmallScreen,
               ),
             );
@@ -160,6 +173,7 @@ class _CardItem extends StatelessWidget {
   final String description;
   final String link;
   final IconData buttonIcon;
+  final VoidCallback onTap;
   final bool isSmallScreen;
 
   const _CardItem({
@@ -168,6 +182,7 @@ class _CardItem extends StatelessWidget {
     required this.description,
     required this.link,
     required this.buttonIcon,
+    required this.onTap,
     this.isSmallScreen = false,
   });
 
@@ -246,7 +261,7 @@ class _CardItem extends StatelessWidget {
                   const Spacer(),
                   // Link with arrow
                   GestureDetector(
-                    onTap: () {},
+                    onTap: onTap,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

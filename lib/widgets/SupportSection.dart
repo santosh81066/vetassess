@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vetassess/widgets/under_maintenance.dart';
 
 class SupportSection extends StatelessWidget {
   const SupportSection({super.key});
@@ -49,8 +50,8 @@ class SupportSection extends StatelessWidget {
                         ? IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: const [
-                                Expanded(
+                              children: [
+                                 Expanded(
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 12),
                                     child: _SupportCard(
@@ -58,22 +59,24 @@ class SupportSection extends StatelessWidget {
                                       description:
                                           "Skills Assessment Support (SAS) services are for migration agents, legal practitioners and prospective applicants who are yet to submit their Skills Assessment application to VETASSESS.",
                                       linkText: "Skills Assessment Support",
-                                      linkUrl:
-                                          "/skills-assessment-for-migration/skills-assessment-support",
+                                       onTap:(){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MaintenancePage()));
+                                }
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 24),
+                                const SizedBox(width: 24),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 12),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
                                     child: _SupportCard(
                                       title: "Help with an urgent application",
                                       description:
                                           "For general and professional occupations, priority processing can be used to fast-track urgent applications.",
                                       linkText: "Fast-track applications",
-                                      linkUrl:
-                                          "/skills-assessment-for-migration/professional-occupations/priority-processing",
+                                      onTap:(){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MaintenancePage()));
+                                }
                                     ),
                                   ),
                                 ),
@@ -81,23 +84,26 @@ class SupportSection extends StatelessWidget {
                             ),
                           )
                         : Column(
-                            children: const [
-                              _SupportCard(
+                            children: [
+                               _SupportCard(
                                 title: "Help with a Skills Assessment",
                                 description:
                                     "Skills Assessment Support (SAS) services are for migration agents, legal practitioners and prospective applicants who are yet to submit their Skills Assessment application to VETASSESS.",
                                 linkText: "Skills Assessment Support",
-                                linkUrl:
-                                    "/skills-assessment-for-migration/skills-assessment-support",
+                                 onTap:(){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MaintenancePage()));
+                                }
                               ),
-                              SizedBox(height: 24),
+                              const SizedBox(height: 24),
                               _SupportCard(
                                 title: "Help with an urgent application",
                                 description:
                                     "For general and professional occupations, priority processing can be used to fast-track urgent applications.",
                                 linkText: "Fast-track applications",
-                                linkUrl:
-                                    "/skills-assessment-for-migration/professional-occupations/priority-processing",
+                                onTap:(){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>MaintenancePage()));
+                                }
+                                    
                               ),
                             ],
                           ),
@@ -116,13 +122,13 @@ class _SupportCard extends StatelessWidget {
   final String title;
   final String description;
   final String linkText;
-  final String linkUrl;
+  final VoidCallback onTap;
 
   const _SupportCard({
     required this.title,
     required this.description,
     required this.linkText,
-    required this.linkUrl,
+    required this.onTap,
   });
 
   @override
@@ -168,7 +174,7 @@ class _SupportCard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             GestureDetector(
-              onTap: () => context.go(linkUrl),
+              onTap: onTap,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

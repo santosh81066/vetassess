@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // optional if using go_router
+import 'package:flutter_html/flutter_html.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vetassess/widgets/under_maintenance.dart'; // optional if using go_router
 
 class NewsUpdatesSection extends StatelessWidget {
   const NewsUpdatesSection({super.key});
@@ -43,7 +45,9 @@ class NewsUpdatesSection extends StatelessWidget {
                     'VETASSESS New Webinar – Engineering Trades | May 6',
                     description:
                     'VETASSESS will hold a Skills Assessment Webinar on Tuesday, May 6, with a focus on Engineering Trades and a live Q&A session.',
-                    link: '/news/vetassess-new-webinar-engineering-trades-may-6',
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    }
                   ),
                 ),
                 const SizedBox(width: 40),
@@ -56,8 +60,9 @@ class NewsUpdatesSection extends StatelessWidget {
                         tags: ['News'],
                         title:
                         'VETASSESS New Webinar – Pharmacy Technician & Microbiologist Skills Assessment Process | April 2',
-                        link:
-                        '/news/vetassess-new-webinar-pharmacy-technician-microbiologist-skills-assessment-process-april-2',
+                       onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    }
                       ),
                       const SizedBox(height: 20),
                       _NewsItem(
@@ -65,8 +70,9 @@ class NewsUpdatesSection extends StatelessWidget {
                         tags: ['News'],
                         title:
                         'VETASSESS and Australian Institute of Health and Safety partner on qualifications recognition',
-                        link:
-                        '/news/vetassess-and-australian-institute-of-health-and-safety-partner-on-qualifications-recognition',
+                       onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    }
                       ),
                       const SizedBox(height: 20),
                       _NewsItem(
@@ -74,8 +80,9 @@ class NewsUpdatesSection extends StatelessWidget {
                         tags: ['News'],
                         title:
                         'Massage & Myotherapy Australia endorses VETASSESS criteria',
-                        link:
-                        '/news/massage-myotherapy-australia-endorses-vetassess-criteria',
+                      onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder:(context) => MaintenancePage(),));
+                    }
                       ),
                     ],
                   ),
@@ -93,14 +100,14 @@ class _FeaturedArticle extends StatelessWidget {
   final List<String> tags;
   final String title;
   final String description;
-  final String link;
+  final VoidCallback onTap;
 
   const _FeaturedArticle({
     required this.image,
     required this.tags,
     required this.title,
     required this.description,
-    required this.link,
+    required this.onTap,
   });
 
   @override
@@ -155,7 +162,7 @@ class _FeaturedArticle extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         GestureDetector(
-          onTap: () => context.go(link),
+          onTap: onTap,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -189,13 +196,13 @@ class _NewsItem extends StatelessWidget {
   
   final List<String> tags;
   final String title;
-  final String link;
+  final VoidCallback onTap;
 
   const _NewsItem({
     
     required this.tags,
     required this.title,
-    required this.link,
+    required this.onTap,
   });
 
   @override
@@ -243,7 +250,7 @@ class _NewsItem extends StatelessWidget {
               const SizedBox(height: 8),
               // Read article link
               GestureDetector(
-                onTap: () => context.go(link),
+                onTap: onTap,
                 child: Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [

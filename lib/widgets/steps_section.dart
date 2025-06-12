@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProcessStepsSection extends StatelessWidget {
   const ProcessStepsSection({super.key});
@@ -24,73 +26,177 @@ class ProcessStepsSection extends StatelessWidget {
     );
   }
 
+  // Helper method to launch URLs
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  // Helper method to create rich text with clickable links
+  Widget _buildRichText(String text, {required double fontSize, bool isBold = false}) {
+    final List<TextSpan> spans = [];
+    final RegExp urlRegex = RegExp(r'(www\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})');
+    final RegExp linkRegex = RegExp(r'(document requirements|Priority Processing|Withdraw my application|Apply or continue assessment)');
+    
+    final matches = <Match>[];
+    matches.addAll(urlRegex.allMatches(text));
+    matches.addAll(linkRegex.allMatches(text));
+    matches.sort((a, b) => a.start.compareTo(b.start));
+
+    int currentIndex = 0;
+    
+    for (final match in matches) {
+      // Add text before the match
+      if (match.start > currentIndex) {
+        spans.add(TextSpan(
+          text: text.substring(currentIndex, match.start),
+          style: TextStyle(
+            fontSize: fontSize,
+            height: 1.6,
+            letterSpacing: 0.3,
+            color: const Color(0xFF424242),
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          ),
+        ));
+      }
+      
+      // Add the clickable link
+      final matchText = match.group(0)!;
+      spans.add(TextSpan(
+        text: matchText,
+        style: TextStyle(
+          fontSize: fontSize,
+          height: 1.6,
+          letterSpacing: 0.3,
+          color: const Color(0xFF006064),
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            if (urlRegex.hasMatch(matchText)) {
+              _launchUrl('https://$matchText');
+            } else {
+              // Handle internal links
+              _handleInternalLink(matchText);
+            }
+          },
+      ));
+      
+      currentIndex = match.end;
+    }
+    
+    // Add remaining text
+    if (currentIndex < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(currentIndex),
+        style: TextStyle(
+          fontSize: fontSize,
+          height: 1.6,
+          letterSpacing: 0.3,
+          color: const Color(0xFF424242),
+          fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+        ),
+      ));
+    }
+    
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
+  // Handle internal navigation links
+  void _handleInternalLink(String linkText) {
+    switch (linkText) {
+      case 'document requirements':
+        // Navigate to document requirements page
+        print('Navigate to document requirements');
+        break;
+      case 'Priority Processing':
+        // Navigate to priority processing page
+        print('Navigate to priority processing');
+        break;
+      case 'Withdraw my application':
+        // Navigate to withdraw application page
+        print('Navigate to withdraw application');
+        break;
+      case 'Apply or continue assessment':
+        // Navigate to application page
+        print('Navigate to apply or continue assessment');
+        break;
+    }
+  }
+
   List<Widget> _buildProcessSteps(
     double screenWidth, {
     required bool isDesktop,
     required bool isTablet,
     required bool isMobile,
   }) {
-    // Define all step data in a list
+    // Updated step data with rich text descriptions
     final List<Map<String, dynamic>> stepsData = [
       {
         'step': 'Step 1',
         'title': 'Choose a professional occupation',
         'description':
-            'Select an occupation that aligns with your qualifications and work experience. Your nomination should reflect your skills and expertise accurately for the best assessment outcome.',
+            'Choose an occupation against which you wish to be assessed and select the visa purpose for which the skills assessment is required. For information on the occupations available for migration to Australia and different visa categories please refer to www.homeaffairs.gov.au.',
         'anzscoInfo':
-            'Review the Australian and New Zealand Standard Classification of Occupations (ANZSCO) to ensure your chosen occupation matches your skills and qualifications.',
+            'For information on the ANZSCO description of your chosen occupation, log on to www.abs.gov.au and enter the ANZSCO code for your selected occupation.',
         'image': 'assets/images/lady_1_occupation.jpg',
         'imageOnRight': false,
+        'linkText': 'Find your occupation',
       },
       {
         'step': 'Step 2',
-        'title': 'Check eligibility requirements',
+        'title': 'Read what\'s required',
         'description':
-            'Verify that you meet the minimum qualification and work experience requirements for your nominated occupation. Different occupations have different eligibility criteria.',
-        'anzscoInfo':
-            'Each occupation has specific skill requirements outlined in the ANZSCO. Ensure you understand these requirements before proceeding with your application.',
+            'If VETASSESS is the assessing authority for your chosen occupation, you will be able to find detailed information on the skills assessment criteria when you search for your occupation on our website. A VETASSESS Skills Assessment considers the relevance of qualifications and employment to the nominated occupation.\n\nOur assessment of your qualification/s will assess the educational level of your qualification against Australian requirements and the relevance of the major area of study. Only a qualification/s assessment is required for 485 visa purposes. An assessment of both qualification/s and employment is required for permanent residency purposes.',
+        'anzscoInfo': '',
         'image': 'assets/images/management_consultant.png',
         'imageOnRight': true,
+        'linkText': 'Find your Occupation',
       },
       {
         'step': 'Step 3',
-        'title': 'Create an account with VETASSESS',
+        'title': 'Create an Account with VETASSESS',
         'description':
-            'Register on the VETASSESS portal to begin your skills assessment process. You will need to provide personal details and create login credentials.',
-        'anzscoInfo':
-            'Have your ANZSCO occupation code ready when creating your account to streamline the application process.',
+            'Log on to Apply or continue assessment.',
+        'anzscoInfo': '',
         'image': 'assets/images/Create_account_with_VETASSESS _1.jpg',
         'imageOnRight': false,
+        'linkText': 'Create an Account',
       },
       {
         'step': 'Step 4',
-        'title': 'Submit your application and documents',
+        'title': 'Submit your Application',
         'description':
-            'Complete the online application form and upload all required documentation, including qualifications, employment evidence, and identification documents.',
-        'anzscoInfo':
-            'Ensure your documentation clearly demonstrates how your skills and experience align with your nominated ANZSCO occupation.',
+            'Complete the online application form and upload high-quality color scans of the necessary documents. Ensure that you thoroughly read and understand the document requirements before applying. Failure to provide all the relevant documents in the correct format may result in a delay in processing your application, extending beyond the standard processing times. If you wish to have your application processed under Priority Processing, you should select this option on your application when submitting it.',
+        'anzscoInfo': '',
         'image': 'assets/images/general_skills_application.jpg',
         'imageOnRight': true,
+        'linkText': 'Apply Now',
       },
       {
         'step': 'Step 5',
-        'title': 'Application processing',
+        'title': 'During your Application',
         'description':
-            'Your application will be reviewed by VETASSESS assessors. You may be contacted for additional information or clarification during this stage.',
-        'anzscoInfo':
-            'VETASSESS assessors will compare your qualifications and experience against the ANZSCO standards for your nominated occupation.',
+            'Your application will be allocated to an assessment officer and if there are additional documents required you will be notified online. If you need to Withdraw my application, you can do so through the online portal.',
+        'anzscoInfo': '',
         'image': 'assets/images/During_your_application.jpg',
         'imageOnRight': false,
+        'linkText': 'Track your Application',
       },
       {
         'step': 'Step 6',
-        'title': 'Receive assessment outcome',
+        'title': 'Application Outcome',
         'description':
-            'Once assessment is complete, you will receive an outcome letter indicating whether your skills have been positively assessed for your nominated occupation.',
-        'anzscoInfo':
-            'If successful, you can use your skills assessment for migration purposes as specified in the Department of Home Affairs requirements.',
+            'Once your skills assessment application is complete, you will be able to view and download your skills assessment outcome letter from the online portal.',
+        'anzscoInfo': '',
         'image': 'assets/images/Application_Outcome.jpg',
         'imageOnRight': true,
+        'linkText': 'Apply Now or View Application',
       },
     ];
 
@@ -123,7 +229,7 @@ class ProcessStepsSection extends StatelessWidget {
       width: screenWidth,
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.05,
-        vertical: index == 0 ? 20 : 50,
+        vertical: index == 0 ? 40 : 60,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,55 +240,64 @@ class ProcessStepsSection extends StatelessWidget {
             child: Image.asset(
               stepData['image'],
               width: screenWidth * 0.9,
+              height: 200,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(height: 24),
-          // Info below the image
+          const SizedBox(height: 32),
+          // Step number and title
           Text(
             stepData['step'],
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF006064),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            stepData['title'],
-            style: const TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Color(0xFF006064),
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            stepData['description'],
+            stepData['title'],
             style: const TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Information on the ANZSCO description',
-            style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF006064),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            stepData['anzscoInfo'],
-            style: const TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              letterSpacing: 0.3,
+          const SizedBox(height: 20),
+          // Description with rich text
+          _buildRichText(stepData['description'], fontSize: 16),
+          const SizedBox(height: 24),
+          // ANZSCO info section (only if not empty)
+          if (stepData['anzscoInfo'].isNotEmpty) ...[
+            const Text(
+              'Information on the ANZSCO description',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF006064),
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            _buildRichText(stepData['anzscoInfo'], fontSize: 16),
+            const SizedBox(height: 24),
+          ],
+          // Link button
+          if (stepData['linkText'] != null)
+            InkWell(
+              onTap: () {
+                // Handle link tap
+                print('Navigate to: ${stepData['linkText']}');
+              },
+              child: Text(
+                stepData['linkText'],
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF006064),
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -196,92 +311,107 @@ class ProcessStepsSection extends StatelessWidget {
     required bool isTablet,
   }) {
     final double horizontalPadding =
-        isDesktop ? screenWidth * 0.1 : screenWidth * 0.05;
-    final double infoColumnWidth =
-        isDesktop ? screenWidth * 0.3 : screenWidth * 0.45;
-    final double imageWidth = isDesktop ? screenWidth * 0.4 : screenWidth * 0.4;
-    final double verticalSpacing =
-        isDesktop ? (index == 0 ? 0 : 100) : (index == 0 ? 0 : 50);
+        isDesktop ? screenWidth * 0.08 : screenWidth * 0.05;
+    final double contentWidth =
+        isDesktop ? screenWidth * 0.84 : screenWidth * 0.9;
+    final double imageWidth = isDesktop ? contentWidth * 0.45 : contentWidth * 0.4;
+    final double textWidth = isDesktop ? contentWidth * 0.45 : contentWidth * 0.5;
+    final double verticalSpacing = isDesktop ? 80 : 60;
 
-    final Widget stepInfoColumn = Container(
-      width: infoColumnWidth,
-      constraints: BoxConstraints(minHeight: isDesktop ? 400 : 300),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    final Widget stepInfoColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
           Text(
             stepData['step'],
             style: TextStyle(
-              fontSize: isDesktop ? 24 : 20,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF006064),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            stepData['title'],
-            style: TextStyle(
-              fontSize: isDesktop ? 20 : 18,
+              fontSize: isDesktop ? 28 : 24,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF006064),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            stepData['description'],
+            stepData['title'],
             style: TextStyle(
-              fontSize: isDesktop ? 16 : 14,
-              height: 1.5,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Information on the ANZSCO description',
-            style: TextStyle(
-              fontSize: isDesktop ? 20 : 18,
+              fontSize: isDesktop ? 24 : 20,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF006064),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            stepData['anzscoInfo'],
-            style: TextStyle(
-              fontSize: isDesktop ? 16 : 14,
-              height: 1.5,
-              letterSpacing: 0.3,
+          const SizedBox(height: 24),
+          // Description with rich text
+          _buildRichText(stepData['description'], fontSize: isDesktop ? 16 : 15),
+          // ANZSCO info section (only if not empty)
+          if (stepData['anzscoInfo'].isNotEmpty) ...[
+            const SizedBox(height: 32),
+            Text(
+              'Information on the ANZSCO description',
+              style: TextStyle(
+                fontSize: isDesktop ? 20 : 18,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF006064),
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            _buildRichText(stepData['anzscoInfo'], fontSize: isDesktop ? 16 : 15),
+          ],
+          // Link button
+          if (stepData['linkText'] != null) ...[
+            const SizedBox(height: 24),
+            InkWell(
+              onTap: () {
+                // Handle link tap
+                print('Navigate to: ${stepData['linkText']}');
+              },
+              child: Text(
+                stepData['linkText'],
+                style: TextStyle(
+                  fontSize: isDesktop ? 16 : 15,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF006064),
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
         ],
+      );
+    
+  
+
+    final Widget imageWidget = Flexible(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset(
+          stepData['image'],
+          width: imageWidth,
+          height: isDesktop ? 350 : 280,
+          fit: BoxFit.cover,
+        ),
       ),
     );
-
-    final Widget imageWidget = ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.asset(
-        stepData['image'],
-        width: imageWidth,
-        fit: BoxFit.cover,
-      ),
-    );
-
-    final List<Widget> rowChildren =
-        stepData['imageOnRight']
-            ? [stepInfoColumn, const Spacer(), imageWidget]
-            : [imageWidget, const Spacer(), stepInfoColumn];
 
     return Container(
       width: screenWidth,
       padding: EdgeInsets.symmetric(
         horizontal: horizontalPadding,
-        vertical: verticalSpacing,
+        vertical: index == 0 ? 40 : verticalSpacing,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: rowChildren,
+        children: stepData['imageOnRight']
+            ? [
+                Expanded(flex: 45, child: stepInfoColumn),
+                const Spacer(flex: 10),
+                Expanded(flex: 45, child: imageWidget),
+              ]
+            : [
+                Expanded(flex: 45, child: imageWidget),
+                const Spacer(flex: 10),
+                Expanded(flex: 45, child: stepInfoColumn),
+              ],
       ),
     );
   }
