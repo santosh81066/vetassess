@@ -3,11 +3,13 @@ import 'dart:html' as html;
 import 'dart:js' as js;
 import 'dart:js_util' as js_util;
 import 'dart:async';
+import 'dart:convert';
 
 class CashfreeService {
   // Use only public/client-side credentials
   static const String _appId = '992060107cd5c2bce28587a7e7060299';
-  static const String _environment = 'sandbox';
+  static const String _environment =
+      'sandbox'; // Change to 'production' for live
 
   // Simple flag to track payment state
   static bool _isPaymentActive = false;
@@ -38,7 +40,7 @@ class CashfreeService {
 
       // Set up one-time callback
       js.context[callbackName] = js.allowInterop((dynamic result) {
-        print('Payment callback executed once');
+        print('Payment callback executed: $result');
 
         // Immediately remove the callback to prevent loops
         js.context[callbackName] = null;
@@ -66,11 +68,12 @@ class CashfreeService {
           }
         } catch (e) {
           print('Callback error: $e');
-          onFailure('Payment processing error');
+          onFailure('Payment processing error: $e');
         }
       });
 
-      // Simple payment initiation
+      // For production, you should create order on your backend
+      // and get paymentSessionId. For now, we'll use order details directly
       _startPayment(
         orderIdFinal,
         amount,
@@ -82,11 +85,14 @@ class CashfreeService {
       );
 
       // Safety timeout
-      Timer(Duration(minutes: 5), () {
+      Timer(Duration(minutes: 10), () {
         if (_isPaymentActive) {
           print('Payment timeout - cleaning up');
-          js.context[callbackName] = null;
+          if (js.context[callbackName] != null) {
+            js.context[callbackName] = null;
+          }
           _isPaymentActive = false;
+          onFailure('Payment timeout');
         }
       });
     } catch (e) {
@@ -104,7 +110,12 @@ class CashfreeService {
     String callbackName,
     Function(String) onFailure,
   ) {
-    // Simple direct call without complex JavaScript
+    // In a real app, you should:
+    // 1. Call your backend to create an order
+    // 2. Get paymentSessionId from the response
+    // 3. Pass paymentSessionId to the frontend
+
+    // For demo purposes, we're passing order details directly
     html.window.postMessage({
       'type': 'start_cashfree_payment',
       'data': {
@@ -116,8 +127,34 @@ class CashfreeService {
         'customerPhone': customerPhone,
         'environment': _environment,
         'callbackName': callbackName,
+        // Note: In production, you should get this from your backend
+        // 'paymentSessionId': 'session_id_from_backend',
       },
     }, '*');
+  }
+
+  // Create order (this should be done on your backend in production)
+  static Future<Map<String, dynamic>?> createOrder({
+    required String orderId,
+    required double amount,
+    required String customerName,
+    required String customerEmail,
+    required String customerPhone,
+  }) async {
+    // WARNING: This is for demo only - never put secret keys in frontend!
+    // In production, this should be done on your backend server
+
+    try {
+      // This is just a placeholder - you need to implement backend order creation
+      return {
+        'orderId': orderId,
+        'paymentSessionId': 'demo_session_id', // This should come from backend
+        'status': 'OK',
+      };
+    } catch (e) {
+      print('Error creating order: $e');
+      return null;
+    }
   }
 
   // Simple property extraction
@@ -141,17 +178,23 @@ class CashfreeService {
 
   static void ensureCashfreeSDKLoaded() {
     print('Checking Cashfree SDK...');
+
+    // Check if Cashfree is available
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      try {
+        var cashfree = js.context['Cashfree'];
+        if (cashfree != null) {
+          print('Cashfree SDK loaded successfully');
+          timer.cancel();
+        }
+      } catch (e) {
+        // Still loading
+      }
+    });
   }
 }
 
-// Simplified extensions and models
-extension CashfreeUrlHandler on String {
-  Map<String, String> get urlParameters {
-    final uri = Uri.parse(this);
-    return uri.queryParameters;
-  }
-}
-
+// Payment result model
 class PaymentResult {
   final String status;
   final String? orderId;
@@ -168,4 +211,22 @@ class PaymentResult {
   });
 
   bool get isSuccess => status.toLowerCase() == 'success';
+
+  factory PaymentResult.fromMap(Map<String, dynamic> map) {
+    return PaymentResult(
+      status: map['status'] ?? 'FAILED',
+      orderId: map['orderId'],
+      paymentId: map['paymentId'],
+      signature: map['signature'],
+      message: map['message'],
+    );
+  }
+}
+
+// Extension for URL parameters (keeping for compatibility)
+extension CashfreeUrlHandler on String {
+  Map<String, String> get urlParameters {
+    final uri = Uri.parse(this);
+    return uri.queryParameters;
+  }
 }

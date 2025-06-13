@@ -227,7 +227,7 @@ class _SecurePaymentWidgetState extends State<SecurePaymentWidget> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                             : const Icon(Icons.payment),
-                    label: const Text('Pay Now (Popup)'),
+                    label: const Text('Pay Now'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -235,7 +235,7 @@ class _SecurePaymentWidgetState extends State<SecurePaymentWidget> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '✓ Secure popup payment window',
+                  '✓ Secure payment window',
                   style: TextStyle(fontSize: 12, color: Colors.green.shade600),
                 ),
               ],
@@ -244,31 +244,6 @@ class _SecurePaymentWidgetState extends State<SecurePaymentWidget> {
         ),
 
         const SizedBox(height: 16),
-
-        // Instructions
-        Card(
-          color: Colors.grey.shade50,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Instructions:',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  '1. Ensure you have included Cashfree SDK scripts in your index.html\n'
-                  '2. Popup method is recommended for better user experience\n'
-                  '3. This implementation is secure for frontend-only apps\n'
-                  '4. Test with small amounts in sandbox mode',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
