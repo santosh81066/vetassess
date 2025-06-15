@@ -92,6 +92,38 @@ class _EducationFormState extends ConsumerState<EducationForm> {
     );
   }
 
+  // Method to show date picker and return formatted date
+  Future<void> _selectDate(TextEditingController controller, {bool isRequired = false}) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+      helpText: 'Select Date',
+      cancelText: 'Cancel',
+      confirmText: 'OK',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.teal,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      // Format the date as dd/mm/yyyy
+      final formattedDate = '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
+      controller.text = formattedDate;
+    }
+  }
+
   Future<void> _continue() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -489,24 +521,31 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
   Widget buildDateField(TextEditingController controller) {
     return SizedBox(
-      width: 150,
+      width: 200, // Increased width to accommodate dd/mm/yyyy format
       height: 34,
       child: TextFormField(
         controller: controller,
+        readOnly: true, // Make it read-only so users can't type
+        onTap: () => _selectDate(controller), // Open calendar on tap
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
-          hintText: 'MM/yyyy',
+          hintText: 'dd/mm/yyyy',
           hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          suffixIcon: Icon(
+            Icons.calendar_today,
+            size: 16,
+            color: Colors.grey.shade600,
+          ),
         ),
         validator: (value) {
           if (value != null && value.isNotEmpty) {
-            final regex = RegExp(r'^\d{2}/\d{4}$');
+            final regex = RegExp(r'^\d{2}/\d{2}/\d{4}$');
             if (!regex.hasMatch(value)) {
-              return 'Use MM/yyyy format';
+              return 'Use dd/mm/yyyy format';
             }
           }
           return null;

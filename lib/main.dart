@@ -29,6 +29,7 @@ import 'package:vetassess/screens/payment_screen.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
 import 'package:vetassess/screens/profissional_viewall.dart';
 import 'package:vetassess/screens/registration_page.dart';
+import 'package:vetassess/screens/review_and_confirm.dart';
 import 'package:vetassess/screens/skills_assessment_support.dart';
 import 'package:vetassess/screens/tertiary_education.dart';
 import 'package:vetassess/widgets/SkillsAssessmentDropdownPanel.dart';
@@ -47,9 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     // Add refresh listenable to rebuild router when login state changes
     refreshListenable: RouterRefreshNotifier(ref),
-    redirect: (context, state) {
+    redirect: (context, state) async {
       // Get current login state
       final loginState = ref.read(loginProvider);
+      final loginNotifier = ref.read(loginProvider.notifier);
       final currentPath = state.fullPath;
 
       // Define login paths
@@ -80,10 +82,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAnyProtectedRoute =
           isApplicantProtectedRoute || isAdminProtectedRoute;
 
+      // For protected routes, validate session before proceeding
+      if (isAnyProtectedRoute) {
+        final isSessionValid = await loginNotifier.validateSession();
+        if (!isSessionValid) {
+          return '/login';
+        }
+      }
+
       // If user is logged in and trying to access login page
       if (loginState.isSuccess && loginState.response != null && isLoginPath) {
         // Navigate based on user role
-        final loginNotifier = ref.read(loginProvider.notifier);
         return loginNotifier.getNavigationRouteForRole();
       }
 
@@ -156,6 +165,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/skills_assess_support',
         builder: (context, state) => const SkillsAssessmentSupport(),
+        
       ),
       GoRoute(
         path: '/nominate_screen',
@@ -231,6 +241,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/appli_opt',
         builder: (context, state) => const AppliOptions(),
       ),
+       GoRoute(
+        path: '/get_all_forms',
+        builder: (context, state) => const ReviewAndConfirm(),
+      ),
     ],
   );
 });
@@ -243,7 +257,8 @@ class RouterRefreshNotifier extends ChangeNotifier {
     _subscription = ref.listen(loginProvider, (previous, next) {
       // Notify router to refresh when login state or role changes
       if (previous?.isSuccess != next.isSuccess ||
-          previous?.userRole != next.userRole) {
+          previous?.userRole != next.userRole ||
+          previous?.response?.userId != next.response?.userId) {
         notifyListeners();
       }
     });

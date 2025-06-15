@@ -59,14 +59,54 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   bool get anyCheckboxSelected =>
       internshipChecked || thesisChecked || majorProjectChecked;
 
- @override
-void initState() {
-  super.initState();
-  // Clear any previous state when entering the form
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    ref.read(tertiaryEducationProvider.notifier).resetState();
-  });
-}
+  // Responsive helper methods
+  double _getFieldWidth(BuildContext context, double baseWidth) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final availableWidth = screenWidth * 0.7 * 0.6; // 60% of the right column
+    
+    if (screenWidth < 768) {
+      return availableWidth * 0.9;
+    } else if (screenWidth < 1024) {
+      return baseWidth * 0.8;
+    }
+    return baseWidth;
+  }
+
+  double _getNavWidth(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 768) {
+      return screenWidth * 0.25;
+    } else if (screenWidth < 1024) {
+      return screenWidth * 0.28;
+    }
+    return screenWidth * 0.3;
+  }
+
+  double _getFontSize(BuildContext context, double baseSize) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 768) {
+      return baseSize * 0.9;
+    }
+    return baseSize;
+  }
+
+  EdgeInsets _getMargin(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 768) {
+      return const EdgeInsets.all(8.0);
+    } else if (screenWidth < 1024) {
+      return const EdgeInsets.all(12.0);
+    }
+    return const EdgeInsets.all(16.0);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(tertiaryEducationProvider.notifier).resetState();
+    });
+  }
 
   @override
   void dispose() {
@@ -83,7 +123,7 @@ void initState() {
 
   String? _validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return null; // Not required
+      return null;
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value.trim())) {
@@ -119,7 +159,6 @@ void initState() {
       return false;
     }
 
-    // Additional validation for dropdowns
     if (awardingBodyCountry == null) {
       _showErrorDialog('Please select Awarding Body Country.');
       return false;
@@ -133,7 +172,6 @@ void initState() {
       return false;
     }
 
-    // Validate course length
     if (_controllers['courseLengthYears']!.text.isEmpty &&
         _controllers['courseLengthSemesters']!.text.isEmpty) {
       _showErrorDialog(
@@ -142,7 +180,6 @@ void initState() {
       return false;
     }
 
-    // Validate checkbox requirements
     if (anyCheckboxSelected &&
         _controllers['activityDetails']!.text.trim().isEmpty) {
       _showErrorDialog(
@@ -157,17 +194,14 @@ void initState() {
   Map<String, dynamic> _createFormData() {
     final formData = <String, dynamic>{};
     
-    // Add all text field values
     _controllers.forEach((key, controller) {
       formData[key] = controller.text.trim();
     });
     
-    // Add dropdown values
     formData['awardingBodyCountry'] = awardingBodyCountry;
     formData['institutionCountry'] = institutionCountry;
     formData['studyMode'] = studyMode;
     
-    // Add checkbox states
     formData['internshipChecked'] = internshipChecked;
     formData['thesisChecked'] = thesisChecked;
     formData['majorProjectChecked'] = majorProjectChecked;
@@ -191,49 +225,47 @@ void initState() {
     );
   }
 
-void _showSuccessDialog() {
-  print('_showSuccessDialog called');
-  
-  if (!mounted) {
-    print('Widget not mounted, skipping dialog');
-    return;
-  }
+  void _showSuccessDialog() {
+    print('_showSuccessDialog called');
+    
+    if (!mounted) {
+      print('Widget not mounted, skipping dialog');
+      return;
+    }
 
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 28),
-            SizedBox(width: 8),
-            Text('Success'),
-          ],
-        ),
-        content: const Text(
-          'Tertiary qualification has been saved successfully!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              print('Continue button pressed');
-              Navigator.of(context).pop(); // Close dialog
-              
-              // Clear the provider state before navigation
-              ref.read(tertiaryEducationProvider.notifier).resetState();
-              
-              // Navigate to next page
-              print('Navigating to /doc_upload');
-              context.go('/doc_upload');
-            },
-            child: const Text('Continue'),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Text('Success'),
+            ],
           ),
-        ],
-      );
-    },
-  );
-}
+          content: const Text(
+            'Tertiary qualification has been saved successfully!',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                print('Continue button pressed');
+                Navigator.of(context).pop();
+                
+                ref.read(tertiaryEducationProvider.notifier).resetState();
+                
+                print('Navigating to /doc_upload');
+                context.go('/employment_form');
+              },
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -264,249 +296,71 @@ void _showSuccessDialog() {
 
   @override
   Widget build(BuildContext context) {
-    
     ref.listen<TertiaryEducationState>(tertiaryEducationProvider, (previous, next) {
+      if (next.isSuccess && (previous?.isSuccess != true)) {
+        print('Triggering success dialog');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showSuccessDialog();
+        });
+      } 
+      else if (next.errorMessage != null && 
+               next.errorMessage!.isNotEmpty && 
+               previous?.errorMessage != next.errorMessage) {
+        print('Triggering error dialog');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showErrorDialog(next.errorMessage!);
+        });
+      }
+    });
     
-    // Check for success transition
-    if (next.isSuccess && (previous?.isSuccess != true)) {
-      print('Triggering success dialog');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showSuccessDialog();
-      });
-    } 
-    // Check for error
-    else if (next.errorMessage != null && 
-             next.errorMessage!.isNotEmpty && 
-             previous?.errorMessage != next.errorMessage) {
-      print('Triggering error dialog');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showErrorDialog(next.errorMessage!);
-      });
-    }
-  });
     final providerState = ref.watch(tertiaryEducationProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return LoginPageLayout(
       child: Stack(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
-                child: const Align(
-                  alignment: Alignment.topRight,
-                  child: ApplicationNav(),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Tertiary education',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF4D4D4D),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Text(
-                                    '* ',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Required Fields',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Provide details of all completed post-secondary qualifications. VETASSESS will assess those qualifications necessary for the applicant to meet the minimum requirements of the nominated occupation.',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              const SizedBox(height: 24),
-                              _buildSection('Qualification Details', [
-                                _buildField(
-                                  'Student registration number',
-                                  'studentRegistration',
-                                  200,
-                                  helperText: '(if available)',
-                                ),
-                                _buildField(
-                                  'Name of qualification obtained',
-                                  'qualificationName',
-                                  350,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Qualification name',
-                                  ),
-                                ),
-                                _buildField(
-                                  'Major field of study',
-                                  'majorField',
-                                  350,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Major field',
-                                  ),
-                                ),
-                              ]),
-                              _buildSection('Awarding Body Details', [
-                                _buildField(
-                                  'Name of awarding body',
-                                  'awardingBodyName',
-                                  350,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Awarding body name',
-                                  ),
-                                ),
-                                _buildDropdownField(
-                                  'Awarding Body Country',
-                                  awardingBodyCountry,
-                                  (v) => setState(() => awardingBodyCountry = v),
-                                  350,
-                                  required: true,
-                                ),
-                                _buildField(
-                                  'Campus you attended',
-                                  'campusAttended',
-                                  350,
-                                ),
-                                _buildField(
-                                  'Name of institution you attended',
-                                  'institutionName',
-                                  350,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Institution name',
-                                  ),
-                                ),
-                                _buildField(
-                                  'Street address',
-                                  'streetAddress1',
-                                  280,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Street address',
-                                  ),
-                                ),
-                                _buildField(
-                                  'Street address second line',
-                                  'streetAddress2',
-                                  280,
-                                ),
-                                _buildField(
-                                  'Suburb/City',
-                                  'suburbCity',
-                                  180,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Suburb/City',
-                                  ),
-                                ),
-                                _buildField('State', 'state', 180),
-                                _buildField('Post code', 'postCode', 180),
-                                _buildDropdownField(
-                                  'Campus/Institution Country',
-                                  institutionCountry,
-                                  (v) => setState(() => institutionCountry = v),
-                                  350,
-                                  required: true,
-                                ),
-                              ]),
-                              _buildSection('Course Details', [
-                                _buildField(
-                                  'What was the normal entry requirement for\nthe course?',
-                                  'normalEntryRequirement',
-                                  250,
-                                  required: true,
-                                  validator: (value) => _validateRequired(
-                                    value,
-                                    'Normal entry requirement',
-                                  ),
-                                ),
-                                _buildField(
-                                  'If different, what was the basis of your entry into\nthe course?',
-                                  'entryBasis',
-                                  250,
-                                ),
-                                _buildCourseLengthField(),
-                                _buildDateField(
-                                  'Date course commenced',
-                                  'courseStartDate',
-                                  required: true,
-                                ),
-                                _buildDateField(
-                                  'Date course completed',
-                                  'courseEndDate',
-                                  required: true,
-                                ),
-                                _buildDateField(
-                                  'Date qualification awarded',
-                                  'qualificationAwardedDate',
-                                ),
-                                _buildDropdownField(
-                                  'Study Mode',
-                                  studyMode,
-                                  (v) => setState(() => studyMode = v),
-                                  180,
-                                  required: true,
-                                  isStudyMode: true,
-                                ),
-                                _buildField(
-                                  'Hours per week',
-                                  'hoursPerWeek',
-                                  180,
-                                  required: true,
-                                  validator: (value) => _validateNumber(
-                                    value,
-                                    'Hours per week',
-                                  ),
-                                ),
-                              ]),
-                              _buildAdditionalRequirementsSection(),
-                              const SizedBox(height: 32),
-                              _buildButtons(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+          // Use LayoutBuilder for better responsive handling
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Switch to column layout on small screens
+              if (screenWidth < 768) {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: const ApplicationNav(),
+                      ),
+                      Container(
+                        margin: _getMargin(context),
+                        child: _buildFormContent(context),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ],
+                );
+              } else {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: _getNavWidth(context),
+                      child: const Align(
+                        alignment: Alignment.topRight,
+                        child: ApplicationNav(),
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: _getMargin(context),
+                          child: _buildFormContent(context),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
           // Loading overlay
           if (providerState.isLoading)
@@ -533,14 +387,239 @@ void _showSuccessDialog() {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> children) {
+  Widget _buildFormContent(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Tertiary education',
+            style: TextStyle(
+              fontSize: _getFontSize(context, 24),
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF4D4D4D),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            padding: _getMargin(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '* ',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: _getFontSize(context, 14),
+                      ),
+                    ),
+                    Text(
+                      'Required Fields',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: _getFontSize(context, 14),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Provide details of all completed post-secondary qualifications. VETASSESS will assess those qualifications necessary for the applicant to meet the minimum requirements of the nominated occupation.',
+                  style: TextStyle(fontSize: _getFontSize(context, 14)),
+                ),
+                const SizedBox(height: 24),
+                _buildSection(context, 'Qualification Details', [
+                  _buildField(
+                    context,
+                    'Student registration number',
+                    'studentRegistration',
+                    200,
+                    helperText: '(if available)',
+                  ),
+                  _buildField(
+                    context,
+                    'Name of qualification obtained',
+                    'qualificationName',
+                    350,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Qualification name',
+                    ),
+                  ),
+                  _buildField(
+                    context,
+                    'Major field of study',
+                    'majorField',
+                    350,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Major field',
+                    ),
+                  ),
+                ]),
+                _buildSection(context, 'Awarding Body Details', [
+                  _buildField(
+                    context,
+                    'Name of awarding body',
+                    'awardingBodyName',
+                    350,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Awarding body name',
+                    ),
+                  ),
+                  _buildDropdownField(
+                    context,
+                    'Awarding Body Country',
+                    awardingBodyCountry,
+                    (v) => setState(() => awardingBodyCountry = v),
+                    350,
+                    required: true,
+                  ),
+                  _buildField(
+                    context,
+                    'Campus you attended',
+                    'campusAttended',
+                    350,
+                  ),
+                  _buildField(
+                    context,
+                    'Name of institution you attended',
+                    'institutionName',
+                    350,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Institution name',
+                    ),
+                  ),
+                  _buildField(
+                    context,
+                    'Street address',
+                    'streetAddress1',
+                    280,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Street address',
+                    ),
+                  ),
+                  _buildField(
+                    context,
+                    'Street address second line',
+                    'streetAddress2',
+                    280,
+                  ),
+                  _buildField(
+                    context,
+                    'Suburb/City',
+                    'suburbCity',
+                    180,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Suburb/City',
+                    ),
+                  ),
+                  _buildField(context, 'State', 'state', 180),
+                  _buildField(context, 'Post code', 'postCode', 180),
+                  _buildDropdownField(
+                    context,
+                    'Campus/Institution Country',
+                    institutionCountry,
+                    (v) => setState(() => institutionCountry = v),
+                    350,
+                    required: true,
+                  ),
+                ]),
+                _buildSection(context, 'Course Details', [
+                  _buildField(
+                    context,
+                    'What was the normal entry requirement for\nthe course?',
+                    'normalEntryRequirement',
+                    250,
+                    required: true,
+                    validator: (value) => _validateRequired(
+                      value,
+                      'Normal entry requirement',
+                    ),
+                  ),
+                  _buildField(
+                    context,
+                    'If different, what was the basis of your entry into\nthe course?',
+                    'entryBasis',
+                    250,
+                  ),
+                  _buildCourseLengthField(context),
+                  _buildDateField(
+                    context,
+                    'Date course commenced',
+                    'courseStartDate',
+                    required: true,
+                  ),
+                  _buildDateField(
+                    context,
+                    'Date course completed',
+                    'courseEndDate',
+                    required: true,
+                  ),
+                  _buildDateField(
+                    context,
+                    'Date qualification awarded',
+                    'qualificationAwardedDate',
+                  ),
+                  _buildDropdownField(
+                    context,
+                    'Study Mode',
+                    studyMode,
+                    (v) => setState(() => studyMode = v),
+                    180,
+                    required: true,
+                    isStudyMode: true,
+                  ),
+                  _buildField(
+                    context,
+                    'Hours per week',
+                    'hoursPerWeek',
+                    180,
+                    required: true,
+                    validator: (value) => _validateNumber(
+                      value,
+                      'Hours per week',
+                    ),
+                  ),
+                ]),
+                _buildAdditionalRequirementsSection(context),
+                const SizedBox(height: 32),
+                _buildButtons(context),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection(BuildContext context, String title, List<Widget> children) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: _getFontSize(context, 18),
             fontWeight: FontWeight.w500,
             color: Color(0xFF4D4D4D),
           ),
@@ -555,17 +634,19 @@ void _showSuccessDialog() {
   }
 
   Widget _buildField(
+    BuildContext context,
     String label,
     String key,
-    double width, {
+    double baseWidth, {
     bool required = false,
     String? helperText,
     String? Function(String?)? validator,
   }) {
     return _buildLabelledField(
+      context,
       label,
       SizedBox(
-        width: width,
+        width: _getFieldWidth(context, baseWidth),
         height: 34,
         child: TextFormField(
           controller: _controllers[key],
@@ -578,11 +659,12 @@ void _showSuccessDialog() {
     );
   }
 
-  Widget _buildDateField(String label, String key, {bool required = false}) {
+  Widget _buildDateField(BuildContext context, String label, String key, {bool required = false}) {
     return _buildLabelledField(
+      context,
       label,
       SizedBox(
-        width: 180,
+        width: _getFieldWidth(context, 180),
         height: 34,
         child: TextFormField(
           controller: _controllers[key],
@@ -608,10 +690,11 @@ void _showSuccessDialog() {
   }
 
   Widget _buildDropdownField(
+    BuildContext context,
     String label,
     String? value,
     ValueChanged<String?> onChanged,
-    double width, {
+    double baseWidth, {
     bool required = false,
     bool isStudyMode = false,
   }) {
@@ -620,9 +703,10 @@ void _showSuccessDialog() {
         : ['India', 'USA', 'UK', 'Australia', 'Canada'];
 
     return _buildLabelledField(
+      context,
       label,
       SizedBox(
-        width: width,
+        width: _getFieldWidth(context, baseWidth),
         height: 34,
         child: DropdownButtonFormField<String>(
           value: value,
@@ -640,84 +724,27 @@ void _showSuccessDialog() {
     );
   }
 
-  Widget _buildCourseLengthField() {
-    return _buildFormRow(
-      'Normal length of full-time course',
-      Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 60,
-                child: TextFormField(
-                  controller: _controllers['courseLengthYears'],
-                  decoration: _inputDecoration(),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text('OR', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 60,
-                child: TextFormField(
-                  controller: _controllers['courseLengthSemesters'],
-                  decoration: _inputDecoration(),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Row(
-            children: [
-              SizedBox(
-                width: 60,
-                child: Text(
-                  'Years',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-              SizedBox(width: 12),
-              Text('  '),
-              SizedBox(width: 12),
-              SizedBox(
-                width: 60,
-                child: Text(
-                  'Semesters',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      isRequired: true,
-    );
-  }
 
-  Widget _buildAdditionalRequirementsSection() {
+  Widget _buildAdditionalRequirementsSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Additional Course Requirements',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: _getFontSize(context, 18),
             fontWeight: FontWeight.w500,
             color: Color(0xFF4D4D4D),
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Were you required to complete any of the following before receiving the qualification?',
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: _getFontSize(context, 14)),
         ),
         const SizedBox(height: 16),
         _buildCheckboxWithWeeks(
+          context,
           'An internship, supervised practical training or work placement',
           internshipChecked,
           'internshipWeeks',
@@ -725,6 +752,7 @@ void _showSuccessDialog() {
         ),
         const SizedBox(height: 8),
         _buildCheckboxWithWeeks(
+          context,
           'A thesis',
           thesisChecked,
           'thesisWeeks',
@@ -732,6 +760,7 @@ void _showSuccessDialog() {
         ),
         const SizedBox(height: 8),
         _buildCheckboxWithWeeks(
+          context,
           'A major project',
           majorProjectChecked,
           'majorProjectWeeks',
@@ -740,9 +769,10 @@ void _showSuccessDialog() {
         if (anyCheckboxSelected) ...[
           const SizedBox(height: 16),
           _buildLabelledField(
+            context,
             'Activity details (including dates)',
             SizedBox(
-              width: 600,
+              width: _getFieldWidth(context, 600),
               child: TextFormField(
                 controller: _controllers['activityDetails'],
                 maxLines: 5,
@@ -759,47 +789,13 @@ void _showSuccessDialog() {
     );
   }
 
-  Widget _buildCheckboxWithWeeks(
-    String label,
-    bool value,
-    String weeksKey,
-    ValueChanged<bool?> onChanged,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
-        const SizedBox(width: 16),
-        if (value) ...[
-          const Text('Number of weeks spent', style: TextStyle(fontSize: 12)),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 60,
-            height: 30,
-            child: TextFormField(
-              controller: _controllers[weeksKey],
-              decoration: _inputDecoration(),
-              keyboardType: TextInputType.number,
-              validator: value
-                  ? (val) => _validateNumber(val, 'Number of weeks')
-                  : null,
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(value: value, onChanged: onChanged),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildButtons() {
+  Widget _buildButtons(BuildContext context) {
     final providerState = ref.watch(tertiaryEducationProvider);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 768;
 
-    return Row(
+    return Flex(
+      direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         OutlinedButton(
@@ -808,21 +804,30 @@ void _showSuccessDialog() {
             foregroundColor: Colors.teal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
+          // Continuation from where the code was cut off
           onPressed: providerState.isLoading
               ? null
               : () {
-                  // Reset form or navigate back
+                  // Clear form and reset state
+                  _controllers.values.forEach((controller) => controller.clear());
+                  setState(() {
+                    awardingBodyCountry = null;
+                    institutionCountry = null;
+                    studyMode = null;
+                    internshipChecked = false;
+                    thesisChecked = false;
+                    majorProjectChecked = false;
+                  });
                   ref.read(tertiaryEducationProvider.notifier).resetState();
-                  context.pop();
                 },
-          child: const Text('Cancel'),
+          child: const Text('Clear'),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: isSmallScreen ? 0 : 16, height: isSmallScreen ? 12 : 0),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.teal,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
           ),
           onPressed: providerState.isLoading ? null : _submitForm,
           child: providerState.isLoading
@@ -834,107 +839,349 @@ void _showSuccessDialog() {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : const Text('Save & Continue'),
+              : const Text('Save and Continue'),
         ),
       ],
     );
   }
 
   Widget _buildLabelledField(
+    BuildContext context,
     String label,
     Widget field, {
     bool isRequired = false,
     String? helperText,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
+    return _buildFormRow(
+      context,
+      label,
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 12,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label, style: const TextStyle(fontSize: 14)),
-                  if (isRequired)
-                    const Text(
-                      ' *',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
+          field,
+          if (helperText != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              helperText,
+              style: TextStyle(
+                fontSize: _getFontSize(context, 12),
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
               ),
             ),
+          ],
+        ],
+      ),
+      isRequired: isRequired,
+    );
+  }
+
+// Replace the _buildFormRow method with this corrected version
+Widget _buildFormRow(
+  BuildContext context,
+  String label,
+  Widget field, {
+  bool isRequired = false,
+}) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isSmallScreen = screenWidth < 768;
+
+  if (isSmallScreen) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (isRequired)
+                Text(
+                  '* ',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: _getFontSize(context, 14),
+                  ),
+                ),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: _getFontSize(context, 14),
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF4D4D4D),
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 8),
+          field,
+        ],
+      ),
+    );
+  }
+
+  // Desktop layout - right-align the field to the label
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 16.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label section - takes up left portion
+        Expanded(
+          flex: 3,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0, right: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end, // Right align the label
               children: [
-                field,
-                if (helperText != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      helperText,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                if (isRequired)
+                  Text(
+                    '* ',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: _getFontSize(context, 14),
                     ),
                   ),
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: _getFontSize(context, 14),
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF4D4D4D),
+                    ),
+                    textAlign: TextAlign.right, // Right align text
+                  ),
+                ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        // Field section - takes up right portion
+        Expanded(
+          flex: 2,
+          child: field,
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildFormRow(String label, Widget field, {bool isRequired = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 12,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label, style: const TextStyle(fontSize: 14)),
-                  if (isRequired)
-                    const Text(
-                      ' *',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
+// Also update the _buildCheckboxWithWeeks method for proper alignment
+Widget _buildCheckboxWithWeeks(
+  BuildContext context,
+  String label,
+  bool value,
+  String weeksKey,
+  ValueChanged<bool?> onChanged,
+) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isSmallScreen = screenWidth < 768;
+  
+  if (isSmallScreen) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label, 
+                style: TextStyle(fontSize: _getFontSize(context, 14))
               ),
             ),
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(value: value, onChanged: onChanged),
+            ),
+          ],
+        ),
+        if (value) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                'Number of weeks spent', 
+                style: TextStyle(fontSize: _getFontSize(context, 12))
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 60,
+                height: 30,
+                child: TextFormField(
+                  controller: _controllers[weeksKey],
+                  decoration: _inputDecoration(),
+                  keyboardType: TextInputType.number,
+                  validator: value
+                      ? (val) => _validateNumber(val, 'Number of weeks')
+                      : null,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(flex: 20, child: field),
         ],
-      ),
+      ],
     );
   }
+  
+  // Desktop layout - right-aligned like other fields
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Label section
+        Expanded(
+          flex: 3,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Text(
+              label,
+              style: TextStyle(fontSize: _getFontSize(context, 14)),
+              textAlign: TextAlign.right, // Right align text
+            ),
+          ),
+        ),
+        // Field section
+        Expanded(
+          flex: 2,
+          child: Row(
+            children: [
+              if (value) ...[
+                Text(
+                  'Number of weeks spent',
+                  style: TextStyle(fontSize: _getFontSize(context, 12)),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 60,
+                  height: 30,
+                  child: TextFormField(
+                    controller: _controllers[weeksKey],
+                    decoration: _inputDecoration(),
+                    keyboardType: TextInputType.number,
+                    validator: value
+                        ? (val) => _validateNumber(val, 'Number of weeks')
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 16),
+              ],
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(value: value, onChanged: onChanged),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// Update the course length field for proper alignment
+Widget _buildCourseLengthField(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isSmallScreen = screenWidth < 768;
+  
+  return _buildFormRow(
+    context,
+    'Normal length of full-time course',
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flex(
+          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+              child: TextFormField(
+                controller: _controllers['courseLengthYears'],
+                decoration: _inputDecoration(),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
+            Text('OR', style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: _getFontSize(context, 14),
+            )),
+            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
+            SizedBox(
+              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+              child: TextFormField(
+                controller: _controllers['courseLengthSemesters'],
+                decoration: _inputDecoration(),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Flex(
+          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+          children: [
+            SizedBox(
+              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+              child: Text(
+                'Years',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: _getFontSize(context, 12)),
+              ),
+            ),
+            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
+            if (!isSmallScreen) const Text('  '),
+            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
+            SizedBox(
+              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+              child: Text(
+                'Semesters',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: _getFontSize(context, 12)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+    isRequired: true,
+  );
+}
 
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(4),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: Colors.grey.shade400),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: BorderSide(color: Colors.grey.shade400),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(color: Colors.teal, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(color: Colors.red, width: 2),
       ),
       hintText: hintText,
+      hintStyle: TextStyle(
+        color: Colors.grey.shade500,
+        fontSize: 14,
+      ),
       isDense: true,
     );
   }
