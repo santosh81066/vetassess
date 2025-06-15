@@ -48,6 +48,8 @@ class _HeaderState extends State<Header> {
   final GlobalKey _migrationNavKey = GlobalKey();
   final GlobalKey _nonMigrationNavKey = GlobalKey();
   final GlobalKey _businessNavKey = GlobalKey();
+  String _selectedLanguage = 'English';
+  final List<String> _languages = ['English', 'Chinese', 'Hindi'];
 
   void _showDropdown(GlobalKey key, Widget panel) {
     if (_isDropdownOpen) return;
@@ -250,137 +252,167 @@ class _HeaderState extends State<Header> {
     bool isMobile,
     double topBarHeight,
   ) {
-    return Flexible(
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // Flexible spacer
-          if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        // Flexible spacer
+        if (isDesktop || isTablet) Expanded(flex: 2, child: Container()),
 
-          // Top navigation items with responsive sizing
-          if (isDesktop || isTablet) ...[
-            _buildLanguageSelector(),
-            SizedBox(
-              width: ResponsiveUtils.getResponsiveValue(
-                context: context,
-                mobile: 12.0,
-                tablet: 16.0,
-                desktop: 24.0,
-              ),
+        // Top navigation items with responsive sizing
+        if (isDesktop || isTablet) ...[
+          _buildLanguageSelector(),
+          SizedBox(
+            width: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 12.0,
+              tablet: 16.0,
+              desktop: 24.0,
             ),
+          ),
 
-            // Desktop-only links
-            if (isDesktop) ...[
-              _TopLink(text: "About", onTap: () => context.go('/maintenance')),
-              SizedBox(width: 24),
-              _TopLink(
-                text: "Resources",
-                onTap: () => context.go('/maintenance'),
-              ),
-              const SizedBox(width: 24),
-              _TopLink(
-                text: "News & Updates",
-                onTap: () => context.go('/maintenance'),
-              ),
-              const SizedBox(width: 24),
-            ],
-
-            _buildLoginSection(),
-            SizedBox(
-              width: ResponsiveUtils.getResponsiveValue(
-                context: context,
-                mobile: 8.0,
-                tablet: 12.0,
-                desktop: 16.0,
-              ),
+          // Desktop-only links
+          if (isDesktop) ...[
+            _TopLink(text: "About", onTap: () => context.go('/about_us')),
+            const SizedBox(width: 24),
+            _TopLink(
+              text: "Resources",
+              onTap: () => context.go('/maintenance'),
             ),
+            const SizedBox(width: 24),
+            _TopLink(
+              text: "News & Updates",
+              onTap: () => context.go('/maintenance'),
+            ),
+            const SizedBox(width: 24),
           ],
 
-          // Apply Now Button with responsive sizing
-          Flexible(
-            child: Container(
-              height: topBarHeight * 0.8,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.go('/apply_now');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFA000),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ResponsiveUtils.getResponsiveValue(
-                      context: context,
-                      mobile: 8.0,
-                      tablet: 10.0,
-                      desktop: 12.0,
-                    ),
-                    vertical: 0,
-                  ),
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: ResponsiveUtils.getResponsiveValue(
-                      context: context,
-                      mobile: 10.0,
-                      tablet: 11.0,
-                      desktop: 13.0,
-                    ),
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-                child: const Text(
-                  "Apply Now",
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
+          _buildLoginSection(),
+          SizedBox(
+            width: ResponsiveUtils.getResponsiveValue(
+              context: context,
+              mobile: 8.0,
+              tablet: 12.0,
+              desktop: 16.0,
             ),
           ),
         ],
-      ),
+
+        // Apply Now Button with responsive sizing
+        Container(
+          height: topBarHeight * 0.8,
+          child: ElevatedButton(
+            onPressed: () {
+              context.go('/apply_now');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFA000),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: EdgeInsets.symmetric(
+                horizontal: ResponsiveUtils.getResponsiveValue(
+                  context: context,
+                  mobile: 10.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+                vertical: 0,
+              ),
+              textStyle: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: ResponsiveUtils.getResponsiveValue(
+                  context: context,
+                  mobile: 11.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+              ),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            child: const Text(
+              "Apply Now",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildLanguageSelector() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.language_outlined,
-          size: ResponsiveUtils.getResponsiveValue(
-            context: context,
-            mobile: 16.0,
-            tablet: 17.0,
-            desktop: 18.0,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          "English",
-          style: TextStyle(
-            fontSize: ResponsiveUtils.getResponsiveValue(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      // decoration: BoxDecoration(
+      //   border: Border.all(color: Colors.grey.shade300),
+      //   borderRadius: BorderRadius.circular(6),
+      // ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedLanguage,
+          isDense: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: ResponsiveUtils.getResponsiveValue(
               context: context,
-              mobile: 12.0,
-              tablet: 12.5,
-              desktop: 13.0,
+              mobile: 13.0,
+              tablet: 13.5,
+              desktop: 14.0,
             ),
             color: Colors.black54,
-            fontWeight: FontWeight.w500,
           ),
+          items:
+              _languages.map((String language) {
+                return DropdownMenuItem<String>(
+                  value: language,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.language_outlined,
+                        size: ResponsiveUtils.getResponsiveValue(
+                          context: context,
+                          mobile: 16.0,
+                          tablet: 17.0,
+                          desktop: 18.0,
+                        ),
+                        color: Colors.black54,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        language,
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.getResponsiveValue(
+                            context: context,
+                            mobile: 12.0,
+                            tablet: 12.5,
+                            desktop: 13.0,
+                          ),
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedLanguage = newValue!;
+            });
+            // Add your language change logic here
+            _onLanguageChanged(newValue!);
+          },
         ),
-        Icon(
-          Icons.keyboard_arrow_down,
-          size: ResponsiveUtils.getResponsiveValue(
-            context: context,
-            mobile: 13.0,
-            tablet: 13.5,
-            desktop: 14.0,
-          ),
-          color: Colors.black54,
-        ),
-      ],
+      ),
     );
+  }
+
+  // Add this method to handle language changes
+  void _onLanguageChanged(String language) {
+    // Implement your language change logic here
+    print('Language changed to: $language');
+    // You can add locale changes, API calls, or other logic here
   }
 
   Widget _buildLoginSection() {
@@ -513,7 +545,7 @@ class _HeaderState extends State<Header> {
                 _NavItem(
                   title: "Contact",
                   fontSize: fontSize,
-                  onTap: () => context.go('/payment_screen'),
+                  onTap: () => context.go('/contact_us'),
                 ),
                 SizedBox(width: sideMargin),
 
@@ -631,7 +663,7 @@ class _HeaderState extends State<Header> {
                 const Divider(),
                 _buildMobileMenuItem(
                   "About",
-                  onTap: () => context.go('/maintenance'),
+                  onTap: () => context.go('/about_us'),
                 ),
                 _buildMobileMenuItem(
                   "Resources",
@@ -641,7 +673,10 @@ class _HeaderState extends State<Header> {
                   "News & Updates",
                   onTap: () => context.go('/maintenance'),
                 ),
-                _buildMobileMenuItem("Login"),
+                _buildMobileMenuItem(
+                  "Login",
+                  onTap: () => context.go('/maintenance'),
+                ),
               ],
             ),
           ),
@@ -671,7 +706,6 @@ class _HeaderState extends State<Header> {
 class _TopLink extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
-
   const _TopLink({required this.text, this.onTap});
 
   @override

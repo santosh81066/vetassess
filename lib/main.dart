@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vetassess/providers/login_provider.dart';
+import 'package:vetassess/screens/about_us.dart';
 import 'package:vetassess/screens/admin_screens/user_application.dart';
 import 'package:vetassess/screens/admin_screens/users_list.dart';
 import 'package:vetassess/screens/application_forms/appli_documents_uploaded.dart';
@@ -15,6 +16,7 @@ import 'package:vetassess/screens/application_process.dart';
 import 'package:vetassess/screens/application_type%20.dart';
 import 'package:vetassess/screens/applioptions.dart';
 import 'package:vetassess/screens/apply_screen.dart';
+import 'package:vetassess/screens/contact_us.dart';
 import 'package:vetassess/screens/eligibility_criteria.dart';
 import 'package:vetassess/screens/employment.dart';
 import 'package:vetassess/screens/fee_screen.dart';
@@ -139,6 +141,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/payment_screen',
         builder: (context, state) => const PaymentScreen(),
       ),
+      GoRoute(path: '/contact_us', builder: (context, state) => ContactUs()),
+      GoRoute(path: '/about_us', builder: (context, state) => AboutUs()),
 
       // Public routes
       GoRoute(

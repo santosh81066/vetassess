@@ -242,252 +242,259 @@ class SkillsAssessmentViewall extends StatelessWidget {
       },
     );
   }
-// Null-safe unified method for both info sections with responsive design
-List<Widget> _buildInfoSection(
-  String? title, 
-  String? description, 
-  String? additionalText,
-  String? imagePath, 
-  bool imageOnRight, 
-  double? screenWidth, 
-  double? screenHeight
-) {
-  
-  // Null safety checks
-  if (screenWidth == null || screenHeight == null) {
-    return [const SizedBox.shrink()]; // Return empty widget if dimensions are null
-  }
-  
-  // Provide default values for null strings
-  final safeTitle = title ?? 'Default Title';
-  final safeDescription = description ?? 'Default description text.';
-  final safeAdditionalText = additionalText ?? 'Additional information.';
-  final safeImagePath = imagePath ?? 'assets/images/placeholder.png'; // Make sure this asset exists
-  
-  // Define breakpoints with null safety
-  bool isMobile = screenWidth < 768;
-  bool isTablet = screenWidth >= 768 && screenWidth < 1024;
-  bool isDesktop = screenWidth >= 1024;
-  
-  // Responsive dimensions with bounds checking
-  double getInfoWidth() {
-    if (isMobile) return (screenWidth * 0.9).clamp(200.0, double.infinity);
-    if (isTablet) return (screenWidth * 0.45).clamp(300.0, double.infinity);
-    return (screenWidth * 0.4).clamp(400.0, double.infinity);
-  }
-  
-  double getImageWidth() {
-    if (isMobile) return (screenWidth * 0.8).clamp(150.0, double.infinity);
-    if (isTablet) return (screenWidth * 0.4).clamp(200.0, double.infinity);
-    return (screenWidth * 0.35).clamp(300.0, double.infinity);
-  }
-  
-  double getImageHeight() {
-    if (isMobile) return (screenHeight * 0.25).clamp(150.0, 300.0);
-    if (isTablet) return (screenHeight * 0.35).clamp(200.0, 400.0);
-    return (screenHeight * 0.45).clamp(250.0, 500.0);
-  }
-  
-  double getFontSize(double baseSizeMobile, double baseSizeDesktop) {
-    if (isMobile) return baseSizeMobile;
-    return baseSizeDesktop;
-  }
-  
-  final Widget infoColumn = Container(
-    width: getInfoWidth(),
-    constraints: BoxConstraints(
-      minHeight: isMobile ? 200 : 400,
-      maxHeight: isMobile ? 500 : 600,
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      children: [
-        Text(
-          safeTitle,
-          textAlign: isMobile ? TextAlign.center : TextAlign.left,
-          style: TextStyle(
-            fontSize: getFontSize(24, 30),
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF006064),
-          ),
-        ),
-        SizedBox(height: isMobile ? 15 : 20),
-        Text(
-          safeDescription,
-          textAlign: isMobile ? TextAlign.center : TextAlign.left,
-          style: TextStyle(
-            fontSize: getFontSize(14, 16),
-            height: 1.5,
-            letterSpacing: 0.3,
-          ),
-        ),
-        SizedBox(height: isMobile ? 15 : 20),
-        Text(
-          safeAdditionalText,
-          textAlign: isMobile ? TextAlign.center : TextAlign.left,
-          style: TextStyle(
-            fontSize: getFontSize(14, 16),
-            height: 1.5,
-            letterSpacing: 0.3,
-          ),
-        ),
-        SizedBox(height: isMobile ? 20 : 25),
-        TextButton(
-          onPressed: () {
-            // Add your navigation logic here
-            print('Find Out More clicked');
-          },
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.zero,
-            alignment: isMobile ? Alignment.center : Alignment.centerLeft,
-          ),
-          child: Text(
-            'Find Out More',
+
+  // Null-safe unified method for both info sections with responsive design
+  List<Widget> _buildInfoSection(
+    String? title,
+    String? description,
+    String? additionalText,
+    String? imagePath,
+    bool imageOnRight,
+    double? screenWidth,
+    double? screenHeight,
+  ) {
+    // Null safety checks
+    if (screenWidth == null || screenHeight == null) {
+      return [
+        const SizedBox.shrink(),
+      ]; // Return empty widget if dimensions are null
+    }
+
+    // Provide default values for null strings
+    final safeTitle = title ?? 'Default Title';
+    final safeDescription = description ?? 'Default description text.';
+    final safeAdditionalText = additionalText ?? 'Additional information.';
+    final safeImagePath =
+        imagePath ??
+        'assets/images/placeholder.png'; // Make sure this asset exists
+
+    // Define breakpoints with null safety
+    bool isMobile = screenWidth < 768;
+    bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+    bool isDesktop = screenWidth >= 1024;
+
+    // Responsive dimensions with bounds checking
+    double getInfoWidth() {
+      if (isMobile) return (screenWidth * 0.9).clamp(200.0, double.infinity);
+      if (isTablet) return (screenWidth * 0.45).clamp(300.0, double.infinity);
+      return (screenWidth * 0.4).clamp(400.0, double.infinity);
+    }
+
+    double getImageWidth() {
+      if (isMobile) return (screenWidth * 0.8).clamp(150.0, double.infinity);
+      if (isTablet) return (screenWidth * 0.4).clamp(200.0, double.infinity);
+      return (screenWidth * 0.35).clamp(300.0, double.infinity);
+    }
+
+    double getImageHeight() {
+      if (isMobile) return (screenHeight * 0.25).clamp(150.0, 300.0);
+      if (isTablet) return (screenHeight * 0.35).clamp(200.0, 400.0);
+      return (screenHeight * 0.45).clamp(250.0, 500.0);
+    }
+
+    double getFontSize(double baseSizeMobile, double baseSizeDesktop) {
+      if (isMobile) return baseSizeMobile;
+      return baseSizeDesktop;
+    }
+
+    final Widget infoColumn = Container(
+      width: getInfoWidth(),
+      constraints: BoxConstraints(
+        minHeight: isMobile ? 200 : 400,
+        maxHeight: isMobile ? 500 : 600,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: [
+          Text(
+            safeTitle,
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-              fontSize: getFontSize(14, 16),
-              fontWeight: FontWeight.w500,
+              fontSize: getFontSize(24, 30),
+              fontWeight: FontWeight.bold,
               color: const Color(0xFF006064),
-              decoration: TextDecoration.underline,
             ),
           ),
-        ),
-      ],
-    ),
-  );
-
-  // Null-safe image widget with error handling
-  final Widget imageWidget = Container(
-    width: getImageWidth(),
-    height: getImageHeight(),
-    child: Image.asset(
-      safeImagePath,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        // Return a placeholder if image fails to load
-        return Container(
-          color: Colors.grey[300],
-          child: const Icon(
-            Icons.image_not_supported,
-            size: 50,
-            color: Colors.grey,
+          SizedBox(height: isMobile ? 15 : 20),
+          Text(
+            safeDescription,
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
+            style: TextStyle(
+              fontSize: getFontSize(14, 16),
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
           ),
-        );
-      },
-    ),
-  );
+          SizedBox(height: isMobile ? 15 : 20),
+          Text(
+            safeAdditionalText,
+            textAlign: isMobile ? TextAlign.center : TextAlign.left,
+            style: TextStyle(
+              fontSize: getFontSize(14, 16),
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+          SizedBox(height: isMobile ? 20 : 25),
+          TextButton(
+            onPressed: () {
+              // Add your navigation logic here
+              print('Find Out More clicked');
+            },
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              alignment: isMobile ? Alignment.center : Alignment.centerLeft,
+            ),
+            child: Text(
+              'Find Out More',
+              style: TextStyle(
+                fontSize: getFontSize(14, 16),
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF006064),
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
 
-  // Mobile layout: Stack vertically
-  if (isMobile) {
+    // Null-safe image widget with error handling
+    final Widget imageWidget = Container(
+      width: getImageWidth(),
+      height: getImageHeight(),
+      child: Image.asset(
+        safeImagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Return a placeholder if image fails to load
+          return Container(
+            color: Colors.grey[300],
+            child: const Icon(
+              Icons.image_not_supported,
+              size: 50,
+              color: Colors.grey,
+            ),
+          );
+        },
+      ),
+    );
+
+    // Mobile layout: Stack vertically
+    if (isMobile) {
+      return [
+        Container(
+          color: AppColors.color12 ?? Colors.white, // Null-safe color access
+          width: screenWidth,
+          padding: EdgeInsets.symmetric(
+            vertical: (screenHeight * 0.03).clamp(10.0, 50.0),
+            horizontal: (screenWidth * 0.05).clamp(10.0, 50.0),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+                imageOnRight
+                    ? [infoColumn, const SizedBox(height: 20), imageWidget]
+                    : [imageWidget, const SizedBox(height: 20), infoColumn],
+          ),
+        ),
+      ];
+    }
+
+    // Tablet and Desktop layout: Side by side
+    final List<Widget> rowChildren =
+        imageOnRight
+            ? [
+              Expanded(flex: 3, child: infoColumn),
+              SizedBox(width: (screenWidth * 0.02).clamp(10.0, 30.0)),
+              Expanded(flex: 2, child: imageWidget),
+            ]
+            : [
+              Expanded(flex: 2, child: imageWidget),
+              SizedBox(width: (screenWidth * 0.02).clamp(10.0, 30.0)),
+              Expanded(flex: 3, child: infoColumn),
+            ];
+
     return [
       Container(
         color: AppColors.color12 ?? Colors.white, // Null-safe color access
         width: screenWidth,
         padding: EdgeInsets.symmetric(
-          vertical: (screenHeight * 0.03).clamp(10.0, 50.0),
-          horizontal: (screenWidth * 0.05).clamp(10.0, 50.0),
+          vertical: (screenHeight * 0.04).clamp(15.0, 60.0),
+          horizontal: (screenWidth * 0.05).clamp(15.0, 80.0),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: imageOnRight 
-            ? [infoColumn, const SizedBox(height: 20), imageWidget]
-            : [imageWidget, const SizedBox(height: 20), infoColumn],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: rowChildren,
         ),
-      )
+      ),
     ];
   }
 
-  // Tablet and Desktop layout: Side by side
-  final List<Widget> rowChildren = imageOnRight
-      ? [
-          Expanded(flex: 3, child: infoColumn),
-          SizedBox(width: (screenWidth * 0.02).clamp(10.0, 30.0)),
-          Expanded(flex: 2, child: imageWidget),
-        ]
-      : [
-          Expanded(flex: 2, child: imageWidget),
-          SizedBox(width: (screenWidth * 0.02).clamp(10.0, 30.0)),
-          Expanded(flex: 3, child: infoColumn),
-        ];
+  // Safe method to get screen dimensions
+  Map<String, double> _getScreenDimensions(BuildContext context) {
+    final MediaQueryData? mediaQuery = MediaQuery.maybeOf(context);
 
-  return [
-    Container(
-      color: AppColors.color12 ?? Colors.white, // Null-safe color access
-      width: screenWidth,
-      padding: EdgeInsets.symmetric(
-        vertical: (screenHeight * 0.04).clamp(15.0, 60.0),
-        horizontal: (screenWidth * 0.05).clamp(15.0, 80.0),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: rowChildren,
-      ),
-    )
-  ];
-}
+    return {
+      'width': mediaQuery?.size.width ?? 375.0, // Default mobile width
+      'height': mediaQuery?.size.height ?? 667.0, // Default mobile height
+    };
+  }
 
-// Safe method to get screen dimensions
-Map<String, double> _getScreenDimensions(BuildContext context) {
-  final MediaQueryData? mediaQuery = MediaQuery.maybeOf(context);
-  
-  return {
-    'width': mediaQuery?.size.width ?? 375.0, // Default mobile width
-    'height': mediaQuery?.size.height ?? 667.0, // Default mobile height
-  };
-}
+  // Usage example with null safety
+  Widget buildInfoSectionSafely(
+    BuildContext context, {
+    String? title,
+    String? description,
+    String? additionalText,
+    String? imagePath,
+    bool imageOnRight = true,
+  }) {
+    final dimensions = _getScreenDimensions(context);
+    final sections = _buildInfoSection(
+      title,
+      description,
+      additionalText,
+      imagePath,
+      imageOnRight,
+      dimensions['width'],
+      dimensions['height'],
+    );
 
-// Usage example with null safety
-Widget buildInfoSectionSafely(BuildContext context, {
-  String? title,
-  String? description, 
-  String? additionalText,
-  String? imagePath,
-  bool imageOnRight = true,
-}) {
-  final dimensions = _getScreenDimensions(context);
-  final sections = _buildInfoSection(
-    title,
-    description,
-    additionalText,
-    imagePath,
-    imageOnRight,
-    dimensions['width'],
-    dimensions['height'],
-  );
-  
-  return Column(children: sections);
-}
+    return Column(children: sections);
+  }
 
-// Alternative with LayoutBuilder for better null safety
-Widget buildInfoSectionWithLayoutBuilder({
-  String? title,
-  String? description,
-  String? additionalText,
-  String? imagePath,
-  bool imageOnRight = true,
-}) {
-  return LayoutBuilder(
-    builder: (BuildContext context, BoxConstraints constraints) {
-      // Safe access to MediaQuery
-      final mediaQuery = MediaQuery.maybeOf(context);
-      final screenHeight = mediaQuery?.size.height ?? 667.0;
-      
-      final sections = _buildInfoSection(
-        title,
-        description,
-        additionalText,
-        imagePath,
-        imageOnRight,
-        constraints.maxWidth > 0 ? constraints.maxWidth : 375.0,
-        screenHeight,
-      );
-      
-      return Column(children: sections);
-    },
-  );
-}
+  // Alternative with LayoutBuilder for better null safety
+  Widget buildInfoSectionWithLayoutBuilder({
+    String? title,
+    String? description,
+    String? additionalText,
+    String? imagePath,
+    bool imageOnRight = true,
+  }) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // Safe access to MediaQuery
+        final mediaQuery = MediaQuery.maybeOf(context);
+        final screenHeight = mediaQuery?.size.height ?? 667.0;
 
+        final sections = _buildInfoSection(
+          title,
+          description,
+          additionalText,
+          imagePath,
+          imageOnRight,
+          constraints.maxWidth > 0 ? constraints.maxWidth : 375.0,
+          screenHeight,
+        );
+
+        return Column(children: sections);
+      },
+    );
+  }
 
   Widget _occupationTypeSections(BuildContext context) {
     return Container(
@@ -693,24 +700,23 @@ Widget buildInfoSectionWithLayoutBuilder({
     );
   }
 
- 
   Widget _exploreMigrationOptionsSection(BuildContext context) {
     final List<MigrationOption> migrationOptions = [
       MigrationOption(
         title: 'Designated Area Migration (DAMA)',
-        imagePath: 'assets/images/migration_road.jpg',
+        imagePath: 'assets/images/During_your_application.jpg',
       ),
       MigrationOption(
         title: 'Post-Vocational Education Work (Subclass 485) visa',
-        imagePath: 'assets/images/education_work.jpg',
+        imagePath: 'assets/images/During_your_application.jpg',
       ),
       MigrationOption(
         title: 'VETASSESS Points Test Advice',
-        imagePath: 'assets/images/points_test.jpg',
+        imagePath: 'assets/images/During_your_application.jpg',
       ),
       MigrationOption(
         title: 'Industry Labour Agreement',
-        imagePath: 'assets/images/labour_agreement.jpg',
+        imagePath: 'assets/images/During_your_application.jpg',
       ),
     ];
 
@@ -832,435 +838,447 @@ Widget buildInfoSectionWithLayoutBuilder({
   }
 
   Widget _buildOccupationSearchSection(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
-  
-  // Responsive padding based on screen width
-  double getHorizontalPadding() {
-    if (screenWidth > 1200) return 250;
-    if (screenWidth > 768) return screenWidth * 0.15;
-    if (screenWidth > 480) return 32;
-    return 16;
-  }
-  
-  // Responsive container padding
-  double getContainerPadding() {
-    if (screenWidth > 768) return 35;
-    if (screenWidth > 480) return 24;
-    return 16;
-  }
-  
-  // Responsive title font size
-  double getTitleFontSize() {
-    if (screenWidth > 1200) return 32;
-    if (screenWidth > 768) return 28;
-    if (screenWidth > 480) return 24;
-    return 20;
-  }
-  
-  // Responsive subtitle font size
-  double getSubtitleFontSize() {
-    if (screenWidth > 768) return 16;
-    if (screenWidth > 480) return 14;
-    return 12;
-  }
-  
-  // Responsive search container height
-  double getSearchHeight() {
-    if (screenWidth > 768) return 50;
-    if (screenWidth > 480) return 45;
-    return 40;
-  }
-  
-  // Responsive search button width
-  double getSearchButtonWidth() {
-    if (screenWidth > 768) return 120;
-    if (screenWidth > 480) return 100;
-    return 80;
-  }
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: getHorizontalPadding()),
-    child: Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(getContainerPadding()),
-      color: const Color(0xFF0A594C),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Search For Your Occupation",
-            style: TextStyle(
-              fontSize: getTitleFontSize(),
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFFFDB713),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: screenWidth > 768 ? 12 : 8),
-          
-          Text(
-            "Find out if we can assess your skills and experience",
-            style: TextStyle(
-              fontSize: getSubtitleFontSize(),
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: screenWidth > 768 ? 24 : 16),
-          
-          // Search container with responsive design
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Container(
-                constraints: BoxConstraints(
-                  maxWidth: screenWidth > 768 ? 620 : double.infinity,
-                ),
-                height: getSearchHeight(),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: const Color(0xFFFDB713), width: 1),
-                ),
-                child: screenWidth > 480 
-                  ? _buildHorizontalSearch(getSearchButtonWidth())
-                  : _buildVerticalSearch(),
-              );
-            },
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    // Responsive padding based on screen width
+    double getHorizontalPadding() {
+      if (screenWidth > 1200) return 250;
+      if (screenWidth > 768) return screenWidth * 0.15;
+      if (screenWidth > 480) return 32;
+      return 16;
+    }
 
-// Horizontal layout for larger screens
-Widget _buildHorizontalSearch(double buttonWidth) {
-  return Row(
-    children: [
-      Expanded(
-        child: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.search,
-                color: Color(0xFFFDB713),
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter your occupation",
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 16,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Container(
-        width: buttonWidth,
-        color: const Color(0xFFFDB713),
-        child: const Center(
-          child: Text(
-            "Search",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-}
+    // Responsive container padding
+    double getContainerPadding() {
+      if (screenWidth > 768) return 35;
+      if (screenWidth > 480) return 24;
+      return 16;
+    }
 
-// Vertical layout for mobile screens
-Widget _buildVerticalSearch() {
-  return Column(
-    children: [
-      Expanded(
-        child: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.search,
-                color: Color(0xFFFDB713),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Enter occupation",
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Container(
+    // Responsive title font size
+    double getTitleFontSize() {
+      if (screenWidth > 1200) return 32;
+      if (screenWidth > 768) return 28;
+      if (screenWidth > 480) return 24;
+      return 20;
+    }
+
+    // Responsive subtitle font size
+    double getSubtitleFontSize() {
+      if (screenWidth > 768) return 16;
+      if (screenWidth > 480) return 14;
+      return 12;
+    }
+
+    // Responsive search container height
+    double getSearchHeight() {
+      if (screenWidth > 768) return 50;
+      if (screenWidth > 480) return 45;
+      return 40;
+    }
+
+    // Responsive search button width
+    double getSearchButtonWidth() {
+      if (screenWidth > 768) return 120;
+      if (screenWidth > 480) return 100;
+      return 80;
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: getHorizontalPadding()),
+      child: Container(
         width: double.infinity,
-        height: 35,
-        color: const Color(0xFFFDB713),
-        child: const Center(
-          child: Text(
-            "Search",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-
-Widget _buildPreparingAppSection(BuildContext context) {
-  final List<String> navigationLinks = [
-    'Apply online',
-    'Track your Application',
-    'View Current Processing Times',
-  ];
-
-  // Get screen dimensions
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
-  
-  // Define breakpoints
-  final bool isMobile = screenWidth < 768;
-  final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
-  final bool isDesktop = screenWidth >= 1024;
-
-  // Responsive values
-  final double horizontalPadding = isMobile ? 16 : (isTablet ? 32 : 50);
-  final double verticalPadding = isMobile ? 20 : 40;
-  final double titleFontSize = isMobile ? 24 : (isTablet ? 28 : 30);
-  final double bodyFontSize = isMobile ? 14 : 15;
-  final double spacingBetweenSections = isMobile ? 20 : (isTablet ? 40 : 100);
-  
-  return Container(
-    width: double.infinity,
-    padding: EdgeInsets.symmetric(
-      horizontal: horizontalPadding,
-      vertical: verticalPadding,
-    ),
-    child: isMobile 
-      ? _buildMobileLayout(navigationLinks, titleFontSize, bodyFontSize)
-      : _buildDesktopLayout(navigationLinks, titleFontSize, bodyFontSize, spacingBetweenSections),
-  );
-}
-
-// Mobile layout - stacked vertically
-Widget _buildMobileLayout(List<String> navigationLinks, double titleFontSize, double bodyFontSize) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _buildContentSection(titleFontSize, bodyFontSize),
-      const SizedBox(height: 40),
-      _buildNavigationSection(navigationLinks, true),
-    ],
-  );
-}
-
-// Desktop/Tablet layout - side by side
-Widget _buildDesktopLayout(List<String> navigationLinks, double titleFontSize, double bodyFontSize, double spacing) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        flex: 2,
-        child: _buildContentSection(titleFontSize, bodyFontSize),
-      ),
-      SizedBox(width: spacing),
-      Expanded(
-        flex: 1,
-        child: _buildNavigationSection(navigationLinks, false),
-      ),
-    ],
-  );
-}
-
-// Content section with title and description
-Widget _buildContentSection(double titleFontSize, double bodyFontSize) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        "Do you need your skills assessed? Find out how.",
-        style: TextStyle(
-          fontSize: titleFontSize,
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF0A594C),
-          height: 1.3,
-        ),
-      ),
-      const SizedBox(height: 20),
-      Text(
-        'Getting your skills assessed is a requirement for skilled migration to Australia. Below, you\'ll find information and resources on what you need to do to get your skills assessed with us.',
-        style: TextStyle(
-          fontSize: bodyFontSize,
-          color: Colors.black87,
-          height: 1.5,
-        ),
-      ),
-    ],
-  );
-}
-
-// Navigation section with links
-Widget _buildNavigationSection(List<String> navigationLinks, bool isMobile) {
-  return Container(
-    padding: EdgeInsets.only(top: isMobile ? 0 : 40),
-    child: Column(
-      crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-      children: navigationLinks.asMap().entries.map((entry) {
-        final int index = entry.key;
-        final String link = entry.value;
-        return Column(
+        padding: EdgeInsets.all(getContainerPadding()),
+        color: const Color(0xFF0A594C),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      link,
-                      style: const TextStyle(
+            Text(
+              "Search For Your Occupation",
+              style: TextStyle(
+                fontSize: getTitleFontSize(),
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFFDB713),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: screenWidth > 768 ? 12 : 8),
+
+            Text(
+              "Find out if we can assess your skills and experience",
+              style: TextStyle(
+                fontSize: getSubtitleFontSize(),
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: screenWidth > 768 ? 24 : 16),
+
+            // Search container with responsive design
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  constraints: BoxConstraints(
+                    maxWidth: screenWidth > 768 ? 620 : double.infinity,
+                  ),
+                  height: getSearchHeight(),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: const Color(0xFFFDB713),
+                      width: 1,
+                    ),
+                  ),
+                  child:
+                      screenWidth > 480
+                          ? _buildHorizontalSearch(getSearchButtonWidth())
+                          : _buildVerticalSearch(),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Horizontal layout for larger screens
+  Widget _buildHorizontalSearch(double buttonWidth) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                const Icon(Icons.search, color: Color(0xFFFDB713), size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Enter your occupation",
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade600,
                         fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
                       ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward,
-                      color: Color(0xFF0A594C),
-                      size: 22,
-                    ),
-                  ),
-                ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: buttonWidth,
+          color: const Color(0xFFFDB713),
+          child: const Center(
+            child: Text(
+              "Search",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
-            if (index < navigationLinks.length - 1)
-              Container(
-                width: double.infinity,
-                height: 1,
-                child: CustomPaint(
-                  painter: DottedLinePainter(
-                    color: const Color(0xFFfd7e14),
-                  ),
-                ),
-              ),
-          ],
-        );
-      }).toList(),
-    ),
-  );
-}
-
-// Updated responsive version of your How to Apply section
-Widget _buildHowToApply(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final bool isMobile = screenWidth < 768;
-  final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
-  
-  final double horizontalPadding = isMobile ? 16 : (isTablet ? 50 : 150);
-  final double verticalPadding = isMobile ? 30 : 40;
-  final double titleFontSize = isMobile ? 28 : 36;
-  final double tabBarHeight = isMobile ? 300 : 400;
-
-  return Container(
-    width: double.infinity,
-    padding: EdgeInsets.symmetric(
-      vertical: verticalPadding, 
-      horizontal: horizontalPadding
-    ),
-    decoration: const BoxDecoration(color: Colors.white),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          'How to apply',
-          style: TextStyle(
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF00695C),
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 48),
-        DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              TabBar(
-                labelColor: const Color(0xFF00695C),
-                unselectedLabelColor: Colors.black45,
-                indicatorColor: const Color(0xFFFFA000),
-                indicatorWeight: 4,
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelStyle: TextStyle(
-                  fontSize: isMobile ? 16 : 20,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: isMobile ? 16 : 20,
-                  fontWeight: FontWeight.w500,
-                ),
-                tabs: const [
-                  Tab(text: "If you're a Professional"),
-                  Tab(text: 'If you have Trade skills'),
-                ],
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                height: tabBarHeight,
-                child: TabBarView(
-                  children: [
-                    _ResponsiveProfessionalOccupationsContent(),
-                    _ResponsiveTradeOccupationsContent(),
-                  ],
-                ),
-              ),
-            ],
           ),
         ),
       ],
-    ),
-  );
-}
+    );
+  }
+
+  // Vertical layout for mobile screens
+  Widget _buildVerticalSearch() {
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.search, color: Color(0xFFFDB713), size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Enter occupation",
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          height: 35,
+          color: const Color(0xFFFDB713),
+          child: const Center(
+            child: Text(
+              "Search",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPreparingAppSection(BuildContext context) {
+    final List<String> navigationLinks = [
+      'Apply online',
+      'Track your Application',
+      'View Current Processing Times',
+    ];
+
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Define breakpoints
+    final bool isMobile = screenWidth < 768;
+    final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+    final bool isDesktop = screenWidth >= 1024;
+
+    // Responsive values
+    final double horizontalPadding = isMobile ? 16 : (isTablet ? 32 : 50);
+    final double verticalPadding = isMobile ? 20 : 40;
+    final double titleFontSize = isMobile ? 24 : (isTablet ? 28 : 30);
+    final double bodyFontSize = isMobile ? 14 : 15;
+    final double spacingBetweenSections = isMobile ? 20 : (isTablet ? 40 : 100);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
+      child:
+          isMobile
+              ? _buildMobileLayout(navigationLinks, titleFontSize, bodyFontSize)
+              : _buildDesktopLayout(
+                navigationLinks,
+                titleFontSize,
+                bodyFontSize,
+                spacingBetweenSections,
+              ),
+    );
+  }
+
+  // Mobile layout - stacked vertically
+  Widget _buildMobileLayout(
+    List<String> navigationLinks,
+    double titleFontSize,
+    double bodyFontSize,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildContentSection(titleFontSize, bodyFontSize),
+        const SizedBox(height: 40),
+        _buildNavigationSection(navigationLinks, true),
+      ],
+    );
+  }
+
+  // Desktop/Tablet layout - side by side
+  Widget _buildDesktopLayout(
+    List<String> navigationLinks,
+    double titleFontSize,
+    double bodyFontSize,
+    double spacing,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: _buildContentSection(titleFontSize, bodyFontSize),
+        ),
+        SizedBox(width: spacing),
+        Expanded(
+          flex: 1,
+          child: _buildNavigationSection(navigationLinks, false),
+        ),
+      ],
+    );
+  }
+
+  // Content section with title and description
+  Widget _buildContentSection(double titleFontSize, double bodyFontSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Do you need your skills assessed? Find out how.",
+          style: TextStyle(
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF0A594C),
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Getting your skills assessed is a requirement for skilled migration to Australia. Below, you\'ll find information and resources on what you need to do to get your skills assessed with us.',
+          style: TextStyle(
+            fontSize: bodyFontSize,
+            color: Colors.black87,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Navigation section with links
+  Widget _buildNavigationSection(List<String> navigationLinks, bool isMobile) {
+    return Container(
+      padding: EdgeInsets.only(top: isMobile ? 0 : 40),
+      child: Column(
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        children:
+            navigationLinks.asMap().entries.map((entry) {
+              final int index = entry.key;
+              final String link = entry.value;
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            link,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_forward,
+                            color: Color(0xFF0A594C),
+                            size: 22,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (index < navigationLinks.length - 1)
+                    Container(
+                      width: double.infinity,
+                      height: 1,
+                      child: CustomPaint(
+                        painter: DottedLinePainter(
+                          color: const Color(0xFFfd7e14),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }).toList(),
+      ),
+    );
+  }
+
+  // Updated responsive version of your How to Apply section
+  Widget _buildHowToApply(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 768;
+    final bool isTablet = screenWidth >= 768 && screenWidth < 1024;
+
+    final double horizontalPadding = isMobile ? 16 : (isTablet ? 50 : 150);
+    final double verticalPadding = isMobile ? 30 : 40;
+    final double titleFontSize = isMobile ? 28 : 36;
+    final double tabBarHeight = isMobile ? 300 : 400;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        vertical: verticalPadding,
+        horizontal: horizontalPadding,
+      ),
+      decoration: const BoxDecoration(color: Colors.white),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'How to apply',
+            style: TextStyle(
+              fontSize: titleFontSize,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF00695C),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 48),
+          DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                TabBar(
+                  labelColor: const Color(0xFF00695C),
+                  unselectedLabelColor: Colors.black45,
+                  indicatorColor: const Color(0xFFFFA000),
+                  indicatorWeight: 4,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelStyle: TextStyle(
+                    fontSize: isMobile ? 16 : 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: TextStyle(
+                    fontSize: isMobile ? 16 : 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  tabs: const [
+                    Tab(text: "If you're a Professional"),
+                    Tab(text: 'If you have Trade skills'),
+                  ],
+                ),
+                const SizedBox(height: 48),
+                SizedBox(
+                  height: tabBarHeight,
+                  child: TabBarView(
+                    children: [
+                      _ResponsiveProfessionalOccupationsContent(),
+                      _ResponsiveTradeOccupationsContent(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // Responsive Professional Occupations Content
@@ -1269,7 +1287,7 @@ class _ResponsiveProfessionalOccupationsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
-    
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1281,9 +1299,9 @@ class _ResponsiveProfessionalOccupationsContent extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
           ),
           SizedBox(height: isMobile ? 30 : 60),
-          isMobile 
-            ? _buildMobileStepsLayout(_getProfessionalSteps())
-            : _buildDesktopStepsLayout(_getProfessionalSteps()),
+          isMobile
+              ? _buildMobileStepsLayout(_getProfessionalSteps())
+              : _buildDesktopStepsLayout(_getProfessionalSteps()),
         ],
       ),
     );
@@ -1294,22 +1312,26 @@ class _ResponsiveProfessionalOccupationsContent extends StatelessWidget {
       {
         "number": "1",
         "title": "Find",
-        "description": "Find the VETASSESS occupation that most closely fits your skills and experience.",
+        "description":
+            "Find the VETASSESS occupation that most closely fits your skills and experience.",
       },
       {
-        "number": "2", 
+        "number": "2",
         "title": "Match",
-        "description": "Match your skills and experience to your chosen occupation.",
+        "description":
+            "Match your skills and experience to your chosen occupation.",
       },
       {
         "number": "3",
-        "title": "Prepare", 
-        "description": "Get ready to apply by preparing all the information and documents you need.",
+        "title": "Prepare",
+        "description":
+            "Get ready to apply by preparing all the information and documents you need.",
       },
       {
         "number": "4",
         "title": "Apply",
-        "description": "Apply online when you're ready. If you're still unsure,",
+        "description":
+            "Apply online when you're ready. If you're still unsure,",
         "linkText": "skills assessment support",
         "linkDescription": "is available when you need it.",
       },
@@ -1323,7 +1345,7 @@ class _ResponsiveTradeOccupationsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
-    
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1333,9 +1355,9 @@ class _ResponsiveTradeOccupationsContent extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
           ),
           SizedBox(height: isMobile ? 30 : 60),
-          isMobile 
-            ? _buildMobileStepsLayout(_getTradeSteps())
-            : _buildDesktopStepsLayout(_getTradeSteps()),
+          isMobile
+              ? _buildMobileStepsLayout(_getTradeSteps())
+              : _buildDesktopStepsLayout(_getTradeSteps()),
         ],
       ),
     );
@@ -1348,11 +1370,11 @@ class _ResponsiveTradeOccupationsContent extends StatelessWidget {
         "title": "Step 1",
         "description": "Check your",
         "linkText": "eligibility ",
-        "linkDescription": "apply for a Trade Skills Assessment."
+        "linkDescription": "apply for a Trade Skills Assessment.",
       },
       {
         "number": "2",
-        "title": "Step 2", 
+        "title": "Step 2",
         "description": "Understand the",
         "linkText": "Assessment Process  ",
       },
@@ -1361,14 +1383,15 @@ class _ResponsiveTradeOccupationsContent extends StatelessWidget {
         "title": "Step 3",
         "description": "Confirm the type of",
         "linkText": "evidence ",
-        "linkDescription": "you may be asked to provide "
+        "linkDescription": "you may be asked to provide ",
       },
       {
         "number": "4",
         "title": "Step 4",
         "description": "Find the",
         "linkText": "cost",
-        "linkDescription": "you'll need to pay up front for your trade skills assessment "
+        "linkDescription":
+            "you'll need to pay up front for your trade skills assessment ",
       },
       {
         "number": "5",
@@ -1383,28 +1406,29 @@ class _ResponsiveTradeOccupationsContent extends StatelessWidget {
 // Mobile steps layout - vertical stacking
 Widget _buildMobileStepsLayout(List<Map<String, String>> steps) {
   return Column(
-    children: steps.asMap().entries.map((entry) {
-      final int index = entry.key;
-      final Map<String, String> step = entry.value;
-      
-      return Column(
-        children: [
-          _ResponsiveStepColumn(
-            number: step["number"]!,
-            title: step["title"]!,
-            description: step["description"]!,
-            linkText: step["linkText"],
-            linkDescription: step["linkDescription"],
-            isMobile: true,
-          ),
-          if (index < steps.length - 1) ...[
-            const SizedBox(height: 20),
-            _ResponsiveDottedLine(),
-            const SizedBox(height: 20),
-          ],
-        ],
-      );
-    }).toList(),
+    children:
+        steps.asMap().entries.map((entry) {
+          final int index = entry.key;
+          final Map<String, String> step = entry.value;
+
+          return Column(
+            children: [
+              _ResponsiveStepColumn(
+                number: step["number"]!,
+                title: step["title"]!,
+                description: step["description"]!,
+                linkText: step["linkText"],
+                linkDescription: step["linkDescription"],
+                isMobile: true,
+              ),
+              if (index < steps.length - 1) ...[
+                const SizedBox(height: 20),
+                _ResponsiveDottedLine(),
+                const SizedBox(height: 20),
+              ],
+            ],
+          );
+        }).toList(),
   );
 }
 
@@ -1415,24 +1439,25 @@ Widget _buildDesktopStepsLayout(List<Map<String, String>> steps) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: steps.asMap().entries.map((entry) {
-        final int index = entry.key;
-        final Map<String, String> step = entry.value;
-        
-        return Row(
-          children: [
-            _ResponsiveStepColumn(
-              number: step["number"]!,
-              title: step["title"]!,  
-              description: step["description"]!,
-              linkText: step["linkText"],
-              linkDescription: step["linkDescription"],
-              isMobile: false,
-            ),
-            if (index < steps.length - 1) _ResponsiveDottedLine(),
-          ],
-        );
-      }).toList(),
+      children:
+          steps.asMap().entries.map((entry) {
+            final int index = entry.key;
+            final Map<String, String> step = entry.value;
+
+            return Row(
+              children: [
+                _ResponsiveStepColumn(
+                  number: step["number"]!,
+                  title: step["title"]!,
+                  description: step["description"]!,
+                  linkText: step["linkText"],
+                  linkDescription: step["linkDescription"],
+                  isMobile: false,
+                ),
+                if (index < steps.length - 1) _ResponsiveDottedLine(),
+              ],
+            );
+          }).toList(),
     ),
   );
 }
@@ -1460,7 +1485,8 @@ class _ResponsiveStepColumn extends StatelessWidget {
     return SizedBox(
       width: isMobile ? double.infinity : 180,
       child: Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment:
+            isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           Container(
             width: 70,
@@ -1499,7 +1525,11 @@ class _ResponsiveStepColumn extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             description,
-            style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              height: 1.4,
+            ),
             textAlign: isMobile ? TextAlign.left : TextAlign.center,
           ),
           if (linkText != null)
@@ -1543,14 +1573,14 @@ class _ResponsiveDottedLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 768;
-    
+
     return SizedBox(
       width: isMobile ? double.infinity : 60,
       height: isMobile ? 20 : 2,
       child: Center(
         child: CustomPaint(
-          painter: _ResponsiveDottedLinePainter(isMobile: isMobile), 
-          size: Size(isMobile ? double.infinity : 60, isMobile ? 20 : 2)
+          painter: _ResponsiveDottedLinePainter(isMobile: isMobile),
+          size: Size(isMobile ? double.infinity : 60, isMobile ? 20 : 2),
         ),
       ),
     );
@@ -1559,15 +1589,16 @@ class _ResponsiveDottedLine extends StatelessWidget {
 
 class _ResponsiveDottedLinePainter extends CustomPainter {
   final bool isMobile;
-  
+
   const _ResponsiveDottedLinePainter({required this.isMobile});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFFFA000)
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
+    final paint =
+        Paint()
+          ..color = const Color(0xFFFFA000)
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round;
 
     const dashWidth = 4.0;
     const dashSpace = 6.0;
@@ -1604,15 +1635,16 @@ class _ResponsiveDottedLinePainter extends CustomPainter {
 // Don't forget to include your DottedLinePainter class
 class DottedLinePainter extends CustomPainter {
   final Color color;
-  
+
   const DottedLinePainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round;
 
     const dashWidth = 4.0;
     const dashSpace = 6.0;
@@ -1631,8 +1663,6 @@ class DottedLinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
- 
 
 // Data model for migration options
 class MigrationOption {
