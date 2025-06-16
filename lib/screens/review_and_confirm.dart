@@ -7,6 +7,7 @@ import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/models/get_forms_model.dart';
 import 'package:vetassess/screens/application_forms/appli_priority.dart';
 import 'package:vetassess/screens/priorityprocessing.dart';
+import 'package:vetassess/widgets/login_page_layout.dart';
 
 import '../services/update_forms.dart';
 
@@ -108,21 +109,6 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
         false;
   }
 
-  // void _editAllForms(Users userData) {
-  //   // Navigate to edit page for all forms
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => EditAllFormsPage(
-  //         userData: userData,
-  //       ),
-  //     ),
-  //   ).then((_) {
-  //     // Refresh data after editing
-  //     _fetchformsCategories();
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     final loginid = ref.read(loginProvider).response?.userId;
@@ -130,32 +116,39 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
     final filteredData =
         data?.where((item) => item.userId == loginid).toList() ?? [];
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Review & Confirm',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF00565B),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _fetchformsCategories,
+    return LoginPageLayout(
+      child: Column(
+        children: [
+          Container(
+            height: 100,
+            color: Color(0xFF00565B),
+            child: Center(
+              child: Text(
+                "Review & Confirm",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            child:
+                isLoading
+                    ? const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF00565B),
+                        ),
+                      ),
+                    )
+                    : filteredData.isEmpty
+                    ? _buildEmptyState()
+                    : _buildFormsList(filteredData),
           ),
         ],
       ),
-      body:
-          isLoading
-              ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00565B)),
-                ),
-              )
-              : filteredData.isEmpty
-              ? _buildEmptyState()
-              : _buildFormsList(filteredData),
     );
   }
 
@@ -267,32 +260,6 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
     );
   }
 
-  // Widget _buildOverallEditButton(Users user) {
-  //   return Container(
-  //     width: double.infinity,
-  //     child: ElevatedButton.icon(
-  //       onPressed: () => _editAllForms(user),
-  //       icon: const Icon(Icons.edit, color: Colors.white),
-  //       label: const Text(
-  //         'Edit All Forms',
-  //         style: TextStyle(
-  //           fontSize: 16,
-  //           fontWeight: FontWeight.w600,
-  //           color: Colors.white,
-  //         ),
-  //       ),
-  //       style: ElevatedButton.styleFrom(
-  //         backgroundColor: const Color(0xFF1976D2),
-  //         padding: const EdgeInsets.symmetric(vertical: 16),
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(8),
-  //         ),
-  //         elevation: 2,
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildSectionsList(Users user) {
     return Column(
       children: [
@@ -301,7 +268,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Personal Details',
             Icons.person,
             user.personalDetails!.length,
-            Colors.blue,
+            Colors.grey.shade600,
             () => _showPersonalDetailsDialog(user.personalDetails!),
           ),
         if (user.educationQualifications?.isNotEmpty == true)
@@ -309,7 +276,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Education Qualifications',
             Icons.school,
             user.educationQualifications!.length,
-            Colors.green,
+            Colors.grey.shade600,
             () => _showEducationQualificationsDialog(
               user.educationQualifications!,
             ),
@@ -319,7 +286,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Educations',
             Icons.cast_for_education,
             user.educations!.length,
-            Colors.orange,
+            Colors.grey.shade600,
             () => _showEducationsDialog(user.educations!),
           ),
         if (user.employments?.isNotEmpty == true)
@@ -327,7 +294,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Employments',
             Icons.work,
             user.employments!.length,
-            Colors.purple,
+            Colors.grey.shade600,
             () => _showEmploymentsDialog(user.employments!),
           ),
         if (user.uploadedDocuments?.isNotEmpty == true)
@@ -335,7 +302,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Uploaded Documents',
             Icons.file_upload,
             user.uploadedDocuments!.length,
-            Colors.teal,
+            Colors.grey.shade600,
             () => _showDocumentsDialog(user.uploadedDocuments!),
           ),
         if (user.userVisas?.isNotEmpty == true)
@@ -343,7 +310,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Visas',
             Icons.flight_takeoff,
             user.userVisas!.length,
-            Colors.indigo,
+            Colors.grey.shade600,
             () => _showVisasDialog(user.userVisas!),
           ),
         if (user.userOccupations?.isNotEmpty == true)
@@ -351,7 +318,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Occupations',
             Icons.business_center,
             user.userOccupations!.length,
-            Colors.brown,
+            Colors.grey.shade600,
             () => _showOccupationsDialog(user.userOccupations!),
           ),
         if (user.licences?.isNotEmpty == true)
@@ -359,7 +326,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Licences',
             Icons.verified,
             user.licences!.length,
-            Colors.red,
+            Colors.grey.shade600,
             () => _showLicencesDialog(user.licences!),
           ),
         if (user.priorityProcess?.isNotEmpty == true)
@@ -367,7 +334,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             'Priority Process',
             Icons.priority_high,
             user.priorityProcess!.length,
-            Colors.deepOrange,
+            Colors.grey.shade600,
             () => _showPriorityProcessDialog(user.priorityProcess!),
           ),
       ],
@@ -559,7 +526,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF1976D2),
+                        color: Color(0xFF00565B),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(16),
