@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:vetassess/providers/get_allforms_providers.dart';
-import 'package:vetassess/providers/getdocument_category_provider.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/models/get_forms_model.dart';
-import 'package:vetassess/screens/application_forms/appli_priority.dart';
-import 'package:vetassess/screens/priorityprocessing.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 
-import '../services/update_forms.dart';
+import '../providers/update_forms.dart';
 
 class ReviewAndConfirm extends ConsumerStatefulWidget {
   const ReviewAndConfirm({super.key});
@@ -313,6 +310,7 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
             Colors.grey.shade600,
             () => _showVisasDialog(user.userVisas!),
           ),
+
         if (user.userOccupations?.isNotEmpty == true)
           _buildSection(
             'Occupations',

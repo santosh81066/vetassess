@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:vetassess/models/get_forms_model.dart';
@@ -10,8 +6,6 @@ import 'package:vetassess/models/document_type.dart';
 import 'dart:convert';
 
 import 'package:vetassess/utils/vetassess_api.dart';
-
-import 'update_forms.dart';
 
 // Updated Provider with API integration
 class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
@@ -39,15 +33,6 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
       print('Error fetching all Forms: $e');
       // Keep the current state or set to empty
       state = GetAllFormsModel.initial();
-    }
-  }
-
-  Future<void> updateUserForms(Map<String, dynamic> requestBody) async {
-    try {
-      await UpdateForms(ref).updateUserForms(requestBody);
-      await fetchallCategories(); // Refresh data after update
-    } catch (e) {
-      throw Exception('Update failed: $e');
     }
   }
 }
