@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:vetassess/providers/get_allforms_providers.dart';
+import 'package:vetassess/providers/getdocument_category_provider.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/models/get_forms_model.dart';
+import 'package:vetassess/screens/application_forms/appli_priority.dart';
+import 'package:vetassess/screens/priorityprocessing.dart';
+
+import '../services/update_forms.dart';
 
 class ReviewAndConfirm extends ConsumerStatefulWidget {
   const ReviewAndConfirm({super.key});
@@ -59,33 +65,6 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
     setState(() {
       isLoading = false;
     });
-  }
-
-  Map<String, dynamic> _buildUpdateRequestBody(Users currentUser) {
-    return {
-      "userId": currentUser.userId,
-      "personalDetails":
-          currentUser.personalDetails?.isNotEmpty == true
-              ? currentUser.personalDetails!.first.toJson()
-              : null,
-      "educationQualifications":
-          currentUser.educationQualifications
-              ?.map((eq) => eq.toJson())
-              .toList(),
-      "educations": currentUser.educations?.map((e) => e.toJson()).toList(),
-      "employments":
-          currentUser.employments?.map((emp) => emp.toJson()).toList(),
-      "uploadedDocuments":
-          currentUser.uploadedDocuments?.map((doc) => doc.toJson()).toList(),
-      "userVisas": currentUser.userVisas?.map((visa) => visa.toJson()).toList(),
-      "userOccupations":
-          currentUser.userOccupations?.map((occ) => occ.toJson()).toList(),
-      "licences": currentUser.licences?.map((lic) => lic.toJson()).toList(),
-      "priorityProcess":
-          currentUser.priorityProcess?.isNotEmpty == true
-              ? currentUser.priorityProcess!.first.toJson()
-              : null,
-    };
   }
 
   Future<void> _deleteFormSection(String sectionType, int itemId) async {
@@ -1160,69 +1139,116 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
     );
   }
 
-  // 8. Save method example
   Future<void> _savePersonalDetails(PersonalDetails item) async {
     // Get updated values from controllers
     final updatedItem = PersonalDetails(
       personalDetailsId: item.personalDetailsId,
+      status: item.status,
+      preferredTitle: item.preferredTitle,
+      surname:
+          _getController(
+            'surname_${item.personalDetailsId}',
+            item.surname ?? '',
+          ).text,
       givenNames:
-          _getController('given_names_${item.personalDetailsId}', '').text,
-      surname: _getController('surname_${item.personalDetailsId}', '').text,
-      emailAddress: _getController('email_${item.personalDetailsId}', '').text,
-      gender: _getController('gender_${item.personalDetailsId}', '').text,
-      dateOfBirth: _getController('dob_${item.personalDetailsId}', '').text,
+          _getController(
+            'given_names_${item.personalDetailsId}',
+            item.givenNames ?? '',
+          ).text,
+      gender:
+          _getController(
+            'gender_${item.personalDetailsId}',
+            item.gender ?? '',
+          ).text,
+      previousSurname: item.previousSurname,
+      previousGivenNames: item.previousGivenNames,
+      dateOfBirth:
+          _getController(
+            'dob_${item.personalDetailsId}',
+            item.dateOfBirth ?? '',
+          ).text,
       countryOfBirth:
-          _getController('country_birth_${item.personalDetailsId}', '').text,
-      mobileNumber: _getController('mobile_${item.personalDetailsId}', '').text,
+          _getController(
+            'country_birth_${item.personalDetailsId}',
+            item.countryOfBirth ?? '',
+          ).text,
+      countryOfCurrentResidency: item.countryOfCurrentResidency,
+      citizenshipCountry: item.citizenshipCountry,
+      currentPassportNumber: item.currentPassportNumber,
+      datePassportIssued: item.datePassportIssued,
+      otherCitizenshipCountry: item.otherCitizenshipCountry,
+      otherPassportNumber: item.otherPassportNumber,
+      otherDatePassportIssued: item.otherDatePassportIssued,
+      emailAddress:
+          _getController(
+            'email_${item.personalDetailsId}',
+            item.emailAddress ?? '',
+          ).text,
+      daytimeTelephoneNumber: item.daytimeTelephoneNumber,
+      faxNumber: item.faxNumber,
+      mobileNumber:
+          _getController(
+            'mobile_${item.personalDetailsId}',
+            item.mobileNumber ?? '',
+          ).text,
+      postalStreetAddress: item.postalStreetAddress,
+      postalStreetAddressLine2: item.postalStreetAddressLine2,
+      postalStreetAddressLine3: item.postalStreetAddressLine3,
+      postalStreetAddressLine4: item.postalStreetAddressLine4,
+      postalSuburbCity: item.postalSuburbCity,
+      postalState: item.postalState,
+      postalPostCode: item.postalPostCode,
+      postalCountry: item.postalCountry,
+      homeStreetAddress: item.homeStreetAddress,
+      homeStreetAddressLine2: item.homeStreetAddressLine2,
+      homeStreetAddressLine3: item.homeStreetAddressLine3,
+      homeStreetAddressLine4: item.homeStreetAddressLine4,
+      homeSuburbCity: item.homeSuburbCity,
+      homeState: item.homeState,
+      homePostCode: item.homePostCode,
+      homeCountry: item.homeCountry,
+      isAgentAuthorized: item.isAgentAuthorized,
+      agentSurname: item.agentSurname,
+      agentGivenNames: item.agentGivenNames,
+      agentCompanyName: item.agentCompanyName,
+      agentMaraNumber: item.agentMaraNumber,
+      agentEmailAddress: item.agentEmailAddress,
+      agentDaytimeTelephoneNumber: item.agentDaytimeTelephoneNumber,
+      agentFaxNumber: item.agentFaxNumber,
+      agentMobileNumber: item.agentMobileNumber,
+      agentStreetAddress: item.agentStreetAddress,
+      agentStreetAddressLine2: item.agentStreetAddressLine2,
+      agentStreetAddressLine3: item.agentStreetAddressLine3,
+      agentStreetAddressLine4: item.agentStreetAddressLine4,
+      agentSuburbCity: item.agentSuburbCity,
+      agentState: item.agentState,
+      agentPostCode: item.agentPostCode,
+      agentCountry: item.agentCountry,
     );
 
     try {
-      final loginid = ref.read(loginProvider).response?.userId;
-      final state = ref.read(getAllformsProviders);
-      final currentUser = state.users?.firstWhere(
-        (user) => user.userId == loginid,
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updatePersonalDetails(
+        userId: userId,
+        authToken: authToken,
+        personalDetails: updatedItem,
       );
 
-      if (currentUser == null) return;
-
-      // Create updated personal details
-      final updatedItem = PersonalDetails(
-        personalDetailsId: item.personalDetailsId,
-        givenNames:
-            _getController('given_names_${item.personalDetailsId}', '').text,
-        surname: _getController('surname_${item.personalDetailsId}', '').text,
-        emailAddress:
-            _getController('email_${item.personalDetailsId}', '').text,
-        gender: _getController('gender_${item.personalDetailsId}', '').text,
-        dateOfBirth: _getController('dob_${item.personalDetailsId}', '').text,
-        countryOfBirth:
-            _getController('country_birth_${item.personalDetailsId}', '').text,
-        mobileNumber:
-            _getController('mobile_${item.personalDetailsId}', '').text,
-      );
-
-      // Create a copy of current user with updated details
-      final updatedUser = currentUser.copyWith(personalDetails: [updatedItem]);
-
-      // Build request body
-      final requestBody = _buildUpdateRequestBody(updatedUser);
-
-      // Call provider update method
-      await ref
-          .read(getAllformsProviders.notifier)
-          .updateUserForms(requestBody);
-      // Make API call to save the updated data
-      // final response = await yourApiService.updatePersonalDetails(updatedItem);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Personal details updated successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Refresh the data
-      _fetchformsCategories();
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Personal details updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Refresh the data
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update personal details');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1236,27 +1262,80 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   Future<void> _saveEducationQualification(EducationQualifications item) async {
     final updatedItem = EducationQualifications(
       educationId: item.educationId,
+      studentRegistrationNumber: item.studentRegistrationNumber,
       qualificationName:
-          _getController('qual_name_${item.educationId}', '').text,
-      majorField: _getController('major_field_${item.educationId}', '').text,
+          _getController(
+            'qual_name_${item.educationId}',
+            item.qualificationName ?? '',
+          ).text,
+      majorField:
+          _getController(
+            'major_field_${item.educationId}',
+            item.majorField ?? '',
+          ).text,
+      awardingBodyName: item.awardingBodyName,
+      awardingBodyCountry: item.awardingBodyCountry,
+      campusAttended: item.campusAttended,
       institutionName:
-          _getController('institution_name_${item.educationId}', '').text,
+          _getController(
+            'institution_name_${item.educationId}',
+            item.institutionName ?? '',
+          ).text,
+      streetAddress1: item.streetAddress1,
+      streetAddress2: item.streetAddress2,
+      suburbCity: item.suburbCity,
+      state: item.state,
+      postCode: item.postCode,
       institutionCountry:
-          _getController('institution_country_${item.educationId}', '').text,
+          _getController(
+            'institution_country_${item.educationId}',
+            item.institutionCountry ?? '',
+          ).text,
+      normalEntryRequirement: item.normalEntryRequirement,
+      entryBasis: item.entryBasis,
+      courseLengthYearsOrSemesters: item.courseLengthYearsOrSemesters,
+      semesterLengthWeeksOrMonths: item.semesterLengthWeeksOrMonths,
       courseStartDate:
-          _getController('course_start_${item.educationId}', '').text,
-      courseEndDate: _getController('course_end_${item.educationId}', '').text,
+          _getController(
+            'course_start_${item.educationId}',
+            item.courseStartDate ?? '',
+          ).text,
+      courseEndDate:
+          _getController(
+            'course_end_${item.educationId}',
+            item.courseEndDate ?? '',
+          ).text,
+      qualificationAwardedDate: item.qualificationAwardedDate,
+      studyMode: item.studyMode,
+      hoursPerWeek: item.hoursPerWeek,
+      internshipWeeks: item.internshipWeeks,
+      thesisWeeks: item.thesisWeeks,
+      majorProjectWeeks: item.majorProjectWeeks,
+      activityDetails: item.activityDetails,
     );
 
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Education qualification updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateEducationQualifications(
+        userId: userId,
+        authToken: authToken,
+        educationQualifications: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Education qualification updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update education qualification');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1270,27 +1349,63 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   Future<void> _saveEducation(Educations item) async {
     final updatedItem = Educations(
       educationId: item.educationId,
-      level: int.tryParse(_getController('level_${item.educationId}', '').text),
-      country: _getController('country_${item.educationId}', '').text,
-      dateStarted: _getController('date_started_${item.educationId}', '').text,
-      dateFinished:
-          _getController('date_finished_${item.educationId}', '').text,
-      numberOfYears: int.tryParse(
-        _getController('num_years_${item.educationId}', '').text,
+      level: int.tryParse(
+        _getController(
+          'level_${item.educationId}',
+          item.level?.toString() ?? '',
+        ).text,
       ),
+      dateStarted:
+          _getController(
+            'date_started_${item.educationId}',
+            item.dateStarted ?? '',
+          ).text,
+      dateFinished:
+          _getController(
+            'date_finished_${item.educationId}',
+            item.dateFinished ?? '',
+          ).text,
+      numberOfYears: int.tryParse(
+        _getController(
+          'num_years_${item.educationId}',
+          item.numberOfYears?.toString() ?? '',
+        ).text,
+      ),
+      country:
+          _getController(
+            'country_${item.educationId}',
+            item.country ?? '',
+          ).text,
+      yearCompleted: item.yearCompleted,
       certificateDetails:
-          _getController('cert_details_${item.educationId}', '').text,
+          _getController(
+            'cert_details_${item.educationId}',
+            item.certificateDetails ?? '',
+          ).text,
     );
 
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Education updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateEducations(
+        userId: userId,
+        authToken: authToken,
+        educations: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Education updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update education');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1304,27 +1419,75 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   Future<void> _saveEmployment(Employments item) async {
     final updatedItem = Employments(
       id: item.id,
-      businessName: _getController('business_name_${item.id}', '').text,
-      positionJobTitle: _getController('position_${item.id}', '').text,
-      nameofemployer: _getController('employer_${item.id}', '').text,
-      country: _getController('emp_country_${item.id}', '').text,
-      dateofemploymentstarted: _getController('emp_start_${item.id}', '').text,
-      dateofemploymentended: _getController('emp_end_${item.id}', '').text,
+      businessName:
+          _getController(
+            'business_name_${item.id}',
+            item.businessName ?? '',
+          ).text,
+      alternateBusinsessname: item.alternateBusinsessname,
+      streetaddress: item.streetaddress,
+      suburbCity: item.suburbCity,
+      state: item.state,
+      postCode: item.postCode,
+      country:
+          _getController('emp_country_${item.id}', item.country ?? '').text,
+      nameofemployer:
+          _getController('employer_${item.id}', item.nameofemployer ?? '').text,
+      datytimePHno: item.datytimePHno,
+      faxnumber: item.faxnumber,
+      mobileNo: item.mobileNo,
+      emailaddress: item.emailaddress,
+      webaddress: item.webaddress,
+      positionJobTitle:
+          _getController(
+            'position_${item.id}',
+            item.positionJobTitle ?? '',
+          ).text,
+      dateofemploymentstarted:
+          _getController(
+            'emp_start_${item.id}',
+            item.dateofemploymentstarted ?? '',
+          ).text,
       isapplicantemployed: _getCheckboxValue(
         'currently_employed_${item.id}',
-        false,
+        item.isapplicantemployed ?? false,
       ),
+      dateofemploymentended:
+          _getController(
+            'emp_end_${item.id}',
+            item.dateofemploymentended ?? '',
+          ).text,
+      totallengthofUnpaidLeave: item.totallengthofUnpaidLeave,
+      normalrequiredWorkinghours: item.normalrequiredWorkinghours,
+      task1: item.task1,
+      task2: item.task2,
+      task3: item.task3,
+      task4: item.task4,
+      task5: item.task5,
     );
 
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Employment updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateEmployments(
+        userId: userId,
+        authToken: authToken,
+        employments: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Employment updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update employment');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1336,15 +1499,42 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   }
 
   Future<void> _saveDocument(UploadedDocuments item) async {
+    final updatedItem = UploadedDocuments(
+      id: item.id,
+      docCategoryid: item.docCategoryid,
+      docTypeid: item.docTypeid,
+      description:
+          _getController(
+            'doc_description_${item.id}',
+            item.description ?? '',
+          ).text,
+      uploadfile: item.uploadfile, // File uploads need special handling
+      categorys: item.categorys,
+      type: item.type,
+    );
+
     try {
-      // Note: File upload might need special handling
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Document updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateDocuments(
+        userId: userId,
+        authToken: authToken,
+        documents: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Document updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update document');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1356,15 +1546,37 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   }
 
   Future<void> _saveVisa(UserVisas item) async {
+    final updatedItem = UserVisas(
+      id: item.id,
+      visaId: item.visaId,
+      userId: item.userId,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      visa: item.visa,
+    );
+
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Visa updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateVisas(
+        userId: userId,
+        authToken: authToken,
+        visas: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Visa updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update visa');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1376,15 +1588,37 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   }
 
   Future<void> _saveOccupation(UserOccupations item) async {
+    final updatedItem = UserOccupations(
+      id: item.id,
+      occupationId: item.occupationId,
+      userId: item.userId,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      occupation: item.occupation,
+    );
+
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Occupation updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateOccupations(
+        userId: userId,
+        authToken: authToken,
+        occupations: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Occupation updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update occupation');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1398,23 +1632,59 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   Future<void> _saveLicence(Licences item) async {
     final updatedItem = Licences(
       id: item.id,
-      nameofIssuingBody: _getController('issuing_body_${item.id}', '').text,
-      typeOfLicence: _getController('licence_type_${item.id}', '').text,
-      registrationNumber: _getController('reg_number_${item.id}', '').text,
-      dateOfExpiry: _getController('expiry_date_${item.id}', '').text,
-      currentStatus: _getController('current_status_${item.id}', '').text,
-      // country: Note - might need special handling for nested objects
+      categoryId: item.categoryId,
+      countryId: item.countryId,
+      nameofIssuingBody:
+          _getController(
+            'issuing_body_${item.id}',
+            item.nameofIssuingBody ?? '',
+          ).text,
+      typeOfLicence:
+          _getController(
+            'licence_type_${item.id}',
+            item.typeOfLicence ?? '',
+          ).text,
+      registrationNumber:
+          _getController(
+            'reg_number_${item.id}',
+            item.registrationNumber ?? '',
+          ).text,
+      dateOfExpiry:
+          _getController(
+            'expiry_date_${item.id}',
+            item.dateOfExpiry ?? '',
+          ).text,
+      currentStatus:
+          _getController(
+            'current_status_${item.id}',
+            item.currentStatus ?? '',
+          ).text,
+      currentStatusDetail: item.currentStatusDetail,
+      country: item.country,
     );
 
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Licence updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updateLicences(
+        userId: userId,
+        authToken: authToken,
+        licences: [updatedItem],
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Licence updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update licence');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1428,21 +1698,47 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
   Future<void> _savePriorityProcess(PriorityProcess item) async {
     final updatedItem = PriorityProcess(
       id: item.id,
-      standardApplication: _getController('standard_app_${item.id}', '').text,
-      priorityProcessing: _getController('priority_proc_${item.id}', '').text,
-      otherDescription: _getController('other_desc_${item.id}', '').text,
-      createdAt: _getController('priority_created_${item.id}', '').text,
+      standardApplication:
+          _getController(
+            'standard_app_${item.id}',
+            item.standardApplication ?? '',
+          ).text,
+      priorityProcessing:
+          _getController(
+            'priority_proc_${item.id}',
+            item.priorityProcessing ?? '',
+          ).text,
+      otherDescription:
+          _getController(
+            'other_desc_${item.id}',
+            item.otherDescription ?? '',
+          ).text,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
     );
 
     try {
-      // API call here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Priority process updated successfully'),
-          backgroundColor: Colors.green,
-        ),
+      final loginResponse = ref.read(loginProvider).response;
+      final userId = loginResponse?.userId ?? 0;
+      final authToken = loginResponse?.accessToken ?? '';
+
+      final success = await FormsApiService.updatePriorityProcess(
+        userId: userId,
+        authToken: authToken,
+        priorityProcess: updatedItem,
       );
-      _fetchformsCategories();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Priority process updated successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchformsCategories();
+      } else {
+        throw Exception('Failed to update priority process');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
