@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vetassess/widgets/application_record.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 import '../../widgets/application_nav.dart';
 
@@ -98,6 +99,9 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             'Application Record:',
             'Click to download',
             isLink: true,
+             onTap: () async {
+                  await ApplicationRecordPdfGenerator.generateApplicationRecordPdf(context, 1);
+                }
           ),
         ],
       ),
@@ -308,7 +312,8 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
                 : child,
       );
 
-  Widget _buildInfoRow(String label, String value, {bool isLink = false}) =>
+   // Updated _buildInfoRow method with onTap functionality
+  Widget _buildInfoRow(String label, String value, {bool isLink = false, VoidCallback? onTap}) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(
@@ -323,13 +328,27 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
                 ),
               ),
             ),
-            Text(
-              value,
-              style: TextStyle(
-                color: isLink ? Colors.orange : const Color(0xFF444444),
-                decoration: isLink ? TextDecoration.underline : null,
-              ),
-            ),
+            isLink && onTap != null
+                ? GestureDetector(
+                    onTap: onTap,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          color: isLink ? Colors.orange : const Color(0xFF444444),
+                          decoration: isLink ? TextDecoration.underline : null,
+                        ),
+                      ),
+                    ),
+                  )
+                : Text(
+                    value,
+                    style: TextStyle(
+                      color: isLink ? Colors.orange : const Color(0xFF444444),
+                      decoration: isLink ? TextDecoration.underline : null,
+                    ),
+                  ),
           ],
         ),
       );

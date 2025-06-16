@@ -56,7 +56,7 @@ class AppliOptions extends StatelessWidget {
                 //   ),
                 // );
                       //context.go('/vetassess_upload');      
-                      context.go('/get_all_forms');   
+                      context.go('/doc_upload');   
               },
               color: const Color(0xFF006257),
               context: context,
