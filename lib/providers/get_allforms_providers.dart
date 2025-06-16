@@ -11,12 +11,15 @@ import 'dart:convert';
 
 import 'package:vetassess/utils/vetassess_api.dart';
 
+import 'update_forms.dart';
+
 // Updated Provider with API integration
 class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
-  GetAllformsProviders() : super(GetAllFormsModel.initial());
+  final Ref ref;
+
+  GetAllformsProviders(this.ref) : super(GetAllFormsModel.initial());
 
   Future<void> fetchallCategories() async {
-
     try {
       final headers = await AuthService.getAuthHeaders();
 
@@ -30,9 +33,7 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
       } else if (response.statusCode == 401) {
         throw Exception('Unauthorized: Please login again');
       } else {
-        throw Exception(
-          'Failed to load all forms: ${response.statusCode}',
-        );
+        throw Exception('Failed to load all forms: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching all Forms: $e');
@@ -40,9 +41,18 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
       state = GetAllFormsModel.initial();
     }
   }
+
+  Future<void> updateUserForms(Map<String, dynamic> requestBody) async {
+    try {
+      await UpdateForms(ref).updateUserForms(requestBody);
+      await fetchallCategories(); // Refresh data after update
+    } catch (e) {
+      throw Exception('Update failed: $e');
+    }
+  }
 }
 
 final getAllformsProviders =
     StateNotifierProvider<GetAllformsProviders, GetAllFormsModel>((ref) {
-      return GetAllformsProviders();
+      return GetAllformsProviders(ref);
     });

@@ -146,10 +146,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           return UserDetailsScreen(user: user);
         },
       ),
-      GoRoute(
-        path: '/payment_screen',
-        builder: (context, state) => const PaymentScreen(),
-      ),
+      // GoRoute(
+      //   path: '/payment_screen',
+      //   builder: (context, state) => const PaymentScreen(),
+      // ),
       GoRoute(path: '/contact_us', builder: (context, state) => ContactUs()),
       GoRoute(path: '/about_us', builder: (context, state) => AboutUs()),
 
@@ -165,7 +165,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/skills_assess_support',
         builder: (context, state) => const SkillsAssessmentSupport(),
-        
       ),
       GoRoute(
         path: '/nominate_screen',
@@ -241,7 +240,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/appli_opt',
         builder: (context, state) => const AppliOptions(),
       ),
-       GoRoute(
+      GoRoute(
         path: '/get_all_forms',
         builder: (context, state) => const ReviewAndConfirm(),
       ),

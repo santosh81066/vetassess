@@ -44,27 +44,28 @@ class Users {
   List<Licences>? licences;
   List<PriorityProcess>? priorityProcess;
 
-  Users(
-      {this.userId,
-      this.givenNames,
-      this.surname,
-      this.dateOfBirth,
-      this.businessName,
-      this.registrationStatus,
-      this.registrationNumber,
-      this.email,
-      this.password,
-      this.role,
-      this.isAgreedToReceiveNews,
-      this.personalDetails,
-      this.educationQualifications,
-      this.educations,
-      this.employments,
-      this.uploadedDocuments,
-      this.userVisas,
-      this.userOccupations,
-      this.licences,
-      this.priorityProcess});
+  Users({
+    this.userId,
+    this.givenNames,
+    this.surname,
+    this.dateOfBirth,
+    this.businessName,
+    this.registrationStatus,
+    this.registrationNumber,
+    this.email,
+    this.password,
+    this.role,
+    this.isAgreedToReceiveNews,
+    this.personalDetails,
+    this.educationQualifications,
+    this.educations,
+    this.employments,
+    this.uploadedDocuments,
+    this.userVisas,
+    this.userOccupations,
+    this.licences,
+    this.priorityProcess,
+  });
 
   Users.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
@@ -181,6 +182,15 @@ class Users {
     }
     return data;
   }
+
+  copyWith({required List<PersonalDetails> personalDetails}) {
+    return Users(
+      userId: userId,
+      personalDetails: personalDetails ?? this.personalDetails,
+      //educationQualifications: educationQualifications ?? this.educationQualifications,
+      // ... other properties
+    );
+  }
 }
 
 class PersonalDetails {
@@ -242,64 +252,65 @@ class PersonalDetails {
   String? createdAt;
   String? updatedAt;
 
-  PersonalDetails(
-      {this.personalDetailsId,
-      this.userId,
-      this.status,
-      this.preferredTitle,
-      this.surname,
-      this.givenNames,
-      this.gender,
-      this.previousSurname,
-      this.previousGivenNames,
-      this.dateOfBirth,
-      this.countryOfBirth,
-      this.countryOfCurrentResidency,
-      this.citizenshipCountry,
-      this.currentPassportNumber,
-      this.datePassportIssued,
-      this.otherCitizenshipCountry,
-      this.otherPassportNumber,
-      this.otherDatePassportIssued,
-      this.emailAddress,
-      this.daytimeTelephoneNumber,
-      this.faxNumber,
-      this.mobileNumber,
-      this.postalStreetAddress,
-      this.postalStreetAddressLine2,
-      this.postalStreetAddressLine3,
-      this.postalStreetAddressLine4,
-      this.postalSuburbCity,
-      this.postalState,
-      this.postalPostCode,
-      this.postalCountry,
-      this.homeStreetAddress,
-      this.homeStreetAddressLine2,
-      this.homeStreetAddressLine3,
-      this.homeStreetAddressLine4,
-      this.homeSuburbCity,
-      this.homeState,
-      this.homePostCode,
-      this.homeCountry,
-      this.isAgentAuthorized,
-      this.agentSurname,
-      this.agentGivenNames,
-      this.agentCompanyName,
-      this.agentMaraNumber,
-      this.agentEmailAddress,
-      this.agentDaytimeTelephoneNumber,
-      this.agentFaxNumber,
-      this.agentMobileNumber,
-      this.agentStreetAddress,
-      this.agentStreetAddressLine2,
-      this.agentStreetAddressLine3,
-      this.agentStreetAddressLine4,
-      this.agentSuburbCity,
-      this.agentState,
-      this.agentPostCode,
-      this.agentCountry,
-      this.createdAt,
-      this.updatedAt});
+  PersonalDetails({
+    this.personalDetailsId,
+    this.userId,
+    this.status,
+    this.preferredTitle,
+    this.surname,
+    this.givenNames,
+    this.gender,
+    this.previousSurname,
+    this.previousGivenNames,
+    this.dateOfBirth,
+    this.countryOfBirth,
+    this.countryOfCurrentResidency,
+    this.citizenshipCountry,
+    this.currentPassportNumber,
+    this.datePassportIssued,
+    this.otherCitizenshipCountry,
+    this.otherPassportNumber,
+    this.otherDatePassportIssued,
+    this.emailAddress,
+    this.daytimeTelephoneNumber,
+    this.faxNumber,
+    this.mobileNumber,
+    this.postalStreetAddress,
+    this.postalStreetAddressLine2,
+    this.postalStreetAddressLine3,
+    this.postalStreetAddressLine4,
+    this.postalSuburbCity,
+    this.postalState,
+    this.postalPostCode,
+    this.postalCountry,
+    this.homeStreetAddress,
+    this.homeStreetAddressLine2,
+    this.homeStreetAddressLine3,
+    this.homeStreetAddressLine4,
+    this.homeSuburbCity,
+    this.homeState,
+    this.homePostCode,
+    this.homeCountry,
+    this.isAgentAuthorized,
+    this.agentSurname,
+    this.agentGivenNames,
+    this.agentCompanyName,
+    this.agentMaraNumber,
+    this.agentEmailAddress,
+    this.agentDaytimeTelephoneNumber,
+    this.agentFaxNumber,
+    this.agentMobileNumber,
+    this.agentStreetAddress,
+    this.agentStreetAddressLine2,
+    this.agentStreetAddressLine3,
+    this.agentStreetAddressLine4,
+    this.agentSuburbCity,
+    this.agentState,
+    this.agentPostCode,
+    this.agentCountry,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   PersonalDetails.fromJson(Map<String, dynamic> json) {
     personalDetailsId = json['personalDetailsId'];
@@ -454,35 +465,36 @@ class EducationQualifications {
   int? majorProjectWeeks;
   String? activityDetails;
 
-  EducationQualifications(
-      {this.educationId,
-      this.userId,
-      this.studentRegistrationNumber,
-      this.qualificationName,
-      this.majorField,
-      this.awardingBodyName,
-      this.awardingBodyCountry,
-      this.campusAttended,
-      this.institutionName,
-      this.streetAddress1,
-      this.streetAddress2,
-      this.suburbCity,
-      this.state,
-      this.postCode,
-      this.institutionCountry,
-      this.normalEntryRequirement,
-      this.entryBasis,
-      this.courseLengthYearsOrSemesters,
-      this.semesterLengthWeeksOrMonths,
-      this.courseStartDate,
-      this.courseEndDate,
-      this.qualificationAwardedDate,
-      this.studyMode,
-      this.hoursPerWeek,
-      this.internshipWeeks,
-      this.thesisWeeks,
-      this.majorProjectWeeks,
-      this.activityDetails});
+  EducationQualifications({
+    this.educationId,
+    this.userId,
+    this.studentRegistrationNumber,
+    this.qualificationName,
+    this.majorField,
+    this.awardingBodyName,
+    this.awardingBodyCountry,
+    this.campusAttended,
+    this.institutionName,
+    this.streetAddress1,
+    this.streetAddress2,
+    this.suburbCity,
+    this.state,
+    this.postCode,
+    this.institutionCountry,
+    this.normalEntryRequirement,
+    this.entryBasis,
+    this.courseLengthYearsOrSemesters,
+    this.semesterLengthWeeksOrMonths,
+    this.courseStartDate,
+    this.courseEndDate,
+    this.qualificationAwardedDate,
+    this.studyMode,
+    this.hoursPerWeek,
+    this.internshipWeeks,
+    this.thesisWeeks,
+    this.majorProjectWeeks,
+    this.activityDetails,
+  });
 
   EducationQualifications.fromJson(Map<String, dynamic> json) {
     educationId = json['educationId'];
@@ -560,16 +572,17 @@ class Educations {
   String? yearCompleted;
   String? certificateDetails;
 
-  Educations(
-      {this.educationId,
-      this.userId,
-      this.level,
-      this.dateStarted,
-      this.dateFinished,
-      this.numberOfYears,
-      this.country,
-      this.yearCompleted,
-      this.certificateDetails});
+  Educations({
+    this.educationId,
+    this.userId,
+    this.level,
+    this.dateStarted,
+    this.dateFinished,
+    this.numberOfYears,
+    this.country,
+    this.yearCompleted,
+    this.certificateDetails,
+  });
 
   Educations.fromJson(Map<String, dynamic> json) {
     educationId = json['educationId'];
@@ -628,35 +641,36 @@ class Employments {
   String? createdAt;
   String? updatedAt;
 
-  Employments(
-      {this.id,
-      this.userId,
-      this.businessName,
-      this.alternateBusinsessname,
-      this.streetaddress,
-      this.suburbCity,
-      this.state,
-      this.postCode,
-      this.country,
-      this.nameofemployer,
-      this.datytimePHno,
-      this.faxnumber,
-      this.mobileNo,
-      this.emailaddress,
-      this.webaddress,
-      this.positionJobTitle,
-      this.dateofemploymentstarted,
-      this.isapplicantemployed,
-      this.dateofemploymentended,
-      this.totallengthofUnpaidLeave,
-      this.normalrequiredWorkinghours,
-      this.task1,
-      this.task2,
-      this.task3,
-      this.task4,
-      this.task5,
-      this.createdAt,
-      this.updatedAt});
+  Employments({
+    this.id,
+    this.userId,
+    this.businessName,
+    this.alternateBusinsessname,
+    this.streetaddress,
+    this.suburbCity,
+    this.state,
+    this.postCode,
+    this.country,
+    this.nameofemployer,
+    this.datytimePHno,
+    this.faxnumber,
+    this.mobileNo,
+    this.emailaddress,
+    this.webaddress,
+    this.positionJobTitle,
+    this.dateofemploymentstarted,
+    this.isapplicantemployed,
+    this.dateofemploymentended,
+    this.totallengthofUnpaidLeave,
+    this.normalrequiredWorkinghours,
+    this.task1,
+    this.task2,
+    this.task3,
+    this.task4,
+    this.task5,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   Employments.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -733,15 +747,16 @@ class UploadedDocuments {
   Categorys? categorys;
   Type? type;
 
-  UploadedDocuments(
-      {this.id,
-      this.docCategoryid,
-      this.docTypeid,
-      this.userId,
-      this.description,
-      this.uploadfile,
-      this.categorys,
-      this.type});
+  UploadedDocuments({
+    this.id,
+    this.docCategoryid,
+    this.docTypeid,
+    this.userId,
+    this.description,
+    this.uploadfile,
+    this.categorys,
+    this.type,
+  });
 
   UploadedDocuments.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -750,9 +765,10 @@ class UploadedDocuments {
     userId = json['userId'];
     description = json['description'];
     uploadfile = json['uploadfile'];
-    categorys = json['category'] != null
-        ? new Categorys.fromJson(json['category'])
-        : null;
+    categorys =
+        json['category'] != null
+            ? new Categorys.fromJson(json['category'])
+            : null;
     type = json['type'] != null ? new Type.fromJson(json['type']) : null;
   }
 
@@ -829,13 +845,14 @@ class UserVisas {
   String? updatedAt;
   Visa? visa;
 
-  UserVisas(
-      {this.id,
-      this.visaId,
-      this.userId,
-      this.createdAt,
-      this.updatedAt,
-      this.visa});
+  UserVisas({
+    this.id,
+    this.visaId,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+    this.visa,
+  });
 
   UserVisas.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -868,13 +885,14 @@ class Visa {
   String? createdAt;
   String? updatedAt;
 
-  Visa(
-      {this.id,
-      this.visaName,
-      this.category,
-      this.assessmentType,
-      this.createdAt,
-      this.updatedAt});
+  Visa({
+    this.id,
+    this.visaName,
+    this.category,
+    this.assessmentType,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   Visa.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -905,13 +923,14 @@ class UserOccupations {
   String? updatedAt;
   Occupation? occupation;
 
-  UserOccupations(
-      {this.id,
-      this.occupationId,
-      this.userId,
-      this.createdAt,
-      this.updatedAt,
-      this.occupation});
+  UserOccupations({
+    this.id,
+    this.occupationId,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+    this.occupation,
+  });
 
   UserOccupations.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -919,9 +938,10 @@ class UserOccupations {
     userId = json['user_id'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
-    occupation = json['Occupation'] != null
-        ? new Occupation.fromJson(json['Occupation'])
-        : null;
+    occupation =
+        json['Occupation'] != null
+            ? new Occupation.fromJson(json['Occupation'])
+            : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -948,15 +968,16 @@ class Occupation {
   String? createdAt;
   String? updatedAt;
 
-  Occupation(
-      {this.id,
-      this.occupationName,
-      this.anzscoCode,
-      this.assessmentType,
-      this.skillsRequirement,
-      this.createdBy,
-      this.createdAt,
-      this.updatedAt});
+  Occupation({
+    this.id,
+    this.occupationName,
+    this.anzscoCode,
+    this.assessmentType,
+    this.skillsRequirement,
+    this.createdBy,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   Occupation.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -999,21 +1020,22 @@ class Licences {
   Category? category;
   Country? country;
 
-  Licences(
-      {this.id,
-      this.userId,
-      this.categoryId,
-      this.countryId,
-      this.nameofIssuingBody,
-      this.typeOfLicence,
-      this.registrationNumber,
-      this.dateOfExpiry,
-      this.currentStatus,
-      this.currentStatusDetail,
-      this.createdAt,
-      this.updatedAt,
-      this.category,
-      this.country});
+  Licences({
+    this.id,
+    this.userId,
+    this.categoryId,
+    this.countryId,
+    this.nameofIssuingBody,
+    this.typeOfLicence,
+    this.registrationNumber,
+    this.dateOfExpiry,
+    this.currentStatus,
+    this.currentStatusDetail,
+    this.createdAt,
+    this.updatedAt,
+    this.category,
+    this.country,
+  });
 
   Licences.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -1028,9 +1050,10 @@ class Licences {
     currentStatusDetail = json['currentStatusDetail'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
-    category = json['Category'] != null
-        ? new Category.fromJson(json['Category'])
-        : null;
+    category =
+        json['Category'] != null
+            ? new Category.fromJson(json['Category'])
+            : null;
     country =
         json['Country'] != null ? new Country.fromJson(json['Country']) : null;
   }
@@ -1119,15 +1142,16 @@ class PriorityProcess {
   String? updatedAt;
   Null? priorityOption;
 
-  PriorityProcess(
-      {this.id,
-      this.userId,
-      this.standardApplication,
-      this.priorityProcessing,
-      this.otherDescription,
-      this.createdAt,
-      this.updatedAt,
-      this.priorityOption});
+  PriorityProcess({
+    this.id,
+    this.userId,
+    this.standardApplication,
+    this.priorityProcessing,
+    this.otherDescription,
+    this.createdAt,
+    this.updatedAt,
+    this.priorityOption,
+  });
 
   PriorityProcess.fromJson(Map<String, dynamic> json) {
     id = json['id'];
