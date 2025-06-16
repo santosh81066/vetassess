@@ -19,4 +19,5 @@ class VetassessApi {
       "$baseUrl/user/priority-subtypes";
   static const String form_tertedu = "$baseUrl/user/tertiary-qualification";
   static const String form_upload_doc = "$baseUrl/user/upload";
+  static const String allform_upload_doc = "$baseUrl/admin/users";
 }

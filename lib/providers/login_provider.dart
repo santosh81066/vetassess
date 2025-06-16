@@ -83,11 +83,8 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final loginResponse = LoginResponse.fromJson(responseData);
 
-        // Store tokens and user role in SharedPreferences
-        await _storeTokens(
-          loginResponse.accessToken,
-          loginResponse.refreshToken,
-        );
+        // Store user data including tokens and userId
+        await _storeUserData(loginResponse);
 
         // Store user role (use response role or fallback to request role)
         final userRole = loginResponse.role ?? request.role;
@@ -129,15 +126,23 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  Future<void> _storeTokens(String? accessToken, String? refreshToken) async {
+  // Store user data including tokens and userId
+  Future<void> _storeUserData(LoginResponse loginResponse) async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (accessToken != null && accessToken.isNotEmpty) {
-      await prefs.setString('access_token', accessToken);
+    if (loginResponse.accessToken != null &&
+        loginResponse.accessToken!.isNotEmpty) {
+      await prefs.setString('access_token', loginResponse.accessToken!);
     }
 
-    if (refreshToken != null && refreshToken.isNotEmpty) {
-      await prefs.setString('refresh_token', refreshToken);
+    if (loginResponse.refreshToken != null &&
+        loginResponse.refreshToken!.isNotEmpty) {
+      await prefs.setString('refresh_token', loginResponse.refreshToken!);
+    }
+
+    // Store userId
+    if (loginResponse.userId != null) {
+      await prefs.setInt('user_id', loginResponse.userId!);
     }
 
     // Store login timestamp for token expiry management
@@ -171,6 +176,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return prefs.getString('refresh_token');
   }
 
+  // Add method to get userId
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id');
+  }
+
   // Check if token has expired
   Future<bool> _isTokenExpired() async {
     final prefs = await SharedPreferences.getInstance();
@@ -190,6 +201,8 @@ class LoginNotifier extends StateNotifier<LoginState> {
       final accessToken = await getAccessToken();
 
       if (accessToken == null || accessToken.isEmpty) {
+        // Make sure state reflects logged out status
+        await _performLogout();
         return false;
       }
 
@@ -198,11 +211,17 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (isExpired) {
         // Try to refresh token
         final refreshSuccessful = await _tryRefreshToken();
+        if (!refreshSuccessful) {
+          // Refresh failed, ensure state reflects logged out status
+          await _performLogout();
+        }
         return refreshSuccessful;
       }
 
       return true;
     } catch (e) {
+      // On any error, ensure user is logged out
+      await _performLogout();
       return false;
     }
   }
@@ -215,6 +234,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       final refreshToken = await getRefreshToken();
 
       if (refreshToken == null || refreshToken.isEmpty) {
+        await _performLogout();
         return false;
       }
 
@@ -229,15 +249,39 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final newAccessToken = responseData['accessToken'];
         final newRefreshToken = responseData['refreshToken'];
 
-        // Store new tokens
-        await _storeTokens(newAccessToken, newRefreshToken);
+        // Store new tokens (maintain existing userId)
+        final prefs = await SharedPreferences.getInstance();
+        if (newAccessToken != null && newAccessToken.isNotEmpty) {
+          await prefs.setString('access_token', newAccessToken);
+        }
+        if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+          await prefs.setString('refresh_token', newRefreshToken);
+        }
+        
+        // Update login timestamp
+        await prefs.setInt(
+          'login_timestamp',
+          DateTime.now().millisecondsSinceEpoch,
+        );
 
         // Get stored user role and update state
         final userRole = await getUserRole();
+        final userId = await getUserId();
+        
+        // Create a new LoginResponse with the refreshed data
+        final loginResponse = LoginResponse(
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+          userId: userId,
+          role: userRole,
+        );
+
         state = state.copyWith(
           isSuccess: true,
           isLoading: false,
           userRole: userRole,
+          response: loginResponse,
+          error: null,
         );
 
         return true;
@@ -272,7 +316,26 @@ class LoginNotifier extends StateNotifier<LoginState> {
     await _performLogout();
   }
 
-  // Clear authentication state
+  // Clear authentication state and storage
+  Future<void> _performLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('access_token');
+    await prefs.remove('refresh_token');
+    await prefs.remove('login_timestamp');
+    await prefs.remove('user_id');
+    await prefs.remove('user_role');
+
+    // Reset state to logged out - this will trigger router refresh
+    state = LoginState().copyWith(
+      isSuccess: false,
+      isLoading: false,
+      response: null,
+      error: null,
+      userRole: null,
+    );
+  }
+
+  // Clear authentication state without affecting storage
   void resetState() {
     state = LoginState().copyWith(
       isSuccess: false,
@@ -297,61 +360,6 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  //user id
-  Future _storeUserData(LoginResponse loginResponse) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (loginResponse.accessToken != null &&
-        loginResponse.accessToken!.isNotEmpty) {
-      await prefs.setString('access_token', loginResponse.accessToken!);
-    }
-
-    if (loginResponse.refreshToken != null &&
-        loginResponse.refreshToken!.isNotEmpty) {
-      await prefs.setString('refresh_token', loginResponse.refreshToken!);
-    }
-
-    // Store userId
-    if (loginResponse.userId != null) {
-      await prefs.setInt('user_id', loginResponse.userId!);
-    }
-
-    // Store login timestamp for token expiry management
-    await prefs.setInt(
-      'login_timestamp',
-      DateTime.now().millisecondsSinceEpoch,
-    );
-  }
-
-  // Add method to get userId
-  Future<int?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('user_id');
-  }
-
-  // 2. Replace the existing _storeTokens method call in login method
-  // In the login method, replace this line:
-  // await _storeTokens(loginResponse.accessToken, loginResponse.refreshToken);
-  // With:
-  // await _storeUserData(loginResponse);
-
-  // 3. Update the _performLogout method to clear userId
-  Future _performLogout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
-    await prefs.remove('refresh_token');
-    await prefs.remove('login_timestamp');
-    await prefs.remove('user_id'); // Add this line
-
-    // Reset state to logged out
-    state = LoginState().copyWith(
-      isSuccess: false,
-      isLoading: false,
-      response: null,
-      error: null,
-    );
-  }
-
   // Get navigation route based on user role
   String getNavigationRouteForRole() {
     final role = state.userRole;
@@ -365,6 +373,16 @@ class LoginNotifier extends StateNotifier<LoginState> {
       default:
         return '/appli_opt'; // Default fallback
     }
+  }
+
+  // Add this method to validate current session
+  Future<bool> validateSession() async {
+    final isValid = await isLoggedIn();
+    if (!isValid) {
+      // Session is invalid, ensure state reflects this
+      await _performLogout();
+    }
+    return isValid;
   }
 }
 

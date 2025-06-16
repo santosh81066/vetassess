@@ -300,31 +300,16 @@ void _showErrorDialog({required String title, required String message}) {
     final screenHeight = screenSize.height;
     final personalDetails = ref.watch(personalDetailsProvider);
     final loginState = ref.watch(loginProvider);
-
+  
        // Show error if user is not logged in
-    if (loginState.response?.userId == null) {
-      return LoginPageLayout(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: Colors.red),
-              SizedBox(height: 16),
-              Text(
-                'Session expired or user not logged in',
-                style: TextStyle(fontSize: 18, color: Colors.red),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => context.go('/login'),
-                child: Text('Go to Login'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
+   // In your screen's initState or build method
+void _checkSession() async {
+  final loginNotifier = ref.read(loginProvider.notifier);
+  final isValid = await loginNotifier.validateSession();
+  if (!isValid && mounted) {
+    context.go('/login');
+  }
+}
     return LoginPageLayout(
       child: LayoutBuilder(
         builder: (context, constraints) {

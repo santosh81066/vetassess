@@ -1,20 +1,107 @@
-// lib/services/cashfree_service.dart
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'dart:js_util' as js_util;
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class CashfreeService {
-  // Use only public/client-side credentials
-  static const String _appId = '992060107cd5c2bce28587a7e7060299';
-  static const String _environment =
-      'sandbox'; // Change to 'production' for live
-
-  // Simple flag to track payment state
+  // Your backend URL - CHANGE THIS TO YOUR ACTUAL BACKEND URL
+  static const String baseUrl = 'https://your-backend-url.com/api';
+  
+  // Environment setting
+  static const String environment = 'sandbox'; // Change to 'production' for live
+  
   static bool _isPaymentActive = false;
+  static int _paymentCounter = 0;
 
-  static void initiateDropInPayment({
+  // Create payment session via your backend
+  static Future<Map<String, dynamic>?> createPaymentSession({
+    required double amount,
+    required String customerName,
+    required String customerEmail,
+    required String customerPhone,
+    String? orderId,
+  }) async {
+    try {
+      print('Creating payment session...');
+      
+      final requestBody = {
+        'amount': amount,
+        'customer_name': customerName,
+        'customer_email': customerEmail,
+        'customer_phone': customerPhone,
+        'order_id': orderId ?? 'ORDER_${DateTime.now().millisecondsSinceEpoch}',
+      };
+
+      print('Request body: $requestBody');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/create-payment-session'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          return {
+            'paymentSessionId': data['payment_session_id'],
+            'orderId': data['order_id'],
+          };
+        } else {
+          throw Exception(data['message'] ?? 'Failed to create payment session');
+        }
+      } else {
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      print('Error creating payment session: $e');
+      return null;
+    }
+  }
+
+  // Verify payment via your backend
+  static Future<Map<String, dynamic>?> verifyPayment({
+    required String orderId,
+  }) async {
+    try {
+      print('Verifying payment for order: $orderId');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/verify-payment'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'order_id': orderId,
+        }),
+      );
+
+      print('Verification response: ${response.statusCode}');
+      print('Verification body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception('Verification failed: ${response.body}');
+      }
+    } catch (e) {
+      print('Error verifying payment: $e');
+      return null;
+    }
+  }
+
+  // Main payment initiation method
+  static Future<void> initiatePayment({
     required double amount,
     required String customerName,
     required String customerEmail,
@@ -22,45 +109,81 @@ class CashfreeService {
     required Function(Map<String, dynamic>) onSuccess,
     required Function(String) onFailure,
     String? orderId,
-  }) {
-    // Prevent multiple payments
+  }) async {
     if (_isPaymentActive) {
-      onFailure('Payment already in progress');
+      onFailure('Another payment is already in progress');
       return;
     }
 
+    print('=== Starting Payment Process ===');
+    print('Amount: ₹$amount');
+    print('Customer: $customerName');
+
     try {
       _isPaymentActive = true;
-      final orderIdFinal =
-          orderId ?? 'ORDER_${DateTime.now().millisecondsSinceEpoch}';
+      _paymentCounter++;
 
-      // Use a unique callback name for this payment
-      final callbackName =
-          'cashfreeCallback_${DateTime.now().millisecondsSinceEpoch}';
+      // Step 1: Create payment session via backend
+      final sessionData = await createPaymentSession(
+        amount: amount,
+        customerName: customerName,
+        customerEmail: customerEmail,
+        customerPhone: customerPhone,
+        orderId: orderId,
+      );
 
-      // Set up one-time callback
+      if (sessionData == null) {
+        _isPaymentActive = false;
+        onFailure('Failed to create payment session');
+        return;
+      }
+
+      final paymentSessionId = sessionData['paymentSessionId'];
+      final finalOrderId = sessionData['orderId'];
+
+      print('Payment session created: $paymentSessionId');
+      print('Order ID: $finalOrderId');
+
+      // Step 2: Check if Cashfree SDK is ready
+      if (!await _checkCashfreeAvailability()) {
+        _isPaymentActive = false;
+        onFailure('Payment system not ready. Please refresh and try again.');
+        return;
+      }
+
+      // Step 3: Set up callback and initiate payment
+      final callbackName = 'cashfreeCallback_${DateTime.now().millisecondsSinceEpoch}_$_paymentCounter';
+
       js.context[callbackName] = js.allowInterop((dynamic result) {
-        print('Payment callback executed: $result');
+        print('=== Payment Callback Received ===');
+        print('Result: $result');
 
-        // Immediately remove the callback to prevent loops
-        js.context[callbackName] = null;
+        // Clean up callback
+        try {
+          js.context[callbackName] = null;
+        } catch (e) {
+          print('Error removing callback: $e');
+        }
+
         _isPaymentActive = false;
 
         try {
           if (result != null) {
             String status = _getStringProperty(result, 'status') ?? 'FAILED';
-
+            
             if (status.toUpperCase() == 'SUCCESS') {
               Map<String, dynamic> resultMap = {
                 'status': status,
-                'orderId': _getStringProperty(result, 'orderId'),
-                'paymentId': _getStringProperty(result, 'paymentId'),
-                'signature': _getStringProperty(result, 'signature'),
+                'orderId': _getStringProperty(result, 'orderId') ?? finalOrderId,
+                'paymentId': _getStringProperty(result, 'paymentId') ?? '',
+                'signature': _getStringProperty(result, 'signature') ?? '',
               };
+              
+              print('Payment successful: $resultMap');
               onSuccess(resultMap);
             } else {
-              String message =
-                  _getStringProperty(result, 'message') ?? 'Payment failed';
+              String message = _getStringProperty(result, 'message') ?? 'Payment failed';
+              print('Payment failed: $message');
               onFailure(message);
             }
           } else {
@@ -68,106 +191,91 @@ class CashfreeService {
           }
         } catch (e) {
           print('Callback error: $e');
-          onFailure('Payment processing error: $e');
+          onFailure('Payment processing error');
         }
       });
 
-      // For production, you should create order on your backend
-      // and get paymentSessionId. For now, we'll use order details directly
-      _startPayment(
-        orderIdFinal,
-        amount,
-        customerName,
-        customerEmail,
-        customerPhone,
-        callbackName,
-        onFailure,
-      );
+      // Step 4: Start payment
+      _startPayment(paymentSessionId, callbackName, onFailure);
 
       // Safety timeout
       Timer(Duration(minutes: 10), () {
         if (_isPaymentActive) {
-          print('Payment timeout - cleaning up');
-          if (js.context[callbackName] != null) {
-            js.context[callbackName] = null;
-          }
           _isPaymentActive = false;
+          try {
+            if (js.context[callbackName] != null) {
+              js.context[callbackName] = null;
+            }
+          } catch (e) {
+            print('Timeout cleanup error: $e');
+          }
           onFailure('Payment timeout');
         }
       });
+
     } catch (e) {
       _isPaymentActive = false;
+      print('Payment initiation error: $e');
       onFailure('Error starting payment: $e');
     }
   }
 
   static void _startPayment(
-    String orderId,
-    double amount,
-    String customerName,
-    String customerEmail,
-    String customerPhone,
+    String paymentSessionId,
     String callbackName,
     Function(String) onFailure,
   ) {
-    // In a real app, you should:
-    // 1. Call your backend to create an order
-    // 2. Get paymentSessionId from the response
-    // 3. Pass paymentSessionId to the frontend
-
-    // For demo purposes, we're passing order details directly
-    html.window.postMessage({
-      'type': 'start_cashfree_payment',
-      'data': {
-        'appId': _appId,
-        'orderId': orderId,
-        'amount': amount,
-        'customerName': customerName,
-        'customerEmail': customerEmail,
-        'customerPhone': customerPhone,
-        'environment': _environment,
-        'callbackName': callbackName,
-        // Note: In production, you should get this from your backend
-        // 'paymentSessionId': 'session_id_from_backend',
-      },
-    }, '*');
-  }
-
-  // Create order (this should be done on your backend in production)
-  static Future<Map<String, dynamic>?> createOrder({
-    required String orderId,
-    required double amount,
-    required String customerName,
-    required String customerEmail,
-    required String customerPhone,
-  }) async {
-    // WARNING: This is for demo only - never put secret keys in frontend!
-    // In production, this should be done on your backend server
-
     try {
-      // This is just a placeholder - you need to implement backend order creation
-      return {
-        'orderId': orderId,
-        'paymentSessionId': 'demo_session_id', // This should come from backend
-        'status': 'OK',
+      print('Starting payment with session: $paymentSessionId');
+      
+      final paymentData = {
+        'type': 'start_cashfree_payment',
+        'data': {
+          'paymentSessionId': paymentSessionId,
+          'environment': environment,
+          'callbackName': callbackName,
+        },
       };
+      
+      html.window.postMessage(paymentData, '*');
+      print('Payment message posted');
     } catch (e) {
-      print('Error creating order: $e');
-      return null;
+      print('Error posting payment message: $e');
+      onFailure('Failed to start payment: $e');
     }
   }
 
-  // Simple property extraction
+  static Future<bool> _checkCashfreeAvailability({int maxWaitSeconds = 10}) async {
+    int attempts = 0;
+    int maxAttempts = maxWaitSeconds * 2;
+    
+    while (attempts < maxAttempts) {
+      try {
+        var cashfree = js.context['Cashfree'];
+        if (cashfree != null) {
+          print('Cashfree SDK available');
+          return true;
+        }
+      } catch (e) {
+        print('Cashfree check error: $e');
+      }
+      
+      await Future.delayed(Duration(milliseconds: 500));
+      attempts++;
+    }
+    
+    print('Cashfree SDK not available');
+    return false;
+  }
+
   static String? _getStringProperty(dynamic obj, String key) {
     try {
       if (obj == null) return null;
-
-      // Try direct access first
+      
       if (obj is Map) {
         return obj[key]?.toString();
       }
-
-      // Try JS property access
+      
       dynamic value = js_util.getProperty(obj, key);
       return value?.toString();
     } catch (e) {
@@ -176,21 +284,15 @@ class CashfreeService {
     }
   }
 
-  static void ensureCashfreeSDKLoaded() {
-    print('Checking Cashfree SDK...');
-
-    // Check if Cashfree is available
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      try {
-        var cashfree = js.context['Cashfree'];
-        if (cashfree != null) {
-          print('Cashfree SDK loaded successfully');
-          timer.cancel();
-        }
-      } catch (e) {
-        // Still loading
+  // Debug methods
+  static void debugCashfree() {
+    try {
+      if (js.context.hasProperty('debugCashfree')) {
+        js.context.callMethod('debugCashfree');
       }
-    });
+    } catch (e) {
+      print('Debug error: $e');
+    }
   }
 }
 
@@ -221,12 +323,9 @@ class PaymentResult {
       message: map['message'],
     );
   }
-}
 
-// Extension for URL parameters (keeping for compatibility)
-extension CashfreeUrlHandler on String {
-  Map<String, String> get urlParameters {
-    final uri = Uri.parse(this);
-    return uri.queryParameters;
+  @override
+  String toString() {
+    return 'PaymentResult(status: $status, orderId: $orderId, paymentId: $paymentId)';
   }
 }
