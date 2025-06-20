@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/application_forms/selectfile.dart';
 import 'package:vetassess/widgets/upload_layout.dart';
 
@@ -217,6 +218,7 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
                 ElevatedButton(
                   onPressed: () {
                     // Handle save and continue later
+                    context.go('/get_all_forms');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue[600],

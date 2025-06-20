@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/application_record.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 import '../../widgets/application_nav.dart';
 
-class DocumentUploadScreen extends StatefulWidget {
+class DocumentUploadScreen extends ConsumerStatefulWidget {
   const DocumentUploadScreen({Key? key}) : super(key: key);
 
   @override
-  State<DocumentUploadScreen> createState() => _DocumentUploadScreenState();
+  ConsumerState<DocumentUploadScreen> createState() => _DocumentUploadScreenState();
 }
 
-class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
+class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -99,9 +101,10 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             'Application Record:',
             'Click to download',
             isLink: true,
-             onTap: () async {
-                  await ApplicationRecordPdfGenerator.generateApplicationRecordPdf(context, 1);
-                }
+            onTap: () async {
+                await PdfGenerationService.generateApplicationRecordPdf(context, ref);
+              }
+
           ),
         ],
       ),
@@ -158,7 +161,9 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   Widget _buildUploadButton() => SizedBox(
     height: 40,
     child: ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        context.go('/get_all_forms');
+      },
       style: _buttonStyle(),
       child: const Text('Upload'),
     ),

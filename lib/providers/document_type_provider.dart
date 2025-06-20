@@ -14,7 +14,7 @@ import 'package:vetassess/utils/vetassess_api.dart';
 class DocumentTypeProvider extends StateNotifier<DocumentType> {
   DocumentTypeProvider() : super(DocumentType.initial());
 
-  Future<void> fetchDocumentCategories() async {
+  Future<void> getDocumentTypes() async {
     try {
       final headers = await AuthService.getAuthHeaders();
 

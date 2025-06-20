@@ -1,11 +1,13 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vetassess/models/getdocument_category.dart' show Data;
 import 'package:vetassess/providers/getdocument_category_provider.dart';
 import 'package:vetassess/providers/document_type_provider.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/providers/upload_documents_provider.dart';
 import 'dart:io';
+import 'package:vetassess/models/document_type.dart' as DocType;
 
 class FileSelectionDialog extends ConsumerStatefulWidget {
   @override
@@ -24,10 +26,10 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
   bool isDocumentTypesLoading = false;
   bool isUploading = false;
 
-  final List<String> tertiaryEducationOptions = [
-    'Select one',
-    'hgcrs - outds5ezx',
-  ];
+  // Store selected IDs for API calls
+  int? selectedCategoryId;
+  int? selectedSubCategoryId;
+  int? selectedDocumentTypeId;
 
   // Get user ID from login state
   int? get _currentUserId {
@@ -42,6 +44,9 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCategories();
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchDocumentTypes();
+    });
   }
 
   Future<void> _fetchCategories() async {
@@ -51,12 +56,12 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     });
   }
 
-  // New method to fetch document types when needed
+  // Fetch document types when needed
   Future<void> _fetchDocumentTypes() async {
     setState(() {
       isDocumentTypesLoading = true;
     });
-    await ref.read(documentTypeProvider.notifier).fetchDocumentCategories();
+    await ref.read(documentTypeProvider.notifier).getDocumentTypes();
     setState(() {
       isDocumentTypesLoading = false;
     });
@@ -68,29 +73,105 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     super.dispose();
   }
 
+  // Get parent categories (categories without parent)
+  List<Data> _getParentCategories(List<Data> allCategories) {
+    return allCategories.where((category) => category.parentCategory == null).toList();
+  }
+
+  // Get subcategories for a specific parent category
+  List<Data> _getSubCategories(List<Data> allCategories, int parentCategoryId) {
+    return allCategories
+        .where((category) => 
+            category.parentCategory != null && 
+            category.parentCategory!.id == parentCategoryId)
+        .toList();
+  }
+
+  // Get document types for a specific subcategory
+  List<DocType.Data> _getDocumentTypes(List<DocType.Data> allDocumentTypes, int subCategoryId) {
+    return allDocumentTypes
+        .where((docType) => docType.docCategoryId == subCategoryId)
+        .toList();
+  }
+
+
+  // Build dropdown widget
+  Widget _buildDropdown({
+    required String? value,
+    required String hint,
+    required List<DropdownMenuItem<String>> items,
+    required ValueChanged<String?> onChanged,
+    bool isLoading = false,
+  }) {
+    // Ensure the value exists in items, if not set to null
+    String? safeValue = value;
+    if (value != null && !items.any((item) => item.value == value)) {
+      safeValue = null;
+    }
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: isLoading
+          ? Container(
+              height: 48,
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600]!),
+                  ),
+                ),
+              ),
+            )
+          : DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: safeValue,
+                hint: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    hint,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  ),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: Icon(Icons.keyboard_arrow_down, color: Colors.grey[600]),
+                ),
+                isExpanded: true,
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final documentCategory = ref.watch(documentCategoryProvider);
     final documentTypes = ref.watch(documentTypeProvider);
 
-    // Create dropdown items from API data
-    List<String> documentCategories = ['Select one'];
+    // Get parent categories
+    List<Data> parentCategories = [];
     if (documentCategory.data != null && documentCategory.data!.isNotEmpty) {
-      documentCategories.addAll(
-        documentCategory.data!
-            .map((data) => data.documentCategory ?? '')
-            .where((cat) => cat.isNotEmpty),
-      );
+      parentCategories = _getParentCategories(documentCategory.data!);
     }
 
-    // Create document type dropdown items from API data
-    List<String> documentTypesList = ['Select one'];
-    if (documentTypes.data != null && documentTypes.data!.isNotEmpty) {
-      documentTypesList.addAll(
-        documentTypes.data!
-            .map((data) => data.name ?? '')
-            .where((name) => name.isNotEmpty),
-      );
+    // Get subcategories based on selected parent category
+    List<Data> subCategories = [];
+    if (selectedCategoryId != null && documentCategory.data != null) {
+      subCategories = _getSubCategories(documentCategory.data!, selectedCategoryId!);
+    }
+
+    // Get document types based on selected subcategory
+    List<DocType.Data> documentTypesList = [];
+    if (selectedSubCategoryId != null && documentTypes.data != null) {
+      documentTypesList = _getDocumentTypes(documentTypes.data!, selectedSubCategoryId!);
     }
 
     return Dialog(
@@ -126,7 +207,7 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
 
               SizedBox(height: 24),
 
-              // Document Category Label
+              // Document Category Section
               Text(
                 'Document Category',
                 style: TextStyle(
@@ -135,161 +216,111 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                   color: Colors.black87,
                 ),
               ),
-
               SizedBox(height: 8),
 
-              // First Dropdown - Document Category
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[300]!),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child:
-                    isLoading
-                        ? Container(
-                          height: 48,
-                          child: Center(
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.grey[600]!,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                        : DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedCategory,
-                            hint: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text(
-                                'Select one',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            icon: Padding(
-                              padding: EdgeInsets.only(right: 12),
-                              child: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            isExpanded: true,
-                            items:
-                                documentCategories.map((String category) {
-                                  return DropdownMenuItem<String>(
-                                    value:
-                                        category == 'Select one'
-                                            ? null
-                                            : category,
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                      ),
-                                      child: Text(
-                                        category,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color:
-                                              category == 'Select one'
-                                                  ? Colors.grey[600]
-                                                  : Colors.black87,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedCategory = newValue;
-                                // Reset sub-category and document type when main category changes
-                                selectedSubCategory = null;
-                                selectedDocumentType = null;
-                              });
-                            },
-                          ),
+              // First Dropdown - Parent Document Category
+              _buildDropdown(
+                value: selectedCategory,
+                hint: 'Select one',
+                isLoading: isLoading,
+                items: [
+                  DropdownMenuItem<String>(
+                    value: null,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'Select one',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                    ),
+                  ),
+                  ...parentCategories.map((Data category) {
+                    return DropdownMenuItem<String>(
+                      value: category.documentCategory,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          category.documentCategory ?? '',
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
                         ),
+                      ),
+                    );
+                  }).toList(),
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCategory = newValue;
+                    selectedSubCategory = null;
+                    selectedDocumentType = null;
+                    selectedSubCategoryId = null;
+                    selectedDocumentTypeId = null;
+                    
+                    // Find and store the selected category ID
+                    if (newValue != null) {
+                      final selectedCat = parentCategories.firstWhere(
+                        (cat) => cat.documentCategory == newValue,
+                      );
+                      selectedCategoryId = selectedCat.id;
+                    } else {
+                      selectedCategoryId = null;
+                    }
+                  });
+                },
               ),
 
-              // Second Dropdown - Show only when Tertiary Education is selected
-              if (selectedCategory == 'Tertiary Education') ...[
+              // Second Dropdown - Subcategories
+              if (selectedCategoryId != null && subCategories.isNotEmpty) ...[
                 SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedSubCategory,
-                      hint: Padding(
+                _buildDropdown(
+                  value: selectedSubCategory,
+                  hint: 'Select subcategory',
+                  items: [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           'Select one',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        ),
+                      ),
+                    ),
+                    ...subCategories.map((Data subCategory) {
+                      return DropdownMenuItem<String>(
+                        value: subCategory.documentCategory,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            subCategory.documentCategory ?? '',
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
                           ),
                         ),
-                      ),
-                      icon: Padding(
-                        padding: EdgeInsets.only(right: 12),
-                        child: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      isExpanded: true,
-                      items:
-                          tertiaryEducationOptions.map((String option) {
-                            return DropdownMenuItem<String>(
-                              value: option == 'Select one' ? null : option,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 12),
-                                child: Text(
-                                  option,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color:
-                                        option == 'Select one'
-                                            ? Colors.grey[600]
-                                            : Colors.black87,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedSubCategory = newValue;
-                          // Reset document type when sub-category changes
-                          selectedDocumentType = null;
-                        });
-                        // Fetch document types when subcategory is selected
-                        if (newValue == 'hgcrs - outds5ezx') {
-                          _fetchDocumentTypes();
-                        }
-                      },
-                    ),
-                  ),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSubCategory = newValue;
+                      selectedDocumentType = null;
+                      selectedDocumentTypeId = null;
+                      
+                      // Find and store the selected subcategory ID
+                      if (newValue != null) {
+                        final selectedSubCat = subCategories.firstWhere(
+                          (subCat) => subCat.documentCategory == newValue,
+                        );
+                        selectedSubCategoryId = selectedSubCat.id;
+                      } else {
+                        selectedSubCategoryId = null;
+                      }
+                    });
+                  },
                 ),
               ],
 
-              // Third Dropdown - Show only when "hgcrs - outds5ezx" is selected
-              if (selectedCategory == 'Tertiary Education' &&
-                  selectedSubCategory == 'hgcrs - outds5ezx') ...[
+                              // Third Dropdown - Document Types
+              if (selectedSubCategoryId != null) ...[
                 SizedBox(height: 16),
-
-                // Document type Label
                 Text(
                   'Document type',
                   style: TextStyle(
@@ -298,86 +329,61 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                     color: Colors.black87,
                   ),
                 ),
-
                 SizedBox(height: 8),
 
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child:
-                      isDocumentTypesLoading
-                          ? Container(
-                            height: 48,
-                            child: Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.grey[600]!,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                          : DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: selectedDocumentType,
-                              hint: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 12),
-                                child: Text(
-                                  'Select one',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              icon: Padding(
-                                padding: EdgeInsets.only(right: 12),
-                                child: Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              isExpanded: true,
-                              items:
-                                  documentTypesList.map((String type) {
-                                    return DropdownMenuItem<String>(
-                                      value: type == 'Select one' ? null : type,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                        ),
-                                        child: Text(
-                                          type,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color:
-                                                type == 'Select one'
-                                                    ? Colors.grey[600]
-                                                    : Colors.black87,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedDocumentType = newValue;
-                                });
-                              },
-                            ),
+                _buildDropdown(
+                  value: selectedDocumentType,
+                  hint: 'Select document type',
+                  isLoading: isDocumentTypesLoading,
+                  items: [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'Select one',
+                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        ),
+                      ),
+                    ),
+                    // Remove duplicates and null values
+                    ...documentTypesList
+                        .where((docType) => docType.name != null && docType.name!.isNotEmpty)
+                        .toSet() // Remove duplicates
+                        .map((DocType.Data docType) {
+                      return DropdownMenuItem<String>(
+                        value: "${docType.id}_${docType.name}", // Use unique identifier
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            docType.name ?? '',
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
                           ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      if (newValue != null && newValue.contains('_')) {
+                        // Extract ID and name from the combined value
+                        final parts = newValue.split('_');
+                        final docId = int.tryParse(parts[0]);
+                        final docName = parts.sublist(1).join('_'); // In case name contains underscore
+                        
+                        selectedDocumentType = newValue;
+                        selectedDocumentTypeId = docId;
+                      } else {
+                        selectedDocumentType = null;
+                        selectedDocumentTypeId = null;
+                      }
+                    });
+                  },
                 ),
 
                 SizedBox(height: 16),
 
-                // Information text (moved to correct position - right after document type dropdown)
+                // Information text
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -396,10 +402,8 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                 ),
               ],
 
-              // Additional fields when any document type is selected
-              if (selectedCategory == 'Tertiary Education' &&
-                  selectedSubCategory == 'hgcrs - outds5ezx' &&
-                  selectedDocumentType != null) ...[
+              // Show additional fields ONLY when document type is selected
+              if (selectedDocumentTypeId != null) ...[
                 SizedBox(height: 24),
 
                 // Description Section
@@ -411,7 +415,6 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                     color: Colors.black87,
                   ),
                 ),
-
                 SizedBox(height: 8),
 
                 Container(
@@ -424,12 +427,8 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                     controller: descriptionController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText:
-                          'Please add a description advising what you are uploading.',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                      hintText: 'Please add a description advising what you are uploading.',
+                      hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(12),
                     ),
@@ -456,10 +455,7 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                           SizedBox(height: 4),
                           Text(
                             '.pdf, .png, .jpg, .jpeg, .gif, .tiff',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                           ),
                         ],
                       ),
@@ -479,10 +475,7 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                         SizedBox(height: 4),
                         Text(
                           '5 MB',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -500,14 +493,11 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                     color: Colors.black87,
                   ),
                 ),
-
                 SizedBox(height: 8),
 
-                // File selection input (clickable to open file picker)
+                // File selection input
                 GestureDetector(
-                  onTap: () {
-                    _pickFile();
-                  },
+                  onTap: _pickFile,
                   child: Container(
                     height: 40,
                     decoration: BoxDecoration(
@@ -517,22 +507,14 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                     child: Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.grey[100],
-                            border: Border(
-                              right: BorderSide(color: Colors.grey[300]!),
-                            ),
+                            border: Border(right: BorderSide(color: Colors.grey[300]!)),
                           ),
                           child: Text(
                             'Choose File',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[700],
-                            ),
+                            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                           ),
                         ),
                         Expanded(
@@ -542,10 +524,9 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
                               selectedFileName ?? 'No file chosen',
                               style: TextStyle(
                                 fontSize: 12,
-                                color:
-                                    selectedFileName != null
-                                        ? Colors.black87
-                                        : Colors.grey[600],
+                                color: selectedFileName != null
+                                    ? Colors.black87
+                                    : Colors.grey[600],
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -558,44 +539,35 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
 
                 SizedBox(height: 24),
 
-                // Upload button (for submitting all form data)
+                // Upload button
                 SizedBox(
-                  width: 60,
+                  width: double.infinity,
                   child: ElevatedButton(
-                    onPressed:
-                        isUploading
-                            ? null
-                            : () {
-                              _uploadFormData();
-                            },
+                    onPressed: isUploading ? null : _uploadFormData,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isUploading ? Colors.grey : Colors.green[600],
+                      backgroundColor: isUploading ? Colors.grey : Colors.green[600],
                       padding: EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    child:
-                        isUploading
-                            ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            )
-                            : Text(
-                              'Upload',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                    child: isUploading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
+                          )
+                        : Text(
+                            'Upload',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -605,6 +577,8 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
       ),
     );
   }
+
+
 
   // Method to handle file picking
   Future<void> _pickFile() async {
@@ -643,39 +617,30 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     }
   }
 
-  // Updated _uploadFormData method for your FileSelectionDialog class
+  // Updated _uploadFormData method
   Future<void> _uploadFormData() async {
     // Validate required fields
-    if (selectedCategory == null) {
+    if (selectedCategoryId == null) {
       _showErrorDialog('Please select a document category');
       return;
     }
 
-    if (selectedCategory == 'Tertiary Education' &&
-        selectedSubCategory == null) {
+    if (selectedSubCategoryId == null) {
       _showErrorDialog('Please select a subcategory');
       return;
     }
 
-    if (selectedCategory == 'Tertiary Education' &&
-        selectedSubCategory == 'hgcrs - outds5ezx' &&
-        selectedDocumentType == null) {
+    if (selectedDocumentTypeId == null) {
       _showErrorDialog('Please select a document type');
       return;
     }
 
-    if (selectedCategory == 'Tertiary Education' &&
-        selectedSubCategory == 'hgcrs - outds5ezx' &&
-        selectedDocumentType != null &&
-        selectedPlatformFile == null) {
+    if (selectedPlatformFile == null) {
       _showErrorDialog('Please select a file to upload');
       return;
     }
 
-    if (selectedCategory == 'Tertiary Education' &&
-        selectedSubCategory == 'hgcrs - outds5ezx' &&
-        selectedDocumentType != null &&
-        descriptionController.text.trim().isEmpty) {
+    if (descriptionController.text.trim().isEmpty) {
       _showErrorDialog('Please add a description');
       return;
     }
@@ -690,37 +655,35 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     });
 
     try {
-      // Get document category ID
-      int? docCategoryId = _getDocumentCategoryId();
-      if (docCategoryId == null) {
-        _showErrorDialog('Could not find document category ID');
-        return;
-      }
-
-      // Get document type ID
-      int? docTypeId = _getDocumentTypeId();
-      if (docTypeId == null) {
-        _showErrorDialog('Could not find document type ID');
-        return;
-      }
-
-      // Use the instance method from UploadProvider with both file parameters
-      final result = await ref
-          .read(uploadProvider.notifier)
-          .uploadFile(
+      // Upload the document
+      final result = await ref.read(uploadProvider.notifier).uploadFile(
             description: descriptionController.text.trim(),
-            docCategoryId: docCategoryId,
-            docTypeId: docTypeId,
+            docCategoryId: selectedSubCategoryId!,
+            docTypeId: selectedDocumentTypeId!,
             userId: _currentUserId!,
             file: selectedFile, // For mobile platforms
             platformFile: selectedPlatformFile, // For web platforms
           );
 
       if (result['success']) {
-        // Show success message
-        _showSuccessDialog(result['message']);
+        // Show success dialog and wait for user to dismiss
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text(result['message']),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
 
-        // Close dialog with result
+        // After the success dialog is dismissed, close the parent dialog
         Navigator.of(context).pop({
           'success': true,
           'category': selectedCategory,
@@ -743,31 +706,6 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
     }
   }
 
-  // Helper method to get document category ID
-  int? _getDocumentCategoryId() {
-    final documentCategory = ref.read(documentCategoryProvider);
-    if (documentCategory.data != null && selectedCategory != null) {
-      for (var data in documentCategory.data!) {
-        if (data.documentCategory == selectedCategory) {
-          return data.id;
-        }
-      }
-    }
-    return null;
-  }
-
-  // Helper method to get document type ID
-  int? _getDocumentTypeId() {
-    final documentTypes = ref.read(documentTypeProvider);
-    if (documentTypes.data != null && selectedDocumentType != null) {
-      for (var data in documentTypes.data!) {
-        if (data.name == selectedDocumentType) {
-          return data.id;
-        }
-      }
-    }
-    return null;
-  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -775,24 +713,6 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Error'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showSuccessDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
           content: Text(message),
           actions: [
             TextButton(

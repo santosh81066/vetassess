@@ -244,6 +244,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/get_all_forms',
         builder: (context, state) => const ReviewAndConfirm(),
       ),
+      GoRoute(
+        path: '/cashfree_pay',
+        builder: (context, state) => const CashfreePaymentScreen(),
+      ),
     ],
   );
 });

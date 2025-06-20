@@ -56,7 +56,8 @@ class AppliOptions extends StatelessWidget {
                 //   ),
                 // );
                       //context.go('/vetassess_upload');      
-                      context.go('/doc_upload');   
+                     // context.go('/doc_upload');
+                     context.go('/maintenance');
               },
               color: const Color(0xFF006257),
               context: context,
@@ -70,10 +71,8 @@ class AppliOptions extends StatelessWidget {
               title: 'View Submitted Applications',
               icon: Icons.description_outlined,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EmploymentForm()),
-                );
+                 //context.go('/get_all_forms');
+                context.go('/maintenance');
               },
               color: const Color(0xFF006257),
               context: context,

@@ -257,7 +257,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                 ref.read(tertiaryEducationProvider.notifier).resetState();
                 
                 print('Navigating to /doc_upload');
-                context.go('/employment_form');
+                context.go('/doc_upload');
               },
               child: const Text('Continue'),
             ),

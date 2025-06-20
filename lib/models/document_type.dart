@@ -3,20 +3,6 @@ class DocumentType {
 
   DocumentType({this.data});
 
-  // CopyWith method
-  DocumentType copyWith({List<Data>? data}) {
-    return DocumentType(
-      data: data ?? this.data,
-    );
-  }
-
-  // Initial factory constructor
-  factory DocumentType.initial() {
-    return DocumentType(
-      data: [],
-    );
-  }
-
   DocumentType.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = <Data>[];
@@ -27,54 +13,62 @@ class DocumentType {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> jsonData = {};
     if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+      jsonData['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    return data;
+    return jsonData;
+  }
+
+  DocumentType copyWith({List<Data>? data}) {
+    return DocumentType(
+      data: data ?? this.data,
+    );
+  }
+
+  factory DocumentType.initial() {
+    return DocumentType(data: []);
   }
 }
 
 class Data {
   int? id;
   String? name;
-  int? docDocumentTypeId;
+  int? docCategoryId;
 
-  Data({this.id, this.name, this.docDocumentTypeId});
-
-  // CopyWith method
-  Data copyWith({
-    int? id,
-    String? name,
-    int? docDocumentTypeId,
-  }) {
-    return Data(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      docDocumentTypeId: docDocumentTypeId ?? this.docDocumentTypeId,
-    );
-  }
-
-  // Initial factory constructor
-  factory Data.initial() {
-    return Data(
-      id: 0,
-      name: '',
-      docDocumentTypeId: 0,
-    );
-  }
+  Data({this.id, this.name, this.docCategoryId});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    docDocumentTypeId = json['docDocumentType_id'];
+    docCategoryId = json['docCategory_id'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['docDocumentType_id'] = this.docDocumentTypeId;
-    return data;
+    final Map<String, dynamic> jsonData = {};
+    jsonData['id'] = this.id;
+    jsonData['name'] = this.name;
+    jsonData['docCategory_id'] = this.docCategoryId;
+    return jsonData;
+  }
+
+  Data copyWith({
+    int? id,
+    String? name,
+    int? docCategoryId,
+  }) {
+    return Data(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      docCategoryId: docCategoryId ?? this.docCategoryId,
+    );
+  }
+
+  factory Data.initial() {
+    return Data(
+      id: 0,
+      name: '',
+      docCategoryId: 0,
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:vetassess/providers/get_allforms_providers.dart';
 import 'package:vetassess/providers/login_provider.dart';
@@ -144,6 +145,12 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
                     ? _buildEmptyState()
                     : _buildFormsList(filteredData),
           ),
+          ElevatedButton(
+            onPressed: ()=> context.go('/cashfree_pay'),
+
+            
+           child: Text('Continue to Payment',)
+           )
         ],
       ),
     );
