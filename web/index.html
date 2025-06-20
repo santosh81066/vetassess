@@ -1,141 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the --base-href argument provided to flutter build.
+  -->
   <base href="$FLUTTER_BASE_HREF">
+
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="vetassess">
   <link rel="apple-touch-icon" href="./icons/Icon-192.png">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="./favicon.png"/>
+
   <title>vetassess</title>
   <link rel="manifest" href="./manifest.json">
 </head>
 <body>
 <script src="./flutter_bootstrap.js" async></script>
-
-<!-- Updated Cashfree SDK - Using the latest version -->
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-
-<script>
-  console.log('Loading Cashfree integration...');
-
-  // Wait for Cashfree to load
-  function waitForCashfree(callback) {
-    if (typeof Cashfree !== 'undefined') {
-      console.log('Cashfree SDK loaded successfully');
-      callback();
-    } else {
-      console.log('Waiting for Cashfree SDK...');
-      setTimeout(() => waitForCashfree(callback), 100);
-    }
-  }
-
-  // Initialize Cashfree when ready
-  waitForCashfree(() => {
-    console.log('Cashfree initialized');
-
-    // Set environment
-    Cashfree.setEnvironment('sandbox'); // Change to 'production' for live
-  });
-
-  // Enhanced message-based payment system
-  window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'start_cashfree_payment') {
-      console.log('Starting Cashfree payment...');
-
-      const paymentData = event.data.data;
-      const callbackName = paymentData.callbackName;
-
-      if (typeof Cashfree === 'undefined') {
-        console.error('Cashfree SDK not loaded');
-        if (window[callbackName]) {
-          window[callbackName]({
-            status: 'FAILED',
-            message: 'Payment system not loaded. Please refresh and try again.'
-          });
-        }
-        return;
-      }
-
-      // Create checkout session
-      const checkoutOptions = {
-        paymentSessionId: paymentData.paymentSessionId || '', // This should come from your backend
-        redirectTarget: '_modal', // or '_self' for redirect
-      };
-
-      // Alternative: If you don't have paymentSessionId, use order details
-      if (!checkoutOptions.paymentSessionId) {
-        // This is a fallback - ideally you should get paymentSessionId from backend
-        checkoutOptions = {
-          orderId: paymentData.orderId,
-          orderAmount: paymentData.amount,
-          orderCurrency: "INR",
-          customerName: paymentData.customerName,
-          customerEmail: paymentData.customerEmail,
-          customerPhone: paymentData.customerPhone,
-          appId: paymentData.appId,
-          redirectTarget: '_modal',
-        };
-      }
-
-      try {
-        // Create checkout session
-        Cashfree.checkout(checkoutOptions).then(function(result) {
-          console.log('Payment Success:', result);
-
-          // Call the Dart callback
-          if (window[callbackName]) {
-            window[callbackName]({
-              status: 'SUCCESS',
-              orderId: result.orderId || paymentData.orderId,
-              paymentId: result.paymentId,
-              signature: result.signature || result.paymentMessage
-            });
-          }
-        }).catch(function(error) {
-          console.log('Payment Failed:', error);
-
-          // Call the Dart callback
-          if (window[callbackName]) {
-            window[callbackName]({
-              status: 'FAILED',
-              message: error.message || 'Payment failed'
-            });
-          }
-        });
-
-      } catch (error) {
-        console.error('Cashfree checkout error:', error);
-        if (window[callbackName]) {
-          window[callbackName]({
-            status: 'FAILED',
-            message: 'Payment system error: ' + error.message
-          });
-        }
-      }
-    }
-  });
-
-  // Debug function
-  window.debugCashfree = function() {
-    console.log('=== Cashfree Debug ===');
-    console.log('Cashfree available:', typeof Cashfree !== 'undefined');
-    if (typeof Cashfree !== 'undefined') {
-      console.log('Cashfree object:', Cashfree);
-    }
-  };
-
-  // Check when page loads
-  window.addEventListener('load', function() {
-    console.log('Page loaded, checking Cashfree...');
-    setTimeout(() => {
-      window.debugCashfree();
-    }, 2000); // Increased timeout to allow SDK to load
-  });
-
-</script>
 </body>
 </html>
