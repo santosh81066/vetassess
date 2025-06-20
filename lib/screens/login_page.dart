@@ -88,9 +88,28 @@ class LoginPage extends StatelessWidget {
               title:
                   'Skills assessment for \nprofessional and general \noccupations',
               links: [
-                LinkItem(text: 'Check your occupation', hasArrow: true),
-                LinkItem(text: 'Fees', hasArrow: true),
-                LinkItem(text: 'Supporting documents', hasArrow: true),
+                LinkItem(
+                  text: 'Check your occupation',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/maintenance');
+                  },
+                ),
+                LinkItem(
+                  text: 'Fees',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/fee_screen');
+                  },
+                ),
+                LinkItem(
+                  text: 'Supporting documents',
+                  hasArrow: true,
+                  onTap: () {
+                    // Add navigation for supporting documents
+                    context.go('/eligibility_criteria');
+                  },
+                ),
               ],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -100,9 +119,27 @@ class LoginPage extends StatelessWidget {
               screenWidth: screenWidth,
               title: 'Skill assessment for trade \noccupations',
               links: [
-                LinkItem(text: 'Check your occupation', hasArrow: true),
-                LinkItem(text: 'Fees', hasArrow: true),
-                LinkItem(text: 'Am I eligible', hasArrow: true),
+                LinkItem(
+                  text: 'Check your occupation',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/maintenance');
+                  },
+                ),
+                LinkItem(
+                  text: 'Fees',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/fee_screen');
+                  },
+                ),
+                LinkItem(
+                  text: 'Am I eligible',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/eligibility_criteria');
+                  },
+                ),
               ],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -112,7 +149,15 @@ class LoginPage extends StatelessWidget {
               screenWidth: screenWidth,
               title:
                   'Skill assessment support (for \nprofessional and general \noccupations)',
-              links: [LinkItem(text: 'How to apply', hasArrow: true)],
+              links: [
+                LinkItem(
+                  text: 'How to apply',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/skills_assess_support');
+                  },
+                ),
+              ],
               hasReadyButton: true,
               hasLoginButton: true,
             ),
@@ -121,8 +166,20 @@ class LoginPage extends StatelessWidget {
               screenWidth: screenWidth,
               title: 'Chinese Qualifications \nVerification',
               links: [
-                LinkItem(text: 'Fees', hasArrow: true),
-                LinkItem(text: 'Supporting documents', hasArrow: true),
+                LinkItem(
+                  text: 'Fees',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/fee_screen');
+                  },
+                ),
+                LinkItem(
+                  text: 'Supporting documents',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/eligibility_criteria');
+                  },
+                ),
               ],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -149,8 +206,20 @@ class LoginPage extends StatelessWidget {
               screenWidth: screenWidth,
               title: 'Psychotherapy and counselling qualifications assessment',
               links: [
-                LinkItem(text: 'Fees', hasArrow: true),
-                LinkItem(text: 'Supporting documents', hasArrow: true),
+                LinkItem(
+                  text: 'Fees',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/fee_screen');
+                  },
+                ),
+                LinkItem(
+                  text: 'Supporting documents',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/eligibility_criteria');
+                  },
+                ),
               ],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -161,8 +230,20 @@ class LoginPage extends StatelessWidget {
               title:
                   'Financial Adviser Standards and Ethics Authority qualifications comparison to the AQF',
               links: [
-                LinkItem(text: 'Fees', hasArrow: true),
-                LinkItem(text: 'Supporting documents', hasArrow: true),
+                LinkItem(
+                  text: 'Fees',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/fee_screen');
+                  },
+                ),
+                LinkItem(
+                  text: 'Supporting documents',
+                  hasArrow: true,
+                  onTap: () {
+                    context.go('/eligibility_criteria');
+                  },
+                ),
               ],
               hasReadyButton: true,
               hasLoginButton: true,
@@ -620,7 +701,7 @@ Widget _buildLink(LinkItem link) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 16.0),
     child: InkWell(
-      onTap: () {},
+      onTap: link.onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -650,10 +731,11 @@ Widget _buildLink(LinkItem link) {
   );
 }
 
-// Helper class for link items
+// Updated LinkItem class to include onTap callback
 class LinkItem {
   final String text;
   final bool hasArrow;
+  final VoidCallback? onTap;
 
-  LinkItem({required this.text, required this.hasArrow});
+  LinkItem({required this.text, required this.hasArrow, this.onTap});
 }
