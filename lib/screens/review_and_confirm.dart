@@ -107,54 +107,92 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
         false;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final loginid = ref.read(loginProvider).response?.userId;
-    final data = ref.read(getAllformsProviders).users;
-    final filteredData =
-        data?.where((item) => item.userId == loginid).toList() ?? [];
+ @override
+Widget build(BuildContext context) {
+  final loginid = ref.read(loginProvider).response?.userId;
+  final data = ref.read(getAllformsProviders).users;
+  final filteredData =
+      data?.where((item) => item.userId == loginid).toList() ?? [];
 
-    return LoginPageLayout(
-      child: Column(
-        children: [
-          Container(
-            height: 100,
-            color: Color(0xFF00565B),
-            child: Center(
-              child: Text(
-                "Review & Confirm",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
+  // Show informative popup
+  void showInfoPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text("Important Note"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/images/vetassess_logo.png', // Ensure this image is in your assets
+                height: 100,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "You have successfully submitted your documents. "
+                "Please wait while the VETASSESS team reviews your information. "
+                "Our team will contact you shortly for any further details or verification steps. "
+                "Ensure your contact information is up-to-date to avoid any delays",
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // After confirming, you can optionally navigate
+                 context.go('/appli_opt'); 
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  return LoginPageLayout(
+    child: Column(
+      children: [
+        Container(
+          height: 100,
+          color: const Color(0xFF00565B),
+          child: const Center(
+            child: Text(
+              "Review & Confirm",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          Container(
-            child:
-                isLoading
-                    ? const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF00565B),
-                        ),
-                      ),
-                    )
-                    : filteredData.isEmpty
-                    ? _buildEmptyState()
-                    : _buildFormsList(filteredData),
-          ),
-          ElevatedButton(
-            onPressed: ()=> context.go('/cashfree_pay'),
-
-            
-           child: Text('Continue to Payment',)
-           )
-        ],
-      ),
-    );
-  }
+        ),
+        Container(
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF00565B),
+                    ),
+                  ),
+                )
+              : filteredData.isEmpty
+                  ? _buildEmptyState()
+                  : _buildFormsList(filteredData),
+        ),
+        ElevatedButton(
+          onPressed: showInfoPopup,
+          child: const Text('Confirm'),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildEmptyState() {
     return Center(
