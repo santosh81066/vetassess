@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/providers/visatype_provider.dart';
-import 'package:vetassess/providers/occupationtype_provider.dart'; // Add this import
+import 'package:vetassess/providers/occupationtype_provider.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 import '../../widgets/application_nav.dart';
 import 'appli_general_edu.dart';
 import 'package:vetassess/models/getvisatype_model.dart';
-import 'package:vetassess/models/getoccupationtype_model.dart'; // Add this import
+import 'package:vetassess/models/getoccupationtype_model.dart';
 
 class OccupationForm extends ConsumerStatefulWidget {
   const OccupationForm({super.key});
@@ -19,30 +19,27 @@ class OccupationForm extends ConsumerStatefulWidget {
 
 class _OccupationFormState extends ConsumerState<OccupationForm> {
   bool isFullSkillsAssessment = true;
-  Occupations? selectedOccupation; // Add this for selected occupation
-  
-  
+  Occupations? selectedOccupation;
   bool _isLoading = false;
+
   // Responsive breakpoints
   static const double _smallBreakpoint = 600;
   static const double _mediumBreakpoint = 900;
 
-   int? get _currentUserId {
+  int? get _currentUserId {
     final loginState = ref.read(loginProvider);
     return loginState.response?.userId;
   }
 
-   int? get _visaId {
+  int? get _visaId {
     final visaState = ref.read(visatypeProvider);
     return visaState.selectedVisaType?.id;
   }
 
-   int? get _occupationId {
-    final visaState = ref.read(occupationtypeProvider);
-    return visaState.occupations?.first.id;
+  // Fixed: Use selectedOccupation from local state instead of provider
+  int? get _occupationId {
+    return selectedOccupation?.id;
   }
-
-
 
   @override
   void initState() {
@@ -50,7 +47,7 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
     // Fetch initial visa types for Full Skills Assessment and occupations
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchVisaTypesForCurrentSelection();
-      _fetchOccupations(); // Add this line
+      _fetchOccupations();
     });
   }
 
@@ -60,60 +57,195 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
     ref.read(visatypeProvider.notifier).fetchVisaTypes(category);
   }
 
-  // Add this method to fetch occupations
   void _fetchOccupations() {
     ref.read(occupationtypeProvider.notifier).fetchDocumentCategories();
   }
 
+  // Enhanced validation method
+  String? _validateForm() {
+    final errors = <String>[];
 
-    Future<void> _continue() async {
-    
-
-     // Check if user ID is available
-    final userId = _currentUserId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in. Please login again.')),
-      );
-      return;
+    // Check if user is logged in
+    if (_currentUserId == null) {
+      errors.add('User not logged in. Please login again.');
     }
 
-     final visaid = _visaId;
-      if (visaid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('visaid not get')),
-      );
-      return;
+    // Check if visa type is selected
+    if (_visaId == null) {
+      errors.add('Please select a visa type.');
     }
 
-    final occupationid = _occupationId;
-      if (occupationid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('occupationid not get')),
+    // Check if occupation is selected
+    if (selectedOccupation == null) {
+      errors.add('Please select an occupation.');
+    }
+
+    return errors.isEmpty ? null : errors.join('\n');
+  }
+
+  void _showErrorDialog({required String title, required String message}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.red.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.4,
+          ),
+          child: SingleChildScrollView(
+            child: SelectableText(
+              message,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.teal,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSuccessDialog({required String message, VoidCallback? onContinue}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Success',
+          style: TextStyle(
+            color: Colors.green,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onContinue?.call();
+            },
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                color: Colors.teal,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _continue() async {
+    // Validate form before submission
+    final validationError = _validateForm();
+    if (validationError != null) {
+      _showErrorDialog(
+        title: 'Validation Error',
+        message: validationError,
       );
       return;
     }
 
     setState(() => _isLoading = true);
-    
-    // Submit the form
-    final  success = await ref.read(occupationtypeProvider.notifier).submitOccupations(    
-      userId:  userId,
-      visaId: visaid ,
-      occupationId:occupationid
-    );
-    
-    setState(() => _isLoading = false);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Personal details submitted successfully!')),
+
+    try {
+      // Submit the form
+      final result = await ref.read(occupationtypeProvider.notifier).submitOccupations(
+        userId: _currentUserId!,
+        visaId: _visaId!,
+        occupationId: _occupationId!,
       );
-      context.go('/education_form');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to submit. Please try again.')),
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        if (result.success) {
+          _showSuccessDialog(
+            message: 'Occupation details submitted successfully!',
+            onContinue: () => context.go('/education_form'),
+          );
+        } else {
+          _showErrorDialog(
+            title: 'Submission Failed',
+            message: result.errorMessage ?? 'Failed to submit occupation details. Please try again.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(
+          title: 'Error',
+          message: 'An unexpected error occurred: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _saveAsDraft() async {
+    // Basic validation for draft
+    if (_currentUserId == null) {
+      _showErrorDialog(
+        title: 'Error',
+        message: 'User not logged in. Please login again.',
       );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // For draft, we can save even without complete data
+      final result = await ref.read(occupationtypeProvider.notifier).saveAsDraft(
+        userId: _currentUserId!,
+        visaId: _visaId,
+        occupationId: _occupationId,
+        assessmentType: isFullSkillsAssessment ? 'Full Skills Assessment' : 'Qualifications Only',
+      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Draft saved successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          _showErrorDialog(
+            title: 'Save Draft Failed',
+            message: result.errorMessage ?? 'Failed to save draft. Please try again.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(
+          title: 'Error',
+          message: 'An unexpected error occurred: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -121,7 +253,6 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final responsive = _ResponsiveHelper(size);
-    
 
     return LoginPageLayout(
       child: Row(
@@ -196,7 +327,10 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
           const SizedBox(height: 25),
           ..._buildFormFields(responsive),
           const SizedBox(height: 30),
-          _buildActionButtons(responsive),
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else
+            _buildActionButtons(responsive),
           const SizedBox(height: 15),
         ],
       ),
@@ -232,8 +366,11 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
         'ANZSCO code',
         false,
         Text(
-          selectedOccupation?.anzscoCode ?? '234111',
-          style: TextStyle(fontSize: responsive.fontSize),
+          selectedOccupation?.anzscoCode ?? 'Please select an occupation',
+          style: TextStyle(
+            fontSize: responsive.fontSize,
+            color: selectedOccupation?.anzscoCode != null ? Colors.black : Colors.grey,
+          ),
         ),
         responsive,
       ),
@@ -271,18 +408,18 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
   }
 
   Widget _buildFormRow(
-    String label,
-    bool isRequired,
-    Widget content,
-    _ResponsiveHelper responsive, {
-    EdgeInsets? contentPadding,
-  }) {
+      String label,
+      bool isRequired,
+      Widget content,
+      _ResponsiveHelper responsive, {
+        EdgeInsets? contentPadding,
+      }) {
     final labelWidget = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
           child: Text(
-            label, 
+            label,
             style: const TextStyle(fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
@@ -336,193 +473,172 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
     );
   }
 
- Widget _buildRadioOption(bool value, String label) {
-  return Row(
-    children: [
-      Radio<bool>(
-        value: value,
-        groupValue: isFullSkillsAssessment,
-        onChanged: (v) {
-          if (v != null) {
-            setState(() => isFullSkillsAssessment = v);
-            // Clear current selection and fetch new visa types
-            ref.read(visatypeProvider.notifier).clearSelection();
-            _fetchVisaTypesForCurrentSelection();
-          }
-        },
-        activeColor: Colors.blue,
-      ),
-      Flexible(child: Text(label)),
-      const SizedBox(width: 5),
-      const Icon(Icons.info_outline, color: Colors.blue, size: 18),
-    ],
-  );
-}
-
-Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
-  final visaTypeState = ref.watch(visatypeProvider);
-  final currentCategory = isFullSkillsAssessment ? 'Full Skills Assessment' : 'Qualifications Only';
-
-  if (visaTypeState.isLoading) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Loading visa types...',
-              style: TextStyle(fontSize: responsive.fontSize),
-            ),
-          ],
+  Widget _buildRadioOption(bool value, String label) {
+    return Row(
+      children: [
+        Radio<bool>(
+          value: value,
+          groupValue: isFullSkillsAssessment,
+          onChanged: (v) {
+            if (v != null) {
+              setState(() {
+                isFullSkillsAssessment = v;
+                // Clear selections when changing assessment type
+                selectedOccupation = null;
+              });
+              // Clear current selection and fetch new visa types
+              ref.read(visatypeProvider.notifier).clearSelection();
+              _fetchVisaTypesForCurrentSelection();
+            }
+          },
+          activeColor: Colors.blue,
         ),
-      ),
+        Flexible(child: Text(label)),
+        const SizedBox(width: 5),
+        const Icon(Icons.info_outline, color: Colors.blue, size: 18),
+      ],
     );
   }
 
-  if (visaTypeState.error != null) {
+  Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
+    final visaTypeState = ref.watch(visatypeProvider);
+    final currentCategory = isFullSkillsAssessment ? 'Full Skills Assessment' : 'Qualifications Only';
+
+    if (visaTypeState.isLoading) {
+      return Container(
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Loading visa types...',
+                style: TextStyle(fontSize: responsive.fontSize),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (visaTypeState.error != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.red),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Center(
+              child: Text(
+                'Error loading visa types',
+                style: TextStyle(color: Colors.red, fontSize: responsive.fontSize),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: _fetchVisaTypesForCurrentSelection,
+            child: const Text('Retry'),
+          ),
+        ],
+      );
+    }
+
+    // Filter visa types for current category
+    final filteredVisaTypes = visaTypeState.visaTypes
+        .where((visaType) => visaType.category?.trim() == currentCategory.trim())
+        .toList();
+
+    if (filteredVisaTypes.isEmpty) {
+      return Container(
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: Text(
+            'No visa types available for $currentCategory',
+            style: TextStyle(fontSize: responsive.fontSize),
+          ),
+        ),
+      );
+    }
+
+    // Check if selected visa type belongs to current category
+    VisaTypeModel? validSelectedVisaType = visaTypeState.selectedVisaType;
+    if (validSelectedVisaType != null &&
+        validSelectedVisaType.category?.trim() != currentCategory.trim()) {
+      validSelectedVisaType = null;
+      // Update the provider to clear invalid selection
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(visatypeProvider.notifier).clearSelection();
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 50,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.red),
-            borderRadius: BorderRadius.circular(4),
+        DropdownButtonFormField<VisaTypeModel>(
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            isDense: responsive.isSmall,
           ),
-          child: Center(
-            child: Text(
-              'Error loading visa types',
-              style: TextStyle(color: Colors.red, fontSize: responsive.fontSize),
-            ),
+          isExpanded: true,
+          value: validSelectedVisaType,
+          hint: Text(
+            'Select a visa type',
+            style: TextStyle(fontSize: responsive.fontSize),
           ),
+          onChanged: (VisaTypeModel? newValue) {
+            if (newValue != null) {
+              ref.read(visatypeProvider.notifier).selectVisaType(newValue);
+            }
+          },
+          items: filteredVisaTypes.map((visaType) {
+            return DropdownMenuItem<VisaTypeModel>(
+              value: visaType,
+              child: Tooltip(
+                message: visaType.visaName ?? '',
+                child: Text(
+                  visaType.visaName ?? '',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: responsive.fontSize),
+                ),
+              ),
+            );
+          }).toList(),
         ),
         const SizedBox(height: 4),
-        TextButton(
-          onPressed: _fetchVisaTypesForCurrentSelection,
-          child: const Text('Retry'),
+        Text(
+          'Category: $currentCategory (${filteredVisaTypes.length} options)',
+          style: TextStyle(
+            fontSize: responsive.smallFontSize,
+            color: Colors.grey[600],
+          ),
         ),
       ],
     );
   }
 
-  // Filter visa types for current category
-  final filteredVisaTypes = visaTypeState.visaTypes
-      .where((visaType) => visaType.category?.trim() == currentCategory.trim())
-      .toList();
-
-  if (filteredVisaTypes.isEmpty) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Center(
-        child: Text(
-          'No visa types available for $currentCategory',
-          style: TextStyle(fontSize: responsive.fontSize),
-        ),
-      ),
-    );
-  }
-
-  // Check if selected visa type belongs to current category
-  VisaTypeModel? validSelectedVisaType = visaTypeState.selectedVisaType;
-  if (validSelectedVisaType != null && 
-      validSelectedVisaType.category?.trim() != currentCategory.trim()) {
-    validSelectedVisaType = null;
-    // Update the provider to clear invalid selection
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(visatypeProvider.notifier).clearSelection();
-    });
-  }
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      DropdownButtonFormField<VisaTypeModel>(
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          isDense: responsive.isSmall,
-        ),
-        isExpanded: true,
-        value: validSelectedVisaType,
-        hint: Text(
-          'Select a visa type',
-          style: TextStyle(fontSize: responsive.fontSize),
-        ),
-        onChanged: (VisaTypeModel? newValue) {
-          if (newValue != null) {
-            ref.read(visatypeProvider.notifier).selectVisaType(newValue);
-          }
-        },
-        items: filteredVisaTypes.map((visaType) {
-          return DropdownMenuItem<VisaTypeModel>(
-            value: visaType,
-            child: Tooltip(
-              message: visaType.visaName ?? '',
-              child: Text(
-                visaType.visaName ?? '',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: responsive.fontSize),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        'Category: $currentCategory (${filteredVisaTypes.length} options)',
-        style: TextStyle(
-          fontSize: responsive.smallFontSize,
-          color: Colors.grey[600],
-        ),
-      ),
-    ],
-  );
-}
-
-  Widget _buildDropdown(
-    String value,
-    List<String> items,
-    _ResponsiveHelper responsive,
-  ) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        isDense: responsive.isSmall,
-      ),
-      isExpanded: true,
-      value: value,
-      onChanged: (String? newValue) {},
-      items: items.map((item) => DropdownMenuItem<String>(
-        value: item,
-        child: Text(
-          item,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: responsive.fontSize),
-        ),
-      )).toList(),
-    );
-  }
-
-  // Updated occupation dropdown with integration
+  // Updated occupation dropdown with better error handling
   Widget _buildOccupationDropdown(_ResponsiveHelper responsive) {
     final occupationState = ref.watch(occupationtypeProvider);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -600,12 +716,12 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
 
   Widget _buildSkillsRequirement(_ResponsiveHelper responsive) {
     final textStyle = TextStyle(fontSize: responsive.fontSize);
-    
+
     // Use skills requirement from selected occupation if available
-    String skillsRequirementText = selectedOccupation?.skillsRequirement ?? 
-      'This occupation requires a qualification assessed as comparable to the education level of an Australian Qualifications Framework (AQF) Bachelor Degree or higher degree and in a field highly relevant to the nominated occupation.';
-    
-    final bullets = [
+    String skillsRequirementText = selectedOccupation?.skillsRequirement ??
+        'This occupation requires a qualification assessed as comparable to the education level of an Australian Qualifications Framework (AQF) Bachelor Degree or higher degree and in a field highly relevant to the nominated occupation.';
+
+    const bullets = [
       'at least one year of post-qualification employment at an appropriate skill level, undertaken in the last five years,',
       'working 20 hours or more per week, and',
       'highly relevant to the nominated occupation.',
@@ -681,7 +797,7 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _isLoading ? null : () => context.go('/personal_form'),
                     style: buttonStyle,
                     child: const Text('Back', style: TextStyle(fontSize: 12)),
                   ),
@@ -689,7 +805,7 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: _isLoading ? null : _saveAsDraft,
                     style: buttonStyle,
                     child: const Text('Save & Exit', style: TextStyle(fontSize: 12)),
                   ),
@@ -702,7 +818,16 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _continue,
                 style: buttonStyle,
-                child: const Text('Continue', style: TextStyle(fontSize: 12)),
+                child: _isLoading
+                    ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : const Text('Continue', style: TextStyle(fontSize: 12)),
               ),
             ),
           ],
@@ -718,13 +843,13 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _isLoading ? null : () => context.go('/personal_form'),
               style: buttonStyle,
               child: const Text('Back'),
             ),
             const SizedBox(width: 15),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _isLoading ? null : _saveAsDraft,
               style: buttonStyle,
               child: const Text('Save & Exit'),
             ),
@@ -732,7 +857,16 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
             ElevatedButton(
               onPressed: _isLoading ? null : _continue,
               style: buttonStyle,
-              child: const Text('Continue'),
+              child: _isLoading
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+                  : const Text('Continue'),
             ),
           ],
         ),
@@ -744,16 +878,16 @@ Widget _buildVisaTypeDropdown(_ResponsiveHelper responsive) {
 // Helper class for responsive design
 class _ResponsiveHelper {
   final Size size;
-  
+
   _ResponsiveHelper(this.size);
-  
+
   bool get isSmall => size.width < 600;
   bool get isMedium => size.width >= 600 && size.width < 900;
   bool get isLarge => size.width >= 900;
-  
+
   double get fontSize => isSmall ? 12 : 14;
   double get smallFontSize => isSmall ? 11 : 13;
-  
+
   double get horizontalPadding => isSmall ? 8 : 16;
   double get containerPadding => isSmall ? 12 : 20;
 }

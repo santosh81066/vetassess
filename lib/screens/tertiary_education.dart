@@ -63,7 +63,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   double _getFieldWidth(BuildContext context, double baseWidth) {
     final screenWidth = MediaQuery.of(context).size.width;
     final availableWidth = screenWidth * 0.7 * 0.6; // 60% of the right column
-    
+
     if (screenWidth < 768) {
       return availableWidth * 0.9;
     } else if (screenWidth < 1024) {
@@ -193,19 +193,19 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
 
   Map<String, dynamic> _createFormData() {
     final formData = <String, dynamic>{};
-    
+
     _controllers.forEach((key, controller) {
       formData[key] = controller.text.trim();
     });
-    
+
     formData['awardingBodyCountry'] = awardingBodyCountry;
     formData['institutionCountry'] = institutionCountry;
     formData['studyMode'] = studyMode;
-    
+
     formData['internshipChecked'] = internshipChecked;
     formData['thesisChecked'] = thesisChecked;
     formData['majorProjectChecked'] = majorProjectChecked;
-    
+
     return formData;
   }
 
@@ -227,7 +227,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
 
   void _showSuccessDialog() {
     print('_showSuccessDialog called');
-    
+
     if (!mounted) {
       print('Widget not mounted, skipping dialog');
       return;
@@ -253,9 +253,9 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
               onPressed: () {
                 print('Continue button pressed');
                 Navigator.of(context).pop();
-                
+
                 ref.read(tertiaryEducationProvider.notifier).resetState();
-                
+
                 print('Navigating to /doc_upload');
                 context.go('/doc_upload');
               },
@@ -302,17 +302,17 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _showSuccessDialog();
         });
-      } 
-      else if (next.errorMessage != null && 
-               next.errorMessage!.isNotEmpty && 
-               previous?.errorMessage != next.errorMessage) {
+      }
+      else if (next.errorMessage != null &&
+          next.errorMessage!.isNotEmpty &&
+          previous?.errorMessage != next.errorMessage) {
         print('Triggering error dialog');
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _showErrorDialog(next.errorMessage!);
         });
       }
     });
-    
+
     final providerState = ref.watch(tertiaryEducationProvider);
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -484,7 +484,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                     context,
                     'Awarding Body Country',
                     awardingBodyCountry,
-                    (v) => setState(() => awardingBodyCountry = v),
+                        (v) => setState(() => awardingBodyCountry = v),
                     350,
                     required: true,
                   ),
@@ -539,7 +539,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                     context,
                     'Campus/Institution Country',
                     institutionCountry,
-                    (v) => setState(() => institutionCountry = v),
+                        (v) => setState(() => institutionCountry = v),
                     350,
                     required: true,
                   ),
@@ -584,7 +584,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                     context,
                     'Study Mode',
                     studyMode,
-                    (v) => setState(() => studyMode = v),
+                        (v) => setState(() => studyMode = v),
                     180,
                     required: true,
                     isStudyMode: true,
@@ -634,20 +634,20 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   }
 
   Widget _buildField(
-    BuildContext context,
-    String label,
-    String key,
-    double baseWidth, {
-    bool required = false,
-    String? helperText,
-    String? Function(String?)? validator,
-  }) {
+      BuildContext context,
+      String label,
+      String key,
+      double baseWidth, {
+        bool required = false,
+        String? helperText,
+        String? Function(String?)? validator,
+      }) {
     return _buildLabelledField(
       context,
       label,
       SizedBox(
         width: _getFieldWidth(context, baseWidth),
-        height: 34,
+        // Remove fixed height to allow error text space
         child: TextFormField(
           controller: _controllers[key],
           decoration: _inputDecoration(),
@@ -665,7 +665,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
       label,
       SizedBox(
         width: _getFieldWidth(context, 180),
-        height: 34,
+        // Remove fixed height to allow error text space
         child: TextFormField(
           controller: _controllers[key],
           decoration: _inputDecoration(hintText: 'yyyy-mm-dd'),
@@ -677,10 +677,23 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
               initialDate: DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime.now(),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Colors.teal,
+                      onPrimary: Colors.white,
+                      surface: Colors.white,
+                      onSurface: Colors.black,
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
             );
             if (date != null) {
               _controllers[key]!.text =
-                  "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+              "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
             }
           },
         ),
@@ -690,14 +703,14 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   }
 
   Widget _buildDropdownField(
-    BuildContext context,
-    String label,
-    String? value,
-    ValueChanged<String?> onChanged,
-    double baseWidth, {
-    bool required = false,
-    bool isStudyMode = false,
-  }) {
+      BuildContext context,
+      String label,
+      String? value,
+      ValueChanged<String?> onChanged,
+      double baseWidth, {
+        bool required = false,
+        bool isStudyMode = false,
+      }) {
     final items = isStudyMode
         ? ['Full-time', 'Part-time', 'Other']
         : ['India', 'USA', 'UK', 'Australia', 'Canada'];
@@ -707,15 +720,23 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
       label,
       SizedBox(
         width: _getFieldWidth(context, baseWidth),
-        height: 34,
+        // Remove fixed height to allow error text space
         child: DropdownButtonFormField<String>(
           value: value,
           decoration: _inputDecoration(),
           hint: const Text('Select one'),
+          validator: required
+              ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '$label is required';
+            }
+            return null;
+          }
+              : null,
           items: items
               .map(
                 (item) => DropdownMenuItem(value: item, child: Text(item)),
-              )
+          )
               .toList(),
           onChanged: onChanged,
         ),
@@ -723,7 +744,6 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
       isRequired: required,
     );
   }
-
 
   Widget _buildAdditionalRequirementsSection(BuildContext context) {
     return Column(
@@ -748,7 +768,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
           'An internship, supervised practical training or work placement',
           internshipChecked,
           'internshipWeeks',
-          (v) => setState(() => internshipChecked = v ?? false),
+              (v) => setState(() => internshipChecked = v ?? false),
         ),
         const SizedBox(height: 8),
         _buildCheckboxWithWeeks(
@@ -756,7 +776,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
           'A thesis',
           thesisChecked,
           'thesisWeeks',
-          (v) => setState(() => thesisChecked = v ?? false),
+              (v) => setState(() => thesisChecked = v ?? false),
         ),
         const SizedBox(height: 8),
         _buildCheckboxWithWeeks(
@@ -764,7 +784,7 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
           'A major project',
           majorProjectChecked,
           'majorProjectWeeks',
-          (v) => setState(() => majorProjectChecked = v ?? false),
+              (v) => setState(() => majorProjectChecked = v ?? false),
         ),
         if (anyCheckboxSelected) ...[
           const SizedBox(height: 16),
@@ -804,22 +824,21 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
             foregroundColor: Colors.teal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
-          // Continuation from where the code was cut off
           onPressed: providerState.isLoading
               ? null
               : () {
-                  // Clear form and reset state
-                  _controllers.values.forEach((controller) => controller.clear());
-                  setState(() {
-                    awardingBodyCountry = null;
-                    institutionCountry = null;
-                    studyMode = null;
-                    internshipChecked = false;
-                    thesisChecked = false;
-                    majorProjectChecked = false;
-                  });
-                  ref.read(tertiaryEducationProvider.notifier).resetState();
-                },
+            // Clear form and reset state
+            _controllers.values.forEach((controller) => controller.clear());
+            setState(() {
+              awardingBodyCountry = null;
+              institutionCountry = null;
+              studyMode = null;
+              internshipChecked = false;
+              thesisChecked = false;
+              majorProjectChecked = false;
+            });
+            ref.read(tertiaryEducationProvider.notifier).resetState();
+          },
           child: const Text('Clear'),
         ),
         SizedBox(width: isSmallScreen ? 0 : 16, height: isSmallScreen ? 12 : 0),
@@ -832,13 +851,13 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
           onPressed: providerState.isLoading ? null : _submitForm,
           child: providerState.isLoading
               ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          )
               : const Text('Save and Continue'),
         ),
       ],
@@ -846,12 +865,12 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
   }
 
   Widget _buildLabelledField(
-    BuildContext context,
-    String label,
-    Widget field, {
-    bool isRequired = false,
-    String? helperText,
-  }) {
+      BuildContext context,
+      String label,
+      Widget field, {
+        bool isRequired = false,
+        String? helperText,
+      }) {
     return _buildFormRow(
       context,
       label,
@@ -876,65 +895,22 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
     );
   }
 
-// Replace the _buildFormRow method with this corrected version
-Widget _buildFormRow(
-  BuildContext context,
-  String label,
-  Widget field, {
-  bool isRequired = false,
-}) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final isSmallScreen = screenWidth < 768;
+  Widget _buildFormRow(
+      BuildContext context,
+      String label,
+      Widget field, {
+        bool isRequired = false,
+      }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 768;
 
-  if (isSmallScreen) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (isRequired)
-                Text(
-                  '* ',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: _getFontSize(context, 14),
-                  ),
-                ),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: _getFontSize(context, 14),
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF4D4D4D),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          field,
-        ],
-      ),
-    );
-  }
-
-  // Desktop layout - right-align the field to the label
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 16.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label section - takes up left portion
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8.0, right: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end, // Right align the label
+    if (isSmallScreen) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
                 if (isRequired)
                   Text(
@@ -945,7 +921,7 @@ Widget _buildFormRow(
                       fontSize: _getFontSize(context, 14),
                     ),
                   ),
-                Flexible(
+                Expanded(
                   child: Text(
                     label,
                     style: TextStyle(
@@ -953,113 +929,106 @@ Widget _buildFormRow(
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF4D4D4D),
                     ),
-                    textAlign: TextAlign.right, // Right align text
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-        // Field section - takes up right portion
-        Expanded(
-          flex: 2,
-          child: field,
-        ),
-      ],
-    ),
-  );
-}
-
-// Also update the _buildCheckboxWithWeeks method for proper alignment
-Widget _buildCheckboxWithWeeks(
-  BuildContext context,
-  String label,
-  bool value,
-  String weeksKey,
-  ValueChanged<bool?> onChanged,
-) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final isSmallScreen = screenWidth < 768;
-  
-  if (isSmallScreen) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                label, 
-                style: TextStyle(fontSize: _getFontSize(context, 14))
-              ),
-            ),
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(value: value, onChanged: onChanged),
-            ),
+            const SizedBox(height: 8),
+            field,
           ],
         ),
-        if (value) ...[
-          const SizedBox(height: 8),
+      );
+    }
+
+    // Desktop layout - right-align the field to the label
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Label section - takes up left portion
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0, right: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end, // Right align the label
+                children: [
+                  if (isRequired)
+                    Text(
+                      '* ',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: _getFontSize(context, 14),
+                      ),
+                    ),
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: _getFontSize(context, 14),
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF4D4D4D),
+                      ),
+                      textAlign: TextAlign.right, // Right align text
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Field section - takes up right portion
+          Expanded(
+            flex: 2,
+            child: field,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckboxWithWeeks(
+      BuildContext context,
+      String label,
+      bool value,
+      String weeksKey,
+      ValueChanged<bool?> onChanged,
+      ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 768;
+
+    if (isSmallScreen) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
-              Text(
-                'Number of weeks spent', 
-                style: TextStyle(fontSize: _getFontSize(context, 12))
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 60,
-                height: 30,
-                child: TextFormField(
-                  controller: _controllers[weeksKey],
-                  decoration: _inputDecoration(),
-                  keyboardType: TextInputType.number,
-                  validator: value
-                      ? (val) => _validateNumber(val, 'Number of weeks')
-                      : null,
+              Expanded(
+                child: Text(
+                    label,
+                    style: TextStyle(fontSize: _getFontSize(context, 14))
                 ),
+              ),
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(value: value, onChanged: onChanged),
               ),
             ],
           ),
-        ],
-      ],
-    );
-  }
-  
-  // Desktop layout - right-aligned like other fields
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 8.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Label section
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Text(
-              label,
-              style: TextStyle(fontSize: _getFontSize(context, 14)),
-              textAlign: TextAlign.right, // Right align text
-            ),
-          ),
-        ),
-        // Field section
-        Expanded(
-          flex: 2,
-          child: Row(
-            children: [
-              if (value) ...[
+          if (value) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
                 Text(
-                  'Number of weeks spent',
-                  style: TextStyle(fontSize: _getFontSize(context, 12)),
+                    'Number of weeks spent',
+                    style: TextStyle(fontSize: _getFontSize(context, 12))
                 ),
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 60,
-                  height: 30,
+                  // Remove fixed height to allow error text space
                   child: TextFormField(
                     controller: _controllers[weeksKey],
                     decoration: _inputDecoration(),
@@ -1069,90 +1038,171 @@ Widget _buildCheckboxWithWeeks(
                         : null,
                   ),
                 ),
-                const SizedBox(width: 16),
               ],
+            ),
+          ],
+        ],
+      );
+    }
+
+    // Desktop layout - right-aligned like other fields
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // Changed from center to start for error text alignment
+        children: [
+          // Label section
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0, top: 8.0), // Added top padding
+              child: Text(
+                label,
+                style: TextStyle(fontSize: _getFontSize(context, 14)),
+                textAlign: TextAlign.right, // Right align text
+              ),
+            ),
+          ),
+          // Field section
+          Expanded(
+            flex: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start, // Align to start for error text
+              children: [
+                if (value) ...[
+                  Text(
+                    'Number of weeks spent',
+                    style: TextStyle(fontSize: _getFontSize(context, 12)),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 60,
+                    // Remove fixed height to allow error text space
+                    child: TextFormField(
+                      controller: _controllers[weeksKey],
+                      decoration: _inputDecoration(),
+                      keyboardType: TextInputType.number,
+                      validator: value
+                          ? (val) => _validateNumber(val, 'Number of weeks')
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0), // Add padding to align with field
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(value: value, onChanged: onChanged),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCourseLengthField(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 768;
+
+    return _buildFormRow(
+      context,
+      'Normal length of full-time course',
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flex(
+            direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(value: value, onChanged: onChanged),
+                width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+                // Remove fixed height to allow error text space
+                child: TextFormField(
+                  controller: _controllers['courseLengthYears'],
+                  decoration: _inputDecoration(),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    // Only validate if both fields are empty
+                    if ((value == null || value.trim().isEmpty) &&
+                        (_controllers['courseLengthSemesters']!.text.isEmpty)) {
+                      return 'Required';
+                    }
+                    if (value != null && value.trim().isNotEmpty) {
+                      final number = int.tryParse(value.trim());
+                      if (number == null || number <= 0) {
+                        return 'Invalid';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
+              Text('OR', style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: _getFontSize(context, 14),
+              )),
+              SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
+              SizedBox(
+                width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+                // Remove fixed height to allow error text space
+                child: TextFormField(
+                  controller: _controllers['courseLengthSemesters'],
+                  decoration: _inputDecoration(),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    // Only validate if both fields are empty
+                    if ((value == null || value.trim().isEmpty) &&
+                        (_controllers['courseLengthYears']!.text.isEmpty)) {
+                      return 'Required';
+                    }
+                    if (value != null && value.trim().isNotEmpty) {
+                      final number = int.tryParse(value.trim());
+                      if (number == null || number <= 0) {
+                        return 'Invalid';
+                      }
+                    }
+                    return null;
+                  },
+                ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-// Update the course length field for proper alignment
-Widget _buildCourseLengthField(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final isSmallScreen = screenWidth < 768;
-  
-  return _buildFormRow(
-    context,
-    'Normal length of full-time course',
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Flex(
-          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
-              child: TextFormField(
-                controller: _controllers['courseLengthYears'],
-                decoration: _inputDecoration(),
-                keyboardType: TextInputType.number,
+          const SizedBox(height: 8),
+          Flex(
+            direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+            children: [
+              SizedBox(
+                width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+                child: Text(
+                  'Years',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: _getFontSize(context, 12)),
+                ),
               ),
-            ),
-            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
-            Text('OR', style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: _getFontSize(context, 14),
-            )),
-            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 8 : 0),
-            SizedBox(
-              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
-              child: TextFormField(
-                controller: _controllers['courseLengthSemesters'],
-                decoration: _inputDecoration(),
-                keyboardType: TextInputType.number,
+              SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
+              if (!isSmallScreen) const Text('  '),
+              SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
+              SizedBox(
+                width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
+                child: Text(
+                  'Semesters',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: _getFontSize(context, 12)),
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Flex(
-          direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
-          children: [
-            SizedBox(
-              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
-              child: Text(
-                'Years',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: _getFontSize(context, 12)),
-              ),
-            ),
-            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
-            if (!isSmallScreen) const Text('  '),
-            SizedBox(width: isSmallScreen ? 0 : 12, height: isSmallScreen ? 4 : 0),
-            SizedBox(
-              width: isSmallScreen ? _getFieldWidth(context, 120) : 60,
-              child: Text(
-                'Semesters',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: _getFontSize(context, 12)),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-    isRequired: true,
-  );
-}
+            ],
+          ),
+        ],
+      ),
+      isRequired: true,
+    );
+  }
 
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
@@ -1182,6 +1232,8 @@ Widget _buildCourseLengthField(BuildContext context) {
         color: Colors.grey.shade500,
         fontSize: 14,
       ),
+      // Add proper error text styling
+      errorStyle: const TextStyle(fontSize: 12, height: 1.2),
       isDense: true,
     );
   }

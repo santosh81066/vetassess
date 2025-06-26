@@ -5,7 +5,6 @@ import 'package:vetassess/providers/educationform_provider.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/screens/application_forms/appli_priority.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
-
 import '../../widgets/application_nav.dart';
 import '../tertiary_education.dart';
 
@@ -18,7 +17,9 @@ class EducationForm extends ConsumerStatefulWidget {
 
 class _EducationFormState extends ConsumerState<EducationForm> {
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
+  // Controllers for Primary School
   final TextEditingController _primaryDateStartedController = TextEditingController();
   final TextEditingController _primaryDateFinishedController = TextEditingController();
   final TextEditingController _primaryNumberOfYearsController = TextEditingController();
@@ -56,7 +57,9 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
   // Generate year options for dropdowns
   List<String> get _yearOptions {
-    final currentYear = DateTime.now().year;
+    final currentYear = DateTime
+        .now()
+        .year;
     final years = <String>[];
     for (int year = currentYear; year >= 1950; year--) {
       years.add(year.toString());
@@ -64,14 +67,151 @@ class _EducationFormState extends ConsumerState<EducationForm> {
     return years;
   }
 
+  // Enhanced validation method
+  String? _validateForm() {
+    final errors = <String>[];
+
+    // Check if user is logged in
+    if (_currentUserId == null) {
+      errors.add('User not logged in. Please login again.');
+    }
+
+    // Primary school validation
+    if (_primaryNumberOfYearsController.text
+        .trim()
+        .isEmpty ||
+        int.tryParse(_primaryNumberOfYearsController.text) == null ||
+        int.parse(_primaryNumberOfYearsController.text) <= 0) {
+      errors.add(
+          'Primary school number of years is required and must be greater than 0.');
+    }
+
+    if (_primaryCountryController.text
+        .trim()
+        .isEmpty) {
+      errors.add('Primary school country is required.');
+    }
+
+    // Secondary school validation
+    if (_secondaryNumberOfYearsController.text
+        .trim()
+        .isEmpty ||
+        int.tryParse(_secondaryNumberOfYearsController.text) == null ||
+        int.parse(_secondaryNumberOfYearsController.text) <= 0) {
+      errors.add(
+          'Secondary school number of years is required and must be greater than 0.');
+    }
+
+    if (_secondaryCountryController.text
+        .trim()
+        .isEmpty) {
+      errors.add('Secondary school country is required.');
+    }
+
+    if (_certificateDetailsController.text
+        .trim()
+        .isEmpty) {
+      errors.add('Highest schooling certificate details are required.');
+    }
+
+    if (_certificateYearObtained == null ||
+        _certificateYearObtained!.trim().isEmpty) {
+      errors.add('Certificate year obtained is required.');
+    }
+
+    return errors.isEmpty ? null : errors.join('\n');
+  }
+
+  void _showErrorDialog({required String title, required String message}) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: Text(
+              title,
+              style: TextStyle(
+                color: Colors.red.shade700,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery
+                    .of(context)
+                    .size
+                    .width * 0.8,
+                maxHeight: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.4,
+              ),
+              child: SingleChildScrollView(
+                child: SelectableText(
+                  message,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.teal,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _showSuccessDialog({required String message, VoidCallback? onContinue}) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: const Text(
+              'Success',
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onContinue?.call();
+                },
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.teal,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
   // Update provider state when text fields change
   void _updateProviderState() {
     final provider = ref.read(educationFormProvider.notifier);
-    
+
     // Update primary school data
     provider.updatePrimarySchool(
-      dateStarted: _primaryDateStartedController.text.isNotEmpty ? _primaryDateStartedController.text : null,
-      dateFinished: _primaryDateFinishedController.text.isNotEmpty ? _primaryDateFinishedController.text : null,
+      dateStarted: _primaryDateStartedController.text.isNotEmpty
+          ? _primaryDateStartedController.text
+          : null,
+      dateFinished: _primaryDateFinishedController.text.isNotEmpty
+          ? _primaryDateFinishedController.text
+          : null,
       numberOfYears: int.tryParse(_primaryNumberOfYearsController.text) ?? 0,
       country: _primaryCountryController.text,
       yearCompleted: int.tryParse(_primaryYearCompleted ?? '0'),
@@ -79,8 +219,12 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
     // Update secondary school data
     provider.updateSecondarySchool(
-      dateStarted: _secondaryDateStartedController.text.isNotEmpty ? _secondaryDateStartedController.text : null,
-      dateFinished: _secondaryDateFinishedController.text.isNotEmpty ? _secondaryDateFinishedController.text : null,
+      dateStarted: _secondaryDateStartedController.text.isNotEmpty
+          ? _secondaryDateStartedController.text
+          : null,
+      dateFinished: _secondaryDateFinishedController.text.isNotEmpty
+          ? _secondaryDateFinishedController.text
+          : null,
       numberOfYears: int.tryParse(_secondaryNumberOfYearsController.text) ?? 0,
       country: _secondaryCountryController.text,
     );
@@ -93,7 +237,8 @@ class _EducationFormState extends ConsumerState<EducationForm> {
   }
 
   // Method to show date picker and return formatted date
-  Future<void> _selectDate(TextEditingController controller, {bool isRequired = false}) async {
+  Future<void> _selectDate(TextEditingController controller,
+      {bool isRequired = false}) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -105,7 +250,7 @@ class _EducationFormState extends ConsumerState<EducationForm> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: Colors.teal,
               onPrimary: Colors.white,
               surface: Colors.white,
@@ -119,64 +264,139 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
     if (picked != null) {
       // Format the date as dd/mm/yyyy
-      final formattedDate = '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
+      final formattedDate = '${picked.day.toString().padLeft(2, '0')}/${picked
+          .month.toString().padLeft(2, '0')}/${picked.year}';
       controller.text = formattedDate;
     }
   }
 
   Future<void> _continue() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    // Check if user ID is available
-    final userId = _currentUserId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in. Please login again.')),
+    // Validate form first
+    if (!_formKey.currentState!.validate()) {
+      _showErrorDialog(
+        title: 'Validation Error',
+        message: 'Please fill all required fields correctly.',
       );
       return;
     }
-    
+
+    // Additional custom validation
+    final validationError = _validateForm();
+    if (validationError != null) {
+      _showErrorDialog(
+        title: 'Validation Error',
+        message: validationError,
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
     _updateProviderState();
-    
-    // Validate form using provider
-    if (!ref.read(educationFormProvider.notifier).validateForm()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields correctly.')),
+
+    try {
+      // Submit the form
+      final result = await ref
+          .read(educationFormProvider.notifier)
+          .submitEducationDetails(
+        userId: _currentUserId!,
+      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        if (result.success) {
+          _showSuccessDialog(
+            message: 'Education details submitted successfully!',
+            onContinue: () => context.go('/tertiary_education_form'),
+          );
+        } else {
+          _showErrorDialog(
+            title: 'Submission Failed',
+            message: result.errorMessage ??
+                'Failed to submit education details. Please try again.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(
+          title: 'Error',
+          message: 'An unexpected error occurred: ${e.toString()}',
+        );
+      }
+    }
+  }
+
+  Future<void> _saveAsDraft() async {
+    // Basic validation for draft
+    if (_currentUserId == null) {
+      _showErrorDialog(
+        title: 'Error',
+        message: 'User not logged in. Please login again.',
       );
       return;
     }
 
-    // Submit the form
-    final success = await ref.read(educationFormProvider.notifier).submitEducationDetails(
-      userId: userId,
-    );
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Education details submitted successfully!')),
+    setState(() => _isLoading = true);
+    _updateProviderState();
+
+    try {
+      // Save as draft
+      final result = await ref.read(educationFormProvider.notifier).saveAsDraft(
+        userId: _currentUserId!,
       );
-      context.go('/tertiary_education_form');
-    } else {
-      final errorMessage = ref.read(educationFormProvider).errorMessage ?? 'Failed to submit. Please try again.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Draft saved successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          _showErrorDialog(
+            title: 'Save Draft Failed',
+            message: result.errorMessage ??
+                'Failed to save draft. Please try again.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(
+          title: 'Error',
+          message: 'An unexpected error occurred: ${e.toString()}',
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final educationState = ref.watch(educationFormProvider);
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return LoginPageLayout(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            child: Align(
+          SizedBox(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.3,
+            child: const Align(
               alignment: Alignment.topRight,
               child: ApplicationNav(),
             ),
@@ -207,7 +427,7 @@ class _EducationFormState extends ConsumerState<EducationForm> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Form Container - WRAPPED IN FORM WIDGET
+                      // Form Container
                       Form(
                         key: _formKey,
                         child: Container(
@@ -221,8 +441,8 @@ class _EducationFormState extends ConsumerState<EducationForm> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Required Fields
-                                Row(
-                                  children: const [
+                                const Row(
+                                  children: [
                                     Text(
                                       '*',
                                       style: TextStyle(
@@ -262,16 +482,20 @@ class _EducationFormState extends ConsumerState<EducationForm> {
                                 ),
                                 buildLabelledField(
                                   'Date finished',
-                                  buildDateField(_primaryDateFinishedController),
+                                  buildDateField(
+                                      _primaryDateFinishedController),
                                 ),
                                 buildLabelledField(
                                   'Number of years',
-                                  buildNumberField(_primaryNumberOfYearsController, isRequired: true),
+                                  buildNumberField(
+                                      _primaryNumberOfYearsController,
+                                      isRequired: true),
                                   isRequired: true,
                                 ),
                                 buildLabelledField(
                                   'Country(s)',
-                                  buildCountryField(_primaryCountryController, isRequired: true),
+                                  buildCountryField(_primaryCountryController,
+                                      isRequired: true),
                                   isRequired: true,
                                 ),
                                 buildLabelledField(
@@ -307,25 +531,32 @@ class _EducationFormState extends ConsumerState<EducationForm> {
                                 // Secondary School Form Fields
                                 buildLabelledField(
                                   'Date started',
-                                  buildDateField(_secondaryDateStartedController),
+                                  buildDateField(
+                                      _secondaryDateStartedController),
                                 ),
                                 buildLabelledField(
                                   'Date finished',
-                                  buildDateField(_secondaryDateFinishedController),
+                                  buildDateField(
+                                      _secondaryDateFinishedController),
                                 ),
                                 buildLabelledField(
                                   'Number of years',
-                                  buildNumberField(_secondaryNumberOfYearsController, isRequired: true),
+                                  buildNumberField(
+                                      _secondaryNumberOfYearsController,
+                                      isRequired: true),
                                   isRequired: true,
                                 ),
                                 buildLabelledField(
                                   'Country(s)',
-                                  buildCountryField(_secondaryCountryController, isRequired: true),
+                                  buildCountryField(_secondaryCountryController,
+                                      isRequired: true),
                                   isRequired: true,
                                 ),
                                 buildLabelledField(
                                   'Highest schooling\ncertificate obtained',
-                                  buildCertificateField(_certificateDetailsController, isRequired: true),
+                                  buildCertificateField(
+                                      _certificateDetailsController,
+                                      isRequired: true),
                                   isRequired: true,
                                 ),
                                 buildLabelledField(
@@ -344,98 +575,12 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
                                 const SizedBox(height: 30),
 
-                                // Buttons
-                                Center(
-                                  child: Wrap(
-                                    spacing: 15,
-                                    runSpacing: 10,
-                                    children: [
-                                      // Back Button
-                                      SizedBox(
-                                        height: 36,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            // Add your back navigation logic here
-                                            context.pop();
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.teal,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                          ),
-                                          child: const Text(
-                                            'Back',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                      // Save & Exit Button
-                                      SizedBox(
-                                        height: 36,
-                                        child: ElevatedButton(
-                                          onPressed: educationState.isLoading ? null : () {
-                                            _updateProviderState();
-                                            // Add save and exit logic here
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Data saved successfully!')),
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.teal,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                          ),
-                                          child: const Text(
-                                            'Save & Exit',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                      // Continue Button
-                                      SizedBox(
-                                        height: 36,
-                                        child: ElevatedButton(
-                                          onPressed: educationState.isLoading ? null : _continue,
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.teal,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                                          ),
-                                          child: educationState.isLoading
-                                              ? const SizedBox(
-                                                  width: 16,
-                                                  height: 16,
-                                                  child: CircularProgressIndicator(
-                                                    color: Colors.white,
-                                                    strokeWidth: 2,
-                                                  ),
-                                                )
-                                              : const Text(
-                                                  'Continue',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                // Loading indicator or buttons
+                                if (_isLoading)
+                                  const Center(
+                                      child: CircularProgressIndicator())
+                                else
+                                  _buildActionButtons(),
                               ],
                             ),
                           ),
@@ -452,11 +597,96 @@ class _EducationFormState extends ConsumerState<EducationForm> {
     );
   }
 
-  Widget buildLabelledField(
-    String label,
-    Widget field, {
-    bool isRequired = false,
-  }) {
+  Widget _buildActionButtons() {
+    return Center(
+      child: Wrap(
+        spacing: 15,
+        runSpacing: 10,
+        children: [
+          // Back Button
+          SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : () =>
+                  context.go('/occupation_form'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: const Text(
+                'Back',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+
+          // Save & Exit Button
+          SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _saveAsDraft,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: const Text(
+                'Save & Exit',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+
+          // Continue Button
+          SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _continue,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : const Text(
+                'Continue',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildLabelledField(String label,
+      Widget field, {
+        bool isRequired = false,
+      }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: LayoutBuilder(
@@ -521,14 +751,15 @@ class _EducationFormState extends ConsumerState<EducationForm> {
 
   Widget buildDateField(TextEditingController controller) {
     return SizedBox(
-      width: 200, // Increased width to accommodate dd/mm/yyyy format
-      height: 34,
+      width: 200,
+      // Remove fixed height to allow error text space
       child: TextFormField(
         controller: controller,
-        readOnly: true, // Make it read-only so users can't type
-        onTap: () => _selectDate(controller), // Open calendar on tap
+        readOnly: true,
+        onTap: () => _selectDate(controller),
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -540,12 +771,29 @@ class _EducationFormState extends ConsumerState<EducationForm> {
             size: 16,
             color: Colors.grey.shade600,
           ),
+          // Ensure error text has proper styling
+          errorStyle: const TextStyle(fontSize: 12, height: 1.2),
+          // Maintain consistent field height when no error
+          isDense: true,
         ),
         validator: (value) {
           if (value != null && value.isNotEmpty) {
             final regex = RegExp(r'^\d{2}/\d{2}/\d{4}$');
             if (!regex.hasMatch(value)) {
               return 'Use dd/mm/yyyy format';
+            }
+            // Additional date validation
+            try {
+              final parts = value.split('/');
+              final day = int.parse(parts[0]);
+              final month = int.parse(parts[1]);
+              final year = int.parse(parts[2]);
+              final date = DateTime(year, month, day);
+              if (date.day != day || date.month != month || date.year != year) {
+                return 'Invalid date';
+              }
+            } catch (e) {
+              return 'Invalid date format';
             }
           }
           return null;
@@ -554,84 +802,122 @@ class _EducationFormState extends ConsumerState<EducationForm> {
     );
   }
 
-  Widget buildNumberField(TextEditingController controller, {bool isRequired = false}) {
+  Widget buildNumberField(TextEditingController controller,
+      {bool isRequired = false}) {
     return SizedBox(
       width: 80,
-      height: 34,
-      child: TextFormField( // Changed from TextField to TextFormField
+      // Remove fixed height to allow error text space
+      child: TextFormField(
         controller: controller,
-        validator: isRequired ? (value) {
-          if (value == null || value.isEmpty) {
+        validator: (value) {
+          if (isRequired && (value == null || value
+              .trim()
+              .isEmpty)) {
             return 'Required';
           }
-          // Additional validation for numbers
-          if (int.tryParse(value) == null) {
-            return 'Enter valid number';
+          if (value != null && value
+              .trim()
+              .isNotEmpty) {
+            final number = int.tryParse(value.trim());
+            if (number == null) {
+              return 'Invalid number';
+            }
+            if (number <= 0) {
+              return 'Must be > 0';
+            }
+            if (number > 50) {
+              return 'Too many years';
+            }
           }
           return null;
-        } : null,
+        },
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 8,
-          ),
+              horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
+          errorStyle: const TextStyle(fontSize: 12, height: 1.2),
+          isDense: true,
         ),
         keyboardType: TextInputType.number,
       ),
     );
   }
 
-  Widget buildCountryField(TextEditingController controller, {bool isRequired = false}) {
+
+  Widget buildCountryField(TextEditingController controller,
+      {bool isRequired = false}) {
     return SizedBox(
       width: 250,
-      height: 34,
-      child: TextFormField( // Changed from TextField to TextFormField
+      // Remove fixed height to allow error text space
+      child: TextFormField(
         controller: controller,
-        validator: isRequired ? (value) {
-          if (value == null || value.isEmpty) {
+        validator: (value) {
+          if (isRequired && (value == null || value
+              .trim()
+              .isEmpty)) {
             return 'Country is required';
           }
+          if (value != null && value
+              .trim()
+              .isNotEmpty && value
+              .trim()
+              .length < 2) {
+            return 'Country name too short';
+          }
           return null;
-        } : null,
+        },
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 8,
-          ),
+              horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
+          hintText: 'Enter country name',
+          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          errorStyle: const TextStyle(fontSize: 12, height: 1.2),
+          isDense: true,
         ),
       ),
     );
   }
 
-  Widget buildCertificateField(TextEditingController controller, {bool isRequired = false}) {
+  Widget buildCertificateField(TextEditingController controller,
+      {bool isRequired = false}) {
     return SizedBox(
       width: 250,
-      height: 34,
-      child: TextFormField( // Changed from TextField to TextFormField
+      // Remove fixed height to allow error text space
+      child: TextFormField(
         controller: controller,
-        validator: isRequired ? (value) {
-          if (value == null || value.isEmpty) {
+        validator: (value) {
+          if (isRequired && (value == null || value
+              .trim()
+              .isEmpty)) {
             return 'Certificate details required';
           }
+          if (value != null && value
+              .trim()
+              .isNotEmpty && value
+              .trim()
+              .length < 3) {
+            return 'Certificate details too short';
+          }
           return null;
-        } : null,
+        },
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 8,
-          ),
+              horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
+          hintText: 'Enter certificate details',
+          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+          errorStyle: const TextStyle(fontSize: 12, height: 1.2),
+          isDense: true,
         ),
       ),
     );
@@ -644,21 +930,26 @@ class _EducationFormState extends ConsumerState<EducationForm> {
   }) {
     return SizedBox(
       width: 200,
-      height: 34,
-      child: DropdownButtonFormField<String>( // Changed to DropdownButtonFormField
+      // Remove fixed height to allow error text space
+      child: DropdownButtonFormField<String>(
         value: value,
-        validator: isRequired ? (value) {
-          if (value == null || value.isEmpty) {
+        validator: (value) {
+          if (isRequired && (value == null || value
+              .trim()
+              .isEmpty)) {
             return 'Year is required';
           }
           return null;
-        } : null,
+        },
         decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
+          errorStyle: const TextStyle(fontSize: 12, height: 1.2),
+          isDense: true,
         ),
         hint: Text(
           'Please pick a year',

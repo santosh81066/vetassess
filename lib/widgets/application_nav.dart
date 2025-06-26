@@ -3,10 +3,223 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 
 class ApplicationNav extends StatelessWidget {
-  const ApplicationNav({super.key});
+  final String? currentRoute;
+
+  const ApplicationNav({
+    super.key,
+    this.currentRoute,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Get current route if not provided
+    final route = currentRoute ?? GoRouterState.of(context).uri.path;
+
+    return Container(
+      width: 340,
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Header - Personal details
+          _buildHeaderItem(
+            title: 'Personal details',
+            route: '/personal_form',
+            currentRoute: route,
+            onTap: () => context.go('/personal_form'),
+          ),
+
+          // Menu Items
+          _buildMenuItem(
+            'Occupation',
+            route: '/occupation_form',
+            currentRoute: route,
+            onTap: () => context.go('/occupation_form'),
+          ),
+          _buildMenuItem(
+            'General education',
+            route: '/education_form',
+            currentRoute: route,
+            onTap: () => context.go('/education_form'),
+          ),
+          _buildMenuItem(
+            'Tertiary education',
+            route: '/tertiary_education_form',
+            currentRoute: route,
+            onTap: () => context.go('/tertiary_education_form'),
+          ),
+          _buildMenuItem(
+            'Documents upload',
+            route: '/doc_upload',
+            currentRoute: route,
+            onTap: () => context.go('/doc_upload'),
+          ),
+          _buildMenuItem(
+            'Review and confirm',
+            route: '/get_all_forms',
+            currentRoute: route,
+            onTap: () => context.go('/get_all_forms'),
+          ),
+          _buildMenuItem(
+            'Payment',
+            route: '/cashfree_pay',
+            currentRoute: route,
+            onTap: () => context.go('/cashfree_pay'),
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderItem({
+    required String title,
+    required String route,
+    required String currentRoute,
+    required VoidCallback onTap,
+  }) {
+    final isActive = currentRoute == route;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.teal : Colors.grey[200],
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
+          border: isActive
+              ? Border.all(color: Colors.teal.shade300, width: 2)
+              : null,
+        ),
+        child: Row(
+          children: [
+            if (isActive) ...[
+              Icon(
+                Icons.check_circle,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isActive ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
+            if (isActive)
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 14,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(
+      String title, {
+        required String route,
+        required String currentRoute,
+        required VoidCallback onTap,
+        bool isLast = false,
+      }) {
+    final isActive = currentRoute == route;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: isActive ? Colors.teal.shade50 : Colors.transparent,
+          border: Border(
+            bottom: isLast
+                ? BorderSide.none
+                : BorderSide(color: Colors.grey[300]!, width: 1),
+            left: isActive
+                ? BorderSide(color: Colors.teal, width: 4)
+                : BorderSide.none,
+          ),
+        ),
+        padding: EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: isActive ? 12 : 16, // Adjust for left border
+        ),
+        child: Row(
+          children: [
+            if (isActive) ...[
+              Icon(
+                Icons.radio_button_checked,
+                color: Colors.teal,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+            ] else ...[
+              Icon(
+                Icons.radio_button_unchecked,
+                color: Colors.grey[400],
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isActive ? Colors.teal.shade700 : Colors.brown[800],
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
+            if (isActive)
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.teal,
+                size: 12,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Alternative version with step completion tracking
+class ApplicationNavWithProgress extends StatelessWidget {
+  final String? currentRoute;
+  final Set<String> completedRoutes;
+
+  const ApplicationNavWithProgress({
+    super.key,
+    this.currentRoute,
+    this.completedRoutes = const {},
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final route = currentRoute ?? GoRouterState.of(context).uri.path;
+
     return Container(
       width: 340,
       decoration: BoxDecoration(
@@ -24,62 +237,225 @@ class ApplicationNav extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Header
-          GestureDetector(
+          _buildProgressHeaderItem(
+            title: 'Personal details',
+            route: '/personal_form',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 1,
             onTap: () => context.go('/personal_form'),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
-                ),
-              ),
-              child: const Text(
-                'Personal details',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
           ),
 
           // Menu Items
-          _buildMenuItem('Occupation',onTap: () => context.go('/occupation_form'),),
-          _buildMenuItem('General education',onTap: () => context.go('/education_form'),),
-          _buildMenuItem('Tertiary education',onTap: () => context.go('/tertiary_education_form'),),
-          _buildMenuItem('Documents upload',onTap: () => context.go('/doc_upload'),),
-          _buildMenuItem('Review and confirm',onTap: () => context.go('/get_all_forms'),),
-          _buildMenuItem('Payment',onTap: () => context.go('/cashfree_pay'), isLast: true),
+          _buildProgressMenuItem(
+            'Occupation',
+            route: '/occupation_form',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 2,
+            onTap: () => context.go('/occupation_form'),
+          ),
+          _buildProgressMenuItem(
+            'General education',
+            route: '/education_form',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 3,
+            onTap: () => context.go('/education_form'),
+          ),
+          _buildProgressMenuItem(
+            'Tertiary education',
+            route: '/tertiary_education_form',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 4,
+            onTap: () => context.go('/tertiary_education_form'),
+          ),
+          _buildProgressMenuItem(
+            'Documents upload',
+            route: '/doc_upload',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 5,
+            onTap: () => context.go('/doc_upload'),
+          ),
+          _buildProgressMenuItem(
+            'Review and confirm',
+            route: '/get_all_forms',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 6,
+            onTap: () => context.go('/get_all_forms'),
+          ),
+          _buildProgressMenuItem(
+            'Payment',
+            route: '/cashfree_pay',
+            currentRoute: route,
+            completedRoutes: completedRoutes,
+            stepNumber: 7,
+            onTap: () => context.go('/cashfree_pay'),
+            isLast: true,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuItem(String title, {bool isLast = false,required VoidCallback onTap}) {
+  Widget _buildProgressHeaderItem({
+    required String title,
+    required String route,
+    required String currentRoute,
+    required Set<String> completedRoutes,
+    required int stepNumber,
+    required VoidCallback onTap,
+  }) {
+    final isActive = currentRoute == route;
+    final isCompleted = completedRoutes.contains(route);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isActive
+              ? Colors.teal
+              : isCompleted
+              ? Colors.green.shade100
+              : Colors.grey[200],
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isActive || isCompleted ? Colors.white : Colors.grey[400],
+              ),
+              child: Center(
+                child: isCompleted
+                    ? Icon(Icons.check, color: Colors.green, size: 16)
+                    : Text(
+                  stepNumber.toString(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isActive ? Colors.teal : Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isActive
+                      ? Colors.white
+                      : isCompleted
+                      ? Colors.green.shade700
+                      : Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressMenuItem(
+      String title, {
+        required String route,
+        required String currentRoute,
+        required Set<String> completedRoutes,
+        required int stepNumber,
+        required VoidCallback onTap,
+        bool isLast = false,
+      }) {
+    final isActive = currentRoute == route;
+    final isCompleted = completedRoutes.contains(route);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
+          color: isActive
+              ? Colors.teal.shade50
+              : isCompleted
+              ? Colors.green.shade50
+              : Colors.transparent,
           border: Border(
-            bottom:
-                isLast
-                    ? BorderSide.none
-                    : BorderSide(color: Colors.grey[300]!, width: 1),
+            bottom: isLast
+                ? BorderSide.none
+                : BorderSide(color: Colors.grey[300]!, width: 1),
+            left: isActive
+                ? BorderSide(color: Colors.teal, width: 4)
+                : isCompleted
+                ? BorderSide(color: Colors.green, width: 4)
+                : BorderSide.none,
           ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.brown[800],
-            fontWeight: FontWeight.w500,
-          ),
+        padding: EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: (isActive || isCompleted) ? 12 : 16,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isActive
+                    ? Colors.teal
+                    : isCompleted
+                    ? Colors.green
+                    : Colors.grey[300],
+              ),
+              child: Center(
+                child: isCompleted
+                    ? Icon(Icons.check, color: Colors.white, size: 14)
+                    : Text(
+                  stepNumber.toString(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: isActive ? Colors.white : Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isActive
+                      ? Colors.teal.shade700
+                      : isCompleted
+                      ? Colors.green.shade700
+                      : Colors.brown[800],
+                  fontWeight: isActive || isCompleted
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                ),
+              ),
+            ),
+            if (isActive)
+              Icon(Icons.arrow_forward_ios, color: Colors.teal, size: 12)
+            else if (isCompleted)
+              Icon(Icons.done, color: Colors.green, size: 16),
+          ],
         ),
       ),
     );

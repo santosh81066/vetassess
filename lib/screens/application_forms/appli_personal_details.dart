@@ -57,7 +57,9 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
 
   @override
   void dispose() {
-    _controllers.values.forEach((controller) => controller.dispose());
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -67,7 +69,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
       MediaQuery.of(context).size.width < 600;
   bool _isTablet(BuildContext context) =>
       MediaQuery.of(context).size.width >= 600 &&
-      MediaQuery.of(context).size.width < 1024;
+          MediaQuery.of(context).size.width < 1024;
 
   double _getNavWidth(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -119,14 +121,133 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     ref.read(personalDetailsProvider.notifier).copyPostalToHome();
   }
 
+  // Validation methods
+  String? _validateRequired(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+    final phoneRegex = RegExp(r'^\+?[\d\s\-\(\)]{8,}$');
+    if (!phoneRegex.hasMatch(value.trim())) {
+      return 'Please enter a valid phone number';
+    }
+    return null;
+  }
+
+  String? _validateDate(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    try {
+      // Validate yyyy-mm-dd format
+      final parts = value.split('-');
+      if (parts.length != 3) throw FormatException();
+
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final day = int.parse(parts[2]);
+
+      final date = DateTime(year, month, day);
+      if (date.year != year || date.month != month || date.day != day) {
+        throw FormatException();
+      }
+
+      return null;
+    } catch (e) {
+      return 'Please enter date in yyyy-mm-dd format';
+    }
+  }
+
+  String? _validateDropdown(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
+  }
+
+  String? _validateAddress() {
+    final address1 = _controllers['postalAddress1']?.text.trim() ?? '';
+    final address2 = _controllers['postalAddress2']?.text.trim() ?? '';
+    final address3 = _controllers['postalAddress3']?.text.trim() ?? '';
+
+    if (address1.isEmpty && address2.isEmpty && address3.isEmpty) {
+      return 'At least one address line is required';
+    }
+    return null;
+  }
+
+  String? _validateHomeAddress() {
+    final address1 = _controllers['homeAddress1']?.text.trim() ?? '';
+    final address2 = _controllers['homeAddress2']?.text.trim() ?? '';
+    final address3 = _controllers['homeAddress3']?.text.trim() ?? '';
+
+    if (address1.isEmpty && address2.isEmpty && address3.isEmpty) {
+      return 'At least one address line is required';
+    }
+    return null;
+  }
+
+  Future<void> _selectDate(String controllerKey) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _controllers[controllerKey]!.text =
+        '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
+  }
+
   Future<void> _handleSubmission(bool isDraft) async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!isDraft && !_formKey.currentState!.validate()) {
+      // Show error message for validation failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all required fields correctly'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate gender selection for non-draft submissions
+    if (!isDraft && ref.read(personalDetailsProvider).gender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select your gender'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     final userId = _currentUserId;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('User not logged in. Please login again.'),
+          backgroundColor: Colors.red,
         ),
       );
       return;
@@ -135,74 +256,84 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     setState(() => _isLoading = true);
     _updateProviderData();
 
-    final result =
-        isDraft
-            ? await ref
-                .read(personalDetailsProvider.notifier)
-                .saveAsDraft(userId: userId)
-            : await ref
-                .read(personalDetailsProvider.notifier)
-                .submitPersonalDetails(userId: userId);
+    try {
+      final result = isDraft
+          ? await ref
+          .read(personalDetailsProvider.notifier)
+          .saveAsDraft(userId: userId)
+          : await ref
+          .read(personalDetailsProvider.notifier)
+          .submitPersonalDetails(userId: userId);
 
-    setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
 
-    if (result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isDraft
-                ? 'Draft saved successfully!'
-                : 'Personal details submitted successfully!',
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-      if (!isDraft) context.go('/occupation_form');
-    } else {
-      _showErrorDialog(
-        title: isDraft ? 'Failed to Save Draft' : 'Submission Failed',
-        message: result.errorMessage ?? 'Unknown error occurred',
-      );
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                isDraft
+                    ? 'Draft saved successfully!'
+                    : 'Personal details submitted successfully!',
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+          if (!isDraft) context.go('/occupation_form');
+        } else {
+          _showErrorDialog(
+            title: isDraft ? 'Failed to Save Draft' : 'Submission Failed',
+            message: result.errorMessage ?? 'Unknown error occurred',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showErrorDialog(
+          title: 'Error',
+          message: 'An unexpected error occurred: ${e.toString()}',
+        );
+      }
     }
   }
 
   void _showErrorDialog({required String title, required String message}) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              title,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.red.shade700,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8,
+            maxHeight: MediaQuery.of(context).size.height * 0.4,
+          ),
+          child: SingleChildScrollView(
+            child: SelectableText(
+              message,
+              style: TextStyle(fontSize: _isMobile(context) ? 12 : 14),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'OK',
               style: TextStyle(
-                color: Colors.red.shade700,
+                color: Colors.teal,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            content: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.8,
-                maxHeight: MediaQuery.of(context).size.height * 0.4,
-              ),
-              child: SingleChildScrollView(
-                child: SelectableText(
-                  message,
-                  style: TextStyle(fontSize: _isMobile(context) ? 12 : 14),
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                    color: Colors.teal,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
           ),
+        ],
+      ),
     );
   }
 
@@ -249,7 +380,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
             Container(
               margin: EdgeInsets.only(top: size.height * 0.02),
               width: _getNavWidth(context),
-              child: Align(
+              child: const Align(
                 alignment: Alignment.topRight,
                 child: ApplicationNav(),
               ),
@@ -319,7 +450,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
       children: [
         Row(
           children: [
-            Text(
+            const Text(
               '* ',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
@@ -339,7 +470,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
 
   List<Widget> _buildAllSections() {
     final personalDetails = ref.watch(personalDetailsProvider);
-    final countries = ['Australia', 'India', 'USA', 'UK', 'Canada'];
+    const countries = ['Australia', 'India', 'USA', 'UK', 'Canada'];
 
     return [
       _buildSection('General Information', [
@@ -347,16 +478,17 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
           'Preferred title',
           _buildDropdown(
             personalDetails.preferredTitle,
-            (v) => ref
+                (v) => ref
                 .read(personalDetailsProvider.notifier)
                 .updatePreferredTitle(v),
-            ['Mr', 'Mrs', 'Ms', 'Dr', 'Prof'],
+            const ['Mr', 'Mrs', 'Ms', 'Dr', 'Prof'],
+            validator: (value) => _validateDropdown(value, 'Preferred title'),
           ),
           required: true,
         ),
         _buildField(
           'Surname or family name',
-          _buildTextField('surname'),
+          _buildTextField('surname', validator: (value) => _validateRequired(value, 'Surname')),
           required: true,
         ),
         _buildField('Given names', _buildTextField('givenNames')),
@@ -370,18 +502,19 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
           _buildTextField('previousGivenNames'),
         ),
         _buildField(
-          'Date of birth (yyy-mm-dd)',
-          _buildTextField('dateOfBirth', _getFieldWidth()),
+          'Date of birth (yyyy-mm-dd)',
+          _buildDateField('dateOfBirth', 'Date of birth'),
           required: true,
         ),
         _buildField(
           'Country of birth',
           _buildDropdown(
             personalDetails.countryOfBirth,
-            (v) => ref
+                (v) => ref
                 .read(personalDetailsProvider.notifier)
                 .updateCountryOfBirth(v),
             countries,
+            validator: (value) => _validateDropdown(value, 'Country of birth'),
           ),
           required: true,
         ),
@@ -389,10 +522,11 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
           'Country of current residency',
           _buildDropdown(
             personalDetails.countryOfCurrentResidency,
-            (v) => ref
+                (v) => ref
                 .read(personalDetailsProvider.notifier)
                 .updateCountryOfCurrentResidency(v),
             countries,
+            validator: (value) => _validateDropdown(value, 'Country of current residency'),
           ),
           required: true,
         ),
@@ -403,10 +537,11 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
           'Country',
           _buildDropdown(
             personalDetails.citizenshipCountry,
-            (v) => ref
+                (v) => ref
                 .read(personalDetailsProvider.notifier)
                 .updateCitizenshipCountry(v),
             countries,
+            validator: (value) => _validateDropdown(value, 'Citizenship country'),
           ),
           required: true,
         ),
@@ -416,7 +551,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         ),
         _buildField(
           'Date passport issued (dd/mm/yyyy)',
-          _buildTextField('passportIssuedDate', _getFieldWidth()),
+          _buildDateField('passportIssuedDate', 'Passport issue date'),
         ),
       ]),
       _buildDivider(),
@@ -428,26 +563,26 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         ),
         _buildField(
           'Date passport issued',
-          _buildTextField('otherPassportIssuedDate', _getFieldWidth()),
+          _buildDateField('otherPassportIssuedDate', 'Other passport issue date'),
         ),
       ]),
       _buildDivider(),
       _buildSection("Applicant's Contact Details", [
-        _buildField('Email address', _buildTextField('email'), required: true),
+        _buildField('Email address', _buildTextField('email', validator: _validateEmail), required: true),
         _buildField(
           'Daytime telephone number',
-          _buildTextField('phone'),
+          _buildTextField('phone', validator: _validatePhone, keyboardType: TextInputType.phone),
           required: true,
         ),
-        _buildField('Fax number', _buildTextField('fax')),
-        _buildField('Mobile number', _buildTextField('mobile')),
+        _buildField('Fax number', _buildTextField('fax', keyboardType: TextInputType.phone)),
+        _buildField('Mobile number', _buildTextField('mobile', keyboardType: TextInputType.phone)),
       ]),
       _buildDivider(),
       _buildAddressSection(
         "Applicant's Postal Address",
         'postal',
         personalDetails.postalCountry,
-        (v) =>
+            (v) =>
             ref.read(personalDetailsProvider.notifier).updatePostalCountry(v),
       ),
       _buildDivider(),
@@ -455,7 +590,7 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         "Applicant's Home Address",
         'home',
         personalDetails.homeCountry,
-        (v) => ref.read(personalDetailsProvider.notifier).updateHomeCountry(v),
+            (v) => ref.read(personalDetailsProvider.notifier).updateHomeCountry(v),
         showCopyButton: true,
       ),
     ];
@@ -490,12 +625,12 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
   }
 
   Widget _buildAddressSection(
-    String title,
-    String prefix,
-    String? selectedCountry,
-    Function(String?) onCountryChanged, {
-    bool showCopyButton = false,
-  }) {
+      String title,
+      String prefix,
+      String? selectedCountry,
+      Function(String?) onCountryChanged, {
+        bool showCopyButton = false,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -540,26 +675,25 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         ),
         _buildField(
           'Suburb/City',
-          _buildTextField('${prefix}Suburb', _getFieldWidth()),
+          _buildTextField('${prefix}Suburb', validator: (value) => _validateRequired(value, 'Suburb/City')),
           required: true,
         ),
         _buildField(
           'State',
-          _buildTextField('${prefix}State', _getFieldWidth()),
+          _buildTextField('${prefix}State'),
         ),
         _buildField(
           'Post code',
-          _buildTextField('${prefix}Postcode', _getFieldWidth()),
+          _buildTextField('${prefix}Postcode'),
         ),
         _buildField(
           'Country',
-          _buildDropdown(selectedCountry, onCountryChanged, [
-            'Australia',
-            'India',
-            'USA',
-            'UK',
-            'Canada',
-          ]),
+          _buildDropdown(
+            selectedCountry,
+            onCountryChanged,
+            const ['Australia', 'India', 'USA', 'UK', 'Canada'],
+            validator: (value) => _validateDropdown(value, 'Country'),
+          ),
           required: true,
         ),
       ],
@@ -571,85 +705,93 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
 
     return Padding(
       padding: EdgeInsets.only(bottom: size.height * 0.02),
-      child:
-          _isMobile(context)
-              ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                      ),
-                      if (required)
-                        Text(
-                          ' *',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                    ],
+      child: _isMobile(context)
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
                   ),
-                  SizedBox(height: size.height * 0.01),
-                  field,
-                ],
-              )
-              : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: size.height * 0.015,
-                        right: size.width * 0.02,
-                      ),
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: _isTablet(context) ? 13 : 14,
-                          color: Colors.grey.shade700,
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ),
-                  if (required)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: size.height * 0.015,
-                        right: 4,
-                      ),
-                      child: Text(
-                        '*',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  Expanded(
-                    flex: 3,
-                    child: Align(alignment: Alignment.centerLeft, child: field),
-                  ),
-                ],
+                ),
               ),
+              if (required)
+                const Text(
+                  ' *',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: size.height * 0.01),
+          field,
+        ],
+      )
+          : Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: size.height * 0.015,
+                right: size.width * 0.02,
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: _isTablet(context) ? 13 : 14,
+                  color: Colors.grey.shade700,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ),
+          if (required)
+            Padding(
+              padding: EdgeInsets.only(
+                top: size.height * 0.015,
+                right: 4,
+              ),
+              child: const Text(
+                '*',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          Expanded(
+            flex: 3,
+            child: Align(alignment: Alignment.centerLeft, child: field),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildTextField(String key, [double? maxWidth]) {
+  Widget _buildTextField(
+      String key, {
+        double? maxWidth,
+        String? Function(String?)? validator,
+        TextInputType? keyboardType,
+        List<TextInputFormatter>? inputFormatters,
+      }) {
     final size = MediaQuery.of(context).size;
     return Container(
       constraints: maxWidth != null ? BoxConstraints(maxWidth: maxWidth) : null,
       child: TextFormField(
         controller: _controllers[key],
+        validator: validator,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -664,11 +806,35 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     );
   }
 
+  Widget _buildDateField(String key, String fieldName) {
+    return GestureDetector(
+      onTap: () => _selectDate(key),
+      child: AbsorbPointer(
+        child: _buildTextField(
+          key,
+          maxWidth: _getFieldWidth(),
+          validator: (value) => _validateDate(value, fieldName),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMultiLineAddress(String prefix) {
     final size = MediaQuery.of(context).size;
+
+    // Custom validator for address that checks if at least one line is filled
+    String? addressValidator(String? value) {
+      if (prefix == 'postal') {
+        return _validateAddress();
+      } else if (prefix == 'home') {
+        return _validateHomeAddress();
+      }
+      return null;
+    }
+
     return Column(
       children: [
-        _buildTextField('${prefix}Address1'),
+        _buildTextField('${prefix}Address1', validator: addressValidator),
         SizedBox(height: size.height * 0.01),
         _buildTextField('${prefix}Address2'),
         SizedBox(height: size.height * 0.01),
@@ -678,16 +844,18 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
   }
 
   Widget _buildDropdown(
-    String? value,
-    Function(String?) onChanged,
-    List<String> options, [
-    double? maxWidth,
-  ]) {
+      String? value,
+      Function(String?) onChanged,
+      List<String> options, {
+        double? maxWidth,
+        String? Function(String?)? validator,
+      }) {
     final size = MediaQuery.of(context).size;
     return Container(
       constraints: maxWidth != null ? BoxConstraints(maxWidth: maxWidth) : null,
       child: DropdownButtonFormField<String>(
         value: value,
+        validator: validator,
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -704,37 +872,35 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
             fontSize: _isMobile(context) ? 12 : 14,
           ),
         ),
-        items:
-            options
-                .map(
-                  (option) =>
-                      DropdownMenuItem(value: option, child: Text(option)),
-                )
-                .toList(),
+        items: options
+            .map(
+              (option) =>
+              DropdownMenuItem(value: option, child: Text(option)),
+        )
+            .toList(),
         onChanged: onChanged,
       ),
     );
   }
 
   Widget _buildGenderRadioGroup() {
-    final genders = ['Male', 'Female', 'Indeterminate'];
-    final labels = ['Male', 'Female', 'Indeterminate/Intersex/Unspecified'];
+    const genders = ['Male', 'Female', 'Indeterminate'];
+    const labels = ['Male', 'Female', 'Indeterminate/Intersex/Unspecified'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(
         genders.length,
-        (index) => RadioListTile<String>(
+            (index) => RadioListTile<String>(
           title: Text(
             labels[index],
             style: TextStyle(fontSize: _isMobile(context) ? 12 : 14),
           ),
           value: genders[index],
           groupValue: ref.watch(personalDetailsProvider).gender,
-          onChanged:
-              (value) => ref
-                  .read(personalDetailsProvider.notifier)
-                  .updateGender(value!),
+          onChanged: (value) => ref
+              .read(personalDetailsProvider.notifier)
+              .updateGender(value!),
           contentPadding: EdgeInsets.zero,
           dense: true,
         ),
@@ -762,80 +928,72 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
               SizedBox(height: size.height * 0.015),
               _isMobile(context)
                   ? Column(
-                    children: [
-                      Row(
-                        children: [
-                          Radio<bool>(
-                            value: true,
-                            groupValue:
-                                ref
-                                    .watch(personalDetailsProvider)
-                                    .isAgentAuthorized,
-                            onChanged:
-                                (v) => ref
-                                    .read(personalDetailsProvider.notifier)
-                                    .updateIsAgentAuthorized(v!),
-                          ),
-                          Text('Yes', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Radio<bool>(
-                            value: false,
-                            groupValue:
-                                ref
-                                    .watch(personalDetailsProvider)
-                                    .isAgentAuthorized,
-                            onChanged:
-                                (v) => ref
-                                    .read(personalDetailsProvider.notifier)
-                                    .updateIsAgentAuthorized(v!),
-                          ),
-                          Text('No', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ],
-                  )
-                  : Row(
+                children: [
+                  Row(
                     children: [
                       Radio<bool>(
                         value: true,
-                        groupValue:
-                            ref
-                                .watch(personalDetailsProvider)
-                                .isAgentAuthorized,
-                        onChanged:
-                            (v) => ref
-                                .read(personalDetailsProvider.notifier)
-                                .updateIsAgentAuthorized(v!),
+                        groupValue: ref
+                            .watch(personalDetailsProvider)
+                            .isAgentAuthorized,
+                        onChanged: (v) => ref
+                            .read(personalDetailsProvider.notifier)
+                            .updateIsAgentAuthorized(v!),
                       ),
-                      Text(
-                        'Yes',
-                        style: TextStyle(
-                          fontSize: _isTablet(context) ? 13 : 14,
-                        ),
-                      ),
-                      SizedBox(width: size.width * 0.03),
-                      Radio<bool>(
-                        value: false,
-                        groupValue:
-                            ref
-                                .watch(personalDetailsProvider)
-                                .isAgentAuthorized,
-                        onChanged:
-                            (v) => ref
-                                .read(personalDetailsProvider.notifier)
-                                .updateIsAgentAuthorized(v!),
-                      ),
-                      Text(
-                        'No',
-                        style: TextStyle(
-                          fontSize: _isTablet(context) ? 13 : 14,
-                        ),
-                      ),
+                      const Text('Yes', style: TextStyle(fontSize: 12)),
                     ],
                   ),
+                  Row(
+                    children: [
+                      Radio<bool>(
+                        value: false,
+                        groupValue: ref
+                            .watch(personalDetailsProvider)
+                            .isAgentAuthorized,
+                        onChanged: (v) => ref
+                            .read(personalDetailsProvider.notifier)
+                            .updateIsAgentAuthorized(v!),
+                      ),
+                      const Text('No', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ],
+              )
+                  : Row(
+                children: [
+                  Radio<bool>(
+                    value: true,
+                    groupValue: ref
+                        .watch(personalDetailsProvider)
+                        .isAgentAuthorized,
+                    onChanged: (v) => ref
+                        .read(personalDetailsProvider.notifier)
+                        .updateIsAgentAuthorized(v!),
+                  ),
+                  Text(
+                    'Yes',
+                    style: TextStyle(
+                      fontSize: _isTablet(context) ? 13 : 14,
+                    ),
+                  ),
+                  SizedBox(width: size.width * 0.03),
+                  Radio<bool>(
+                    value: false,
+                    groupValue: ref
+                        .watch(personalDetailsProvider)
+                        .isAgentAuthorized,
+                    onChanged: (v) => ref
+                        .read(personalDetailsProvider.notifier)
+                        .updateIsAgentAuthorized(v!),
+                  ),
+                  Text(
+                    'No',
+                    style: TextStyle(
+                      fontSize: _isTablet(context) ? 13 : 14,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -853,76 +1011,76 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
 
     return _isMobile(context)
         ? Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              onPressed: _isLoading ? null : () => _handleSubmission(true),
-              style: buttonStyle.copyWith(
-                padding: WidgetStateProperty.all(
-                  EdgeInsets.symmetric(vertical: size.height * 0.015),
-                ),
-              ),
-              child: Text(
-                'Save & Exit',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton(
+          onPressed: _isLoading ? null : () => _handleSubmission(true),
+          style: buttonStyle.copyWith(
+            padding: WidgetStateProperty.all(
+              EdgeInsets.symmetric(vertical: size.height * 0.015),
             ),
-            SizedBox(height: size.height * 0.015),
-            ElevatedButton(
-              onPressed: _isLoading ? null : () => _handleSubmission(false),
-              style: buttonStyle.copyWith(
-                padding: WidgetStateProperty.all(
-                  EdgeInsets.symmetric(vertical: size.height * 0.015),
-                ),
-              ),
-              child: Text(
-                'Continue',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
+          ),
+          child: const Text(
+            'Save & Exit',
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ),
+        SizedBox(height: size.height * 0.015),
+        ElevatedButton(
+          onPressed: _isLoading ? null : () => _handleSubmission(false),
+          style: buttonStyle.copyWith(
+            padding: WidgetStateProperty.all(
+              EdgeInsets.symmetric(vertical: size.height * 0.015),
             ),
-          ],
-        )
+          ),
+          child: const Text(
+            'Continue',
+            style: TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ),
+      ],
+    )
         : Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _isLoading ? null : () => _handleSubmission(true),
-              style: buttonStyle.copyWith(
-                padding: WidgetStateProperty.all(
-                  EdgeInsets.symmetric(
-                    horizontal: size.width * 0.03,
-                    vertical: size.height * 0.015,
-                  ),
-                ),
-              ),
-              child: Text(
-                'Save & Exit',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: _isTablet(context) ? 13 : 14,
-                ),
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: _isLoading ? null : () => _handleSubmission(true),
+          style: buttonStyle.copyWith(
+            padding: WidgetStateProperty.all(
+              EdgeInsets.symmetric(
+                horizontal: size.width * 0.03,
+                vertical: size.height * 0.015,
               ),
             ),
-            SizedBox(width: size.width * 0.02),
-            ElevatedButton(
-              onPressed: _isLoading ? null : () => _handleSubmission(false),
-              style: buttonStyle.copyWith(
-                padding: WidgetStateProperty.all(
-                  EdgeInsets.symmetric(
-                    horizontal: size.width * 0.03,
-                    vertical: size.height * 0.015,
-                  ),
-                ),
-              ),
-              child: Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: _isTablet(context) ? 13 : 14,
-                ),
+          ),
+          child: Text(
+            'Save & Exit',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: _isTablet(context) ? 13 : 14,
+            ),
+          ),
+        ),
+        SizedBox(width: size.width * 0.02),
+        ElevatedButton(
+          onPressed: _isLoading ? null : () => _handleSubmission(false),
+          style: buttonStyle.copyWith(
+            padding: WidgetStateProperty.all(
+              EdgeInsets.symmetric(
+                horizontal: size.width * 0.03,
+                vertical: size.height * 0.015,
               ),
             ),
-          ],
-        );
+          ),
+          child: Text(
+            'Continue',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: _isTablet(context) ? 13 : 14,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
