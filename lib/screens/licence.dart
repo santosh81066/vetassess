@@ -1,13 +1,13 @@
-// Updated licence_form.dart with API integration
+// Fixed licence_form.dart with proper state handling
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
 import '../providers/category_country_provider.dart';
-import '../providers/licence_provider.dart'; // Add this import
+import '../providers/licence_provider.dart';
 import '../models/category_country_models.dart';
-import '../models/licence_models.dart'; // Add this import
+import '../models/licence_models.dart';
 import '../widgets/application_nav.dart';
 
 class LicenceForm extends ConsumerStatefulWidget {
@@ -21,6 +21,7 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
   String? _currentStatus;
   Category? _selectedCategory;
   Country? _selectedCountry;
+  bool _hasNavigated = false; // Add this flag to prevent multiple navigations
 
   // Form controllers
   final _issuingBodyController = TextEditingController();
@@ -32,8 +33,10 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
   @override
   void initState() {
     super.initState();
-    // Fetch data when the widget initializes
+    // Reset the navigation flag and clear any previous state
+    _hasNavigated = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(licenceProvider.notifier).reset(); // Clear previous state
       ref.read(categoriesProvider.notifier).fetchCategories();
       ref.read(countriesProvider.notifier).fetchCountries();
     });
@@ -55,18 +58,25 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
     final isMobile = size.width < 600;
     final isTablet = size.width >= 600 && size.width < 1024;
 
-    // Listen to licence provider state
+    // Listen to licence provider state with proper handling
     ref.listen<LicenceState>(licenceProvider, (previous, next) {
-      if (next.error != null) {
+      // Only handle state changes if we haven't already navigated
+      if (_hasNavigated) return;
+
+      if (next.error != null && previous?.error != next.error) {
+        // Show error only if it's a new error
         _showErrorSnackBar(next.error!);
-        ref.read(licenceProvider.notifier).clearError();
-      } else if (next.response != null) {
+      } else if (next.response != null && previous?.response != next.response) {
+        // Show success and navigate only if it's a new response
         _showSuccessSnackBar(next.response!.message);
-        // Navigate to next page on success
-        context.go(
-          '/app_priority_form',
-        ); // <-- This line handles the navigation
-        ref.read(licenceProvider.notifier).clearResponse();
+        _hasNavigated = true; // Set flag to prevent multiple navigations
+
+        // Navigate after a small delay to ensure snackbar is shown
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            context.go('/app_priority_form');
+          }
+        });
       }
     });
 
@@ -94,8 +104,6 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
                   '/education_form',
                   '/tertiary_education_form',
                   '/employment_form',
-                  // '/licence_form',
-                  // '/app_priority_form',
                 },
               ),
             ),
@@ -198,7 +206,8 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
                                             const SizedBox(height: 10),
                                             buildButton(
                                               'Save & Continue',
-                                              licenceState.isLoading
+                                              licenceState.isLoading ||
+                                                      _hasNavigated
                                                   ? null
                                                   : () => _saveAndContinue(),
                                               isLoading: licenceState.isLoading,
@@ -212,7 +221,8 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
                                             buildButton('Cancel', () {}),
                                             buildButton(
                                               'Save & Continue',
-                                              licenceState.isLoading
+                                              licenceState.isLoading ||
+                                                      _hasNavigated
                                                   ? null
                                                   : () => _saveAndContinue(),
                                               isLoading: licenceState.isLoading,
@@ -630,6 +640,9 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
   }
 
   void _saveAndContinue() {
+    // Don't proceed if already processing or navigated
+    if (_hasNavigated) return;
+
     // Validation
     if (_selectedCategory == null) {
       _showErrorSnackBar('Please select a category');
@@ -722,7 +735,6 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
     }
   }
 
-  // 3. Update the _formatDate method (for API submission)
   String _formatDate(String date) {
     // If date is already in yyyy-mm-dd format, return as is
     if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(date)) {
@@ -743,22 +755,26 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }
