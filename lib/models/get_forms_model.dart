@@ -27,9 +27,9 @@ class Users {
   String? givenNames;
   String? surname;
   String? dateOfBirth;
-  Null? businessName;
-  Null? registrationStatus;
-  Null? registrationNumber;
+  String? businessName; // Changed from Null? to String?
+  String? registrationStatus; // Changed from Null? to String?
+  String? registrationNumber; // Changed from Null? to String?
   String? email;
   String? password;
   String? role;
@@ -793,14 +793,22 @@ class UploadedDocuments {
 class Categorys {
   int? id;
   String? documentCategory;
+  dynamic subtype;
   String? createdAt;
   String? updatedAt;
 
-  Categorys({this.id, this.documentCategory, this.createdAt, this.updatedAt});
+  Categorys({
+    this.id,
+    this.documentCategory,
+    this.subtype,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   Categorys.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     documentCategory = json['documentCategory'];
+    subtype = json['Subtype'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
   }
@@ -809,6 +817,7 @@ class Categorys {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['documentCategory'] = this.documentCategory;
+    data['Subtype'] = this.subtype;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     return data;
@@ -962,7 +971,7 @@ class Occupation {
   int? id;
   String? occupationName;
   String? anzscoCode;
-  Null? assessmentType;
+  int? assessmentType;
   String? skillsRequirement;
   int? createdBy;
   String? createdAt;
@@ -1140,7 +1149,7 @@ class PriorityProcess {
   String? otherDescription;
   String? createdAt;
   String? updatedAt;
-  Null? priorityOption;
+  dynamic priorityOption;
 
   PriorityProcess({
     this.id,

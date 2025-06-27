@@ -24,14 +24,28 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        print('user all documents...${response.body}');
-        
-        // ✅ Save JSON to storage (works on all platforms)
+        print('Raw JSON response: ${response.body}');
+
+        // 🔍 Debug: Print the structure of jsonData
+        _debugJsonStructure(jsonData);
+
+        // Save JSON to storage
         await _saveJsonToStorage(jsonData);
-        
-        // Update state
-        final getAllFormsModel = GetAllFormsModel.fromJson(jsonData);
-        state = getAllFormsModel;
+
+        // 🔍 Debug: Try to create model with detailed error handling
+        try {
+          final getAllFormsModel = GetAllFormsModel.fromJson(jsonData);
+          state = getAllFormsModel;
+          print('✅ Model created successfully');
+        } catch (modelError) {
+          print('❌ Error creating model from JSON: $modelError');
+          print('JSON keys: ${jsonData.keys.toList()}');
+          // Print each field's type
+          jsonData.forEach((key, value) {
+            print('Field "$key": ${value.runtimeType} = $value');
+          });
+          rethrow;
+        }
       } else if (response.statusCode == 401) {
         throw Exception('Unauthorized: Please login again');
       } else {
@@ -44,30 +58,49 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
     }
   }
 
+  void _debugJsonStructure(dynamic data, [String prefix = '']) {
+    if (data is Map) {
+      data.forEach((key, value) {
+        print('$prefix$key: ${value.runtimeType}');
+        if (value is Map || value is List) {
+          _debugJsonStructure(value, '$prefix  ');
+        }
+      });
+    } else if (data is List) {
+      print('${prefix}List with ${data.length} items');
+      if (data.isNotEmpty) {
+        print('${prefix}First item type: ${data.first.runtimeType}');
+        if (data.first is Map || data.first is List) {
+          _debugJsonStructure(data.first, '$prefix  ');
+        }
+      }
+    }
+  }
+
   /// Save JSON data using platform-appropriate storage
   Future<void> _saveJsonToStorage(dynamic jsonData) async {
     try {
       final jsonString = json.encode(jsonData);
       print('saved json data....$jsonData');
-      
+
       if (kIsWeb) {
         // Use SharedPreferences for web
         final prefs = await SharedPreferences.getInstance();
-        
+
         // Check if data has changed
         final currentData = prefs.getString(_cacheKey);
         if (currentData == jsonString) {
           print("No change in data, skipping storage write.");
           return;
         }
-        
+
         await prefs.setString(_cacheKey, jsonString);
         print('JSON data saved to web storage');
       } else {
         // Use file system for mobile/desktop
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/cached_all_forms.json');
-        
+
         // Check if file already has same content
         if (await file.exists()) {
           final currentData = await file.readAsString();
@@ -76,7 +109,7 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
             return;
           }
         }
-        
+
         await file.writeAsString(jsonString);
         print('JSON data saved to ${file.path}');
       }
@@ -89,26 +122,37 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
   Future<void> _loadFromCachedStorage() async {
     try {
       String? jsonString;
-      
+
       if (kIsWeb) {
-        // Load from SharedPreferences for web
         final prefs = await SharedPreferences.getInstance();
         jsonString = prefs.getString(_cacheKey);
       } else {
-        // Load from file system for mobile/desktop
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/cached_all_forms.json');
-        
+
         if (await file.exists()) {
           jsonString = await file.readAsString();
         }
       }
-      
+
       if (jsonString != null && jsonString.isNotEmpty) {
         final jsonData = json.decode(jsonString);
-        final getAllFormsModel = GetAllFormsModel.fromJson(jsonData);
-        state = getAllFormsModel;
-        print('Data loaded from cached storage');
+        print('🔍 Cached JSON structure:');
+        _debugJsonStructure(jsonData);
+
+        // 🔍 Debug: Try to create model with error handling
+        try {
+          final getAllFormsModel = GetAllFormsModel.fromJson(jsonData);
+          state = getAllFormsModel;
+          print('✅ Model loaded from cache successfully');
+        } catch (modelError) {
+          print('❌ Error creating model from cached JSON: $modelError');
+          print('Cached JSON keys: ${jsonData.keys.toList()}');
+          jsonData.forEach((key, value) {
+            print('Cached field "$key": ${value.runtimeType} = $value');
+          });
+          state = GetAllFormsModel.initial();
+        }
       } else {
         print('No cached data found');
         state = GetAllFormsModel.initial();
@@ -123,7 +167,7 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
   Future<Map<String, dynamic>?> getCachedJsonData() async {
     try {
       String? jsonString;
-      
+
       if (kIsWeb) {
         // Load from SharedPreferences for web
         final prefs = await SharedPreferences.getInstance();
@@ -132,12 +176,12 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
         // Load from file system for mobile/desktop
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/cached_all_forms.json');
-        
+
         if (await file.exists()) {
           jsonString = await file.readAsString();
         }
       }
-      
+
       if (jsonString != null && jsonString.isNotEmpty) {
         return json.decode(jsonString) as Map<String, dynamic>;
       }
