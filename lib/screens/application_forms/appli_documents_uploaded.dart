@@ -16,6 +16,23 @@ class DocumentUploadScreen extends ConsumerStatefulWidget {
 }
 
 class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchformsCategories();
+    });
+  }
+
+  Future<void> _fetchformsCategories() async {
+    await ref.read(getAllformsProviders.notifier).fetchallCategories();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -23,21 +40,20 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     final isMediumScreen = size.width >= 600 && size.width < 1024;
     final isLargeScreen = size.width >= 1024;
 
-    final loginid = ref.read(loginProvider).response?.userId;
-    final data = ref.read(getAllformsProviders).users;
-    final filteredData =
-        data?.where((item) => item.userId == loginid).toList() ?? [];
+    // Watch the providers instead of reading them once
+    final loginState = ref.watch(loginProvider);
+    final formsState = ref.watch(getAllformsProviders);
 
-    // Extract the applicant's name from the filtered data
-    String applicantName = ''; // Default fallback
-    if (filteredData.isNotEmpty && filteredData.first.givenNames != null) {
-      applicantName = filteredData.first.givenNames!;
-      // Optionally include surname as well
-      if (filteredData.first.surname != null) {
-        applicantName =
-            '${filteredData.first.givenNames!} ${filteredData.first.surname!}';
-      }
-    }
+    final loginid = loginState.response?.userId;
+    final data = formsState.users;
+
+    final applicantName = loginState.response?.fullName ?? 'Not available';
+
+    // Debug: Add these print statements to check the data
+    print('Login ID: $loginid');
+    print('FINAL APPLICANT NAME: $applicantName');
+    print('Total users: ${data?.length ?? 0}');
+    print('All user IDs: ${data?.map((user) => user.userId).toList()}');
 
     // Responsive dimensions
     final navWidth = isSmallScreen ? size.width * 0.2 : size.width * 0.3;
@@ -61,16 +77,16 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
             child: const Align(
               alignment: Alignment.topRight,
               child: ApplicationNavWithProgress(
-                  currentRoute: '/doc_upload',
-            completedRoutes: {
-              '/personal_form',
-              '/occupation_form',
-              '/education_form',
-             '/tertiary_education_form',
-              // '/employment_form',
-              // '/licence_form',
-              // '/app_priority_form',
-            },
+                currentRoute: '/doc_upload',
+                completedRoutes: {
+                  '/personal_form',
+                  '/occupation_form',
+                  '/education_form',
+                  '/tertiary_education_form',
+                  // '/employment_form',
+                  // '/licence_form',
+                  // '/app_priority_form',
+                },
               ),
             ),
           ),

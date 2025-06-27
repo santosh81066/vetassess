@@ -28,33 +28,37 @@ class LoginRequest {
 class LoginResponse {
   String? message;
   int? userId;
+  String? fullName; // Add fullName field
   String? accessToken;
   String? refreshToken;
-  String? role; // Add role field to response
+  String? role;
 
   LoginResponse({
-    this.message, 
-    this.userId, 
-    this.accessToken, 
+    this.message,
+    this.userId,
+    this.fullName, // Add fullName parameter
+    this.accessToken,
     this.refreshToken,
-    this.role, // Add role parameter
+    this.role,
   });
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     userId = json['userId'];
+    fullName = json['fullName']; // Parse fullName from response
     accessToken = json['accessToken'];
     refreshToken = json['refreshToken'];
-    role = json['role']; // Parse role from response
+    role = json['role'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['message'] = this.message;
     data['userId'] = this.userId;
+    data['fullName'] = this.fullName; // Include fullName in JSON
     data['accessToken'] = this.accessToken;
     data['refreshToken'] = this.refreshToken;
-    data['role'] = this.role; // Include role in JSON
+    data['role'] = this.role;
     return data;
   }
 }
@@ -76,7 +80,7 @@ class LoginState {
   final LoginResponse? response;
   final String? captcha;
   final bool isLoadingCaptcha;
-  final String? userRole; // Add user role to state
+  final String? userRole;
 
   LoginState({
     this.isLoading = false,
@@ -85,7 +89,7 @@ class LoginState {
     this.response,
     this.captcha,
     this.isLoadingCaptcha = false,
-    this.userRole, // Add userRole parameter
+    this.userRole,
   });
 
   LoginState copyWith({
@@ -95,7 +99,7 @@ class LoginState {
     LoginResponse? response,
     String? captcha,
     bool? isLoadingCaptcha,
-    String? userRole, // Add userRole to copyWith
+    String? userRole,
   }) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
@@ -104,7 +108,7 @@ class LoginState {
       response: response ?? this.response,
       captcha: captcha ?? this.captcha,
       isLoadingCaptcha: isLoadingCaptcha ?? this.isLoadingCaptcha,
-      userRole: userRole ?? this.userRole, // Include userRole in copyWith
+      userRole: userRole ?? this.userRole,
     );
   }
 }

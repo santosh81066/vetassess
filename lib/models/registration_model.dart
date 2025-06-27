@@ -43,17 +43,51 @@ class SignupRequest {
 class SignupResponse {
   final String? message;
   final String? token;
-  final Map<String, dynamic>? user;
+  final SignupUser? user;
 
   SignupResponse({this.message, this.token, this.user});
 
   factory SignupResponse.fromJson(Map<String, dynamic> json) {
     return SignupResponse(
-      message: json['message'],
-      token: json['token'],
-      user: json['user'],
+      message: json['message'] as String?,
+      token: json['token'] as String?,
+      user:
+          json['user'] != null
+              ? SignupUser.fromJson(json['user'] as Map<String, dynamic>)
+              : null,
     );
   }
+}
+
+class SignupUser {
+  final int userId;
+  final String givenNames;
+  final String surname;
+  final String dateOfBirth;
+  final String role;
+  final bool isAgreedToReceiveNews;
+
+  SignupUser({
+    required this.userId,
+    required this.givenNames,
+    required this.surname,
+    required this.dateOfBirth,
+    required this.role,
+    required this.isAgreedToReceiveNews,
+  });
+
+  factory SignupUser.fromJson(Map<String, dynamic> json) {
+    return SignupUser(
+      userId: json['userId'] ?? 0,
+      givenNames: json['givenNames'] ?? '',
+      surname: json['surname'] ?? '',
+      dateOfBirth: json['dateOfBirth'] ?? '',
+      role: json['role'] ?? '',
+      isAgreedToReceiveNews: json['isAgreedToReceiveNews'] ?? false,
+    );
+  }
+
+  String get fullName => '$givenNames $surname';
 }
 
 class SignupState {

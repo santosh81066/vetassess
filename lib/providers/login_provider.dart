@@ -18,13 +18,24 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<void> _checkInitialLoginStatus() async {
     final isLoggedInResult = await isLoggedIn();
     if (isLoggedInResult) {
-      // Get stored user role
+      // Get stored user data
       final userRole = await getUserRole();
+      final userId = await getUserId();
+      final fullName = await getFullName();
+
+      // Create LoginResponse with stored data
+      final loginResponse = LoginResponse(
+        userId: userId,
+        fullName: fullName,
+        role: userRole,
+      );
+
       // User is logged in, set success state
       state = state.copyWith(
         isSuccess: true,
         isLoading: false,
         userRole: userRole,
+        response: loginResponse,
       );
     } else {
       // User is not logged in, ensure state reflects this
@@ -83,12 +94,17 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final loginResponse = LoginResponse.fromJson(responseData);
 
-        // Store user data including tokens and userId
+        // Store user data including tokens, userId, and fullName
         await _storeUserData(loginResponse);
 
         // Store user role (use response role or fallback to request role)
         final userRole = loginResponse.role ?? request.role;
         await _storeUserRole(userRole);
+
+        // Store fullName
+        if (loginResponse.fullName != null) {
+          await _storeFullName(loginResponse.fullName!);
+        }
 
         state = state.copyWith(
           isLoading: false,
@@ -126,7 +142,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  // Store user data including tokens and userId
+  // Store user data including tokens, userId, and fullName
   Future<void> _storeUserData(LoginResponse loginResponse) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -145,6 +161,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
       await prefs.setInt('user_id', loginResponse.userId!);
     }
 
+    // Store fullName
+    if (loginResponse.fullName != null) {
+      await prefs.setString('full_name', loginResponse.fullName!);
+    }
+
     // Store login timestamp for token expiry management
     await prefs.setInt(
       'login_timestamp',
@@ -158,10 +179,22 @@ class LoginNotifier extends StateNotifier<LoginState> {
     await prefs.setString('user_role', role);
   }
 
+  // Store fullName
+  Future<void> _storeFullName(String fullName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('full_name', fullName);
+  }
+
   // Get stored user role
   Future<String?> getUserRole() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_role');
+  }
+
+  // Get stored fullName
+  Future<String?> getFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('full_name');
   }
 
   // Get stored access token
@@ -176,7 +209,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     return prefs.getString('refresh_token');
   }
 
-  // Add method to get userId
+  // Get userId
   Future<int?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('user_id');
@@ -249,7 +282,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         final newAccessToken = responseData['accessToken'];
         final newRefreshToken = responseData['refreshToken'];
 
-        // Store new tokens (maintain existing userId)
+        // Store new tokens (maintain existing userId and fullName)
         final prefs = await SharedPreferences.getInstance();
         if (newAccessToken != null && newAccessToken.isNotEmpty) {
           await prefs.setString('access_token', newAccessToken);
@@ -257,22 +290,24 @@ class LoginNotifier extends StateNotifier<LoginState> {
         if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
           await prefs.setString('refresh_token', newRefreshToken);
         }
-        
+
         // Update login timestamp
         await prefs.setInt(
           'login_timestamp',
           DateTime.now().millisecondsSinceEpoch,
         );
 
-        // Get stored user role and update state
+        // Get stored user data and update state
         final userRole = await getUserRole();
         final userId = await getUserId();
-        
+        final fullName = await getFullName();
+
         // Create a new LoginResponse with the refreshed data
         final loginResponse = LoginResponse(
           accessToken: newAccessToken,
           refreshToken: newRefreshToken,
           userId: userId,
+          fullName: fullName,
           role: userRole,
         );
 
@@ -324,6 +359,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     await prefs.remove('login_timestamp');
     await prefs.remove('user_id');
     await prefs.remove('user_role');
+    await prefs.remove('full_name'); // Remove fullName on logout
 
     // Reset state to logged out - this will trigger router refresh
     state = LoginState().copyWith(
@@ -351,10 +387,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
     try {
       final accessToken = await getAccessToken();
       final userRole = await getUserRole();
+      final fullName = await getFullName();
 
       if (accessToken == null) return null;
 
-      return {'role': userRole, 'hasToken': true};
+      return {'role': userRole, 'fullName': fullName, 'hasToken': true};
     } catch (e) {
       return null;
     }
@@ -389,6 +426,12 @@ class LoginNotifier extends StateNotifier<LoginState> {
 final userIdProvider = FutureProvider<int?>((ref) async {
   final loginNotifier = ref.read(loginProvider.notifier);
   return await loginNotifier.getUserId();
+});
+
+// Add fullName provider
+final fullNameProvider = FutureProvider<String?>((ref) async {
+  final loginNotifier = ref.read(loginProvider.notifier);
+  return await loginNotifier.getFullName();
 });
 
 // Provider
