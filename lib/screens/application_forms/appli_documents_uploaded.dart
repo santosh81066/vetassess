@@ -60,7 +60,18 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
             width: navWidth,
             child: const Align(
               alignment: Alignment.topRight,
-              child: ApplicationNav(),
+              child: ApplicationNavWithProgress(
+                  currentRoute: '/doc_upload',
+            completedRoutes: {
+              '/personal_form',
+              '/occupation_form',
+              '/education_form',
+             '/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
             ),
           ),
           Expanded(

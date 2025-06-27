@@ -115,7 +115,18 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
             width: isMobile ? 0 : MediaQuery.of(context).size.width * 0.3,
             child: isMobile ? const SizedBox.shrink() : Align(
               alignment: Alignment.topRight,
-              child: ApplicationNav(),
+               child: ApplicationNavWithProgress(
+                  currentRoute: '/employment_form',
+            completedRoutes: {
+              '/personal_form',
+              '/occupation_form',
+              '/education_form',
+             '/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
             ),
           ),
 

@@ -398,7 +398,18 @@ class _EducationFormState extends ConsumerState<EducationForm> {
                 .width * 0.3,
             child: const Align(
               alignment: Alignment.topRight,
-              child: ApplicationNav(),
+               child: ApplicationNavWithProgress(
+                  currentRoute: '/education_form',
+            completedRoutes: {
+              '/personal_form',
+              '/occupation_form',
+              //'/education_form',
+             // '/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
             ),
           ),
           Expanded(

@@ -49,15 +49,10 @@ class AppliOptions extends StatelessWidget {
               title: 'Continue Incomplete Application',
               icon: Icons.edit_note,
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => TertiaryEducationForm(),
-                //   ),
-                // );
+              
                       //context.go('/vetassess_upload');      
                      // context.go('/doc_upload');
-                     context.go('/maintenance');
+                    // context.go('null');
               },
               color: const Color(0xFF006257),
               context: context,
@@ -72,7 +67,7 @@ class AppliOptions extends StatelessWidget {
               icon: Icons.description_outlined,
               onPressed: () {
                  //context.go('/get_all_forms');
-                context.go('/maintenance');
+                //context.go('null');
               },
               color: const Color(0xFF006257),
               context: context,
@@ -86,10 +81,7 @@ class AppliOptions extends StatelessWidget {
               title: 'Update my details',
               icon: Icons.person_outline,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LicenceForm()),
-                );
+                 //context.go('null');
               },
               color: const Color(0xFF006257),
               context: context,

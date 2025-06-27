@@ -94,10 +94,18 @@ class LoginHeader extends ConsumerWidget {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/images/vetassess_logo.png',
-            height: logoSize,
-            fit: BoxFit.contain,
+          GestureDetector(
+              onTap: () {
+               
+               _showLogoutDialogImage(context, ref);
+             
+
+            },
+            child: Image.asset(
+              'assets/images/vetassess_logo.png',
+              height: logoSize,
+              fit: BoxFit.contain,
+            ),
           ),
           SizedBox(height: spacing / 2),
           Padding(
@@ -123,11 +131,12 @@ class LoginHeader extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
+
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
+               
+               _showLogoutDialogImage(context, ref);
+             
+
             },
             child: Image.asset(
               'assets/images/vetassess_logo.png',
@@ -181,7 +190,9 @@ class LoginHeader extends ConsumerWidget {
                   color: Colors.orange[900],
                   size: iconSize,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  context.go('/appli_opt');
+                },
               ),
             ),
             for (final item in ['Contact', 'Links', 'FAQs'])
@@ -207,7 +218,9 @@ class LoginHeader extends ConsumerWidget {
           children: [
             IconButton(
               icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
-              onPressed: () {},
+              onPressed: () {
+                 context.go('/appli_opt');
+              },
             ),
             for (final item in ['Contact us', 'Useful links', 'FAQs'])
               TextButton(
@@ -345,6 +358,83 @@ class LoginHeader extends ConsumerWidget {
       },
     );
   }
+
+   void _showLogoutDialogImage(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final loginState = ref.watch(loginProvider);
+
+            return AlertDialog(
+              title: const Text('Logout'),
+              content:
+                  loginState.isLoading
+                      ? const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Logging out...'),
+                        ],
+                      )
+                      : const Text('Are you sure you want to logout?'),
+              actions:
+                  loginState.isLoading
+                      ? []
+                      : [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            // Perform logout using the provider
+                            await ref.read(loginProvider.notifier).logout();
+
+                            // Close dialog first
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop();
+                            }
+
+                            // Navigate using GoRouter
+                            
+                              // Use GoRouter to navigate and clear stack
+                               Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => HomeScreen()),
+
+                                  );
+
+                              // Show logout success message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Successfully logged out'),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                          
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+ 
+
 
   double _getResponsiveHeight(
     double screenHeight,

@@ -323,9 +323,10 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {},
+           // context.go('/occupation_form'),
             child: const Text(
-              'OK',
+              'Continue',
               style: TextStyle(
                 color: Colors.teal,
                 fontWeight: FontWeight.bold,
@@ -382,7 +383,18 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
               width: _getNavWidth(context),
               child: const Align(
                 alignment: Alignment.topRight,
-                child: ApplicationNav(),
+                 child: ApplicationNavWithProgress(
+                  currentRoute: '/personal_form',
+            completedRoutes: {
+              // '/personal_form',
+              // '/occupation_form',
+              // '/education_form',
+              // '/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
               ),
             ),
             Expanded(
@@ -548,11 +560,14 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         _buildField(
           'Current passport number',
           _buildTextField('passportNumber'),
+          required: true,
         ),
         _buildField(
           'Date passport issued (dd/mm/yyyy)',
           _buildDateField('passportIssuedDate', 'Passport issue date'),
+          required: true,
         ),
+        
       ]),
       _buildDivider(),
       _buildSection('Other Citizenship', [
@@ -564,7 +579,9 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
         _buildField(
           'Date passport issued',
           _buildDateField('otherPassportIssuedDate', 'Other passport issue date'),
+          required: false,
         ),
+        
       ]),
       _buildDivider(),
       _buildSection("Applicant's Contact Details", [

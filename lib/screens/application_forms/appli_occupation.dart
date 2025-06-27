@@ -262,7 +262,18 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
             width: size.width * 0.3,
             child: const Align(
               alignment: Alignment.topRight,
-              child: ApplicationNav(),
+              child: ApplicationNavWithProgress(
+                  currentRoute: '/occupation_form',
+            completedRoutes: {
+              '/personal_form',
+              // '/occupation_form',
+              // '/education_form',
+              // '/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
             ),
           ),
           Expanded(child: _buildMainContent(context, responsive)),

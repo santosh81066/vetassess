@@ -256,8 +256,8 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
 
                 ref.read(tertiaryEducationProvider.notifier).resetState();
 
-                print('Navigating to /doc_upload');
-                context.go('/doc_upload');
+                print('Navigating to /employment_form');
+                context.go('/employment_form');
               },
               child: const Text('Continue'),
             ),
@@ -329,7 +329,18 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                     children: [
                       SizedBox(
                         width: double.infinity,
-                        child: const ApplicationNav(),
+                         child: ApplicationNavWithProgress(
+                  currentRoute: '/tertiary_education_form',
+            completedRoutes: {
+              '/personal_form',
+               '/occupation_form',
+               '/education_form',
+              //'/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
                       ),
                       Container(
                         margin: _getMargin(context),

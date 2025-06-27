@@ -1,7 +1,7 @@
 class VetassessApi {
   static const String baseUrl = "https://vetassess.com.co";
   static const String signup = "$baseUrl/auth/signup/applicant";
-  static const String captcha = "https://vetassess.com.co/auth/captcha";
+  static const String captcha = "$baseUrl/auth/captcha";
   static const String auth_refresh = "$baseUrl/auth/refresh";
   static const String login = "$baseUrl/auth/login";
   static const String form_cat = "$baseUrl/user/categories";

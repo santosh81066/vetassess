@@ -84,7 +84,18 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
                     : size.width * 0.3,
             child: Align(
               alignment: Alignment.topRight,
-              child: ApplicationNav(),
+               child: ApplicationNavWithProgress(
+                  currentRoute: '/licence_form',
+            completedRoutes: {
+              '/personal_form',
+              '/occupation_form',
+              '/education_form',
+             '/tertiary_education_form',
+               '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              )
             ),
           ),
 
