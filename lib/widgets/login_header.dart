@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vetassess/screens/home_screen.dart';
 import '../providers/login_provider.dart';
 
@@ -94,12 +95,24 @@ class LoginHeader extends ConsumerWidget {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // In the _buildHeaderContent method, replace the GestureDetector onTap:
           GestureDetector(
-              onTap: () {
-               
-               _showLogoutDialogImage(context, ref);
-             
+            onTap: () {
+              final currentRoute = GoRouterState.of(context).uri.path;
 
+              // If on login page, just navigate to home
+              if (currentRoute == '/login') {
+                context.go('/');
+              } else {
+                // If logged in and not on login page, show logout dialog
+                final loginState = ref.watch(loginProvider);
+                if (loginState.isSuccess && loginState.response != null) {
+                  _showLogoutDialogImage(context, ref);
+                } else {
+                  // Not logged in, navigate to home
+                  context.go('/');
+                }
+              }
             },
             child: Image.asset(
               'assets/images/vetassess_logo.png',
@@ -130,13 +143,24 @@ class LoginHeader extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // In the _buildHeaderContent method, replace the GestureDetector onTap:
           GestureDetector(
-
             onTap: () {
-               
-               _showLogoutDialogImage(context, ref);
-             
+              final currentRoute = GoRouterState.of(context).uri.path;
 
+              // If on login page, just navigate to home
+              if (currentRoute == '/login') {
+                context.go('/');
+              } else {
+                // If logged in and not on login page, show logout dialog
+                final loginState = ref.watch(loginProvider);
+                if (loginState.isSuccess && loginState.response != null) {
+                  _showLogoutDialogImage(context, ref);
+                } else {
+                  // Not logged in, navigate to home
+                  context.go('/');
+                }
+              }
             },
             child: Image.asset(
               'assets/images/vetassess_logo.png',
@@ -144,7 +168,6 @@ class LoginHeader extends ConsumerWidget {
               fit: BoxFit.contain,
             ),
           ),
-
           SizedBox(width: spacing),
           Flexible(
             child: Padding(
@@ -219,12 +242,19 @@ class LoginHeader extends ConsumerWidget {
             IconButton(
               icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
               onPressed: () {
-                 context.go('/appli_opt');
+                context.go('/appli_opt');
               },
             ),
             for (final item in ['Contact us', 'Useful links', 'FAQs'])
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (item == 'Contact us') {
+                    _launchURL('https://www.vetassess.com.co/#/contact_us');
+                  }
+                  if (item == 'Useful links') {
+                    showUsefulLinksDialog(context);
+                  }
+                },
                 child: Text(
                   item,
                   style: TextStyle(
@@ -359,7 +389,7 @@ class LoginHeader extends ConsumerWidget {
     );
   }
 
-   void _showLogoutDialogImage(BuildContext context, WidgetRef ref) {
+  void _showLogoutDialogImage(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -401,14 +431,8 @@ class LoginHeader extends ConsumerWidget {
                               Navigator.of(dialogContext).pop();
                             }
 
-                            // Navigate using GoRouter
-                            
-                              // Use GoRouter to navigate and clear stack
-                               Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => HomeScreen()),
-
-                                  );
+                            if (context.mounted) {
+                              context.pushReplacement('/');
 
                               // Show logout success message
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -418,8 +442,8 @@ class LoginHeader extends ConsumerWidget {
                                   duration: Duration(seconds: 2),
                                 ),
                               );
-                            },
-                          
+                            }
+                          },
                           child: const Text(
                             'Logout',
                             style: TextStyle(color: Colors.red),
@@ -432,9 +456,6 @@ class LoginHeader extends ConsumerWidget {
       },
     );
   }
-
- 
-
 
   double _getResponsiveHeight(
     double screenHeight,
@@ -491,6 +512,325 @@ class LoginHeader extends ConsumerWidget {
       return 28.0;
     } else {
       return 40.0; // Original spacing
+    }
+  }
+
+  void showUsefulLinksDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54, // Dimmed background
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(2.0),
+          ),
+          child: Container(
+            width: 600,
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with title and close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Useful Links',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Description text
+                const Text(
+                  'If you wish to find out more about your nominated occupation, the assessment process, or information about migration and working in Australia, please see the links below.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    height: 1.4,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Application process section
+                const Text(
+                  'Application process',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'VETASSESS - ',
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                      WidgetSpan(
+                        child: GestureDetector(
+                          onTap:
+                              () => _launchURL('https://www.vetassess.com.co'),
+                          child: const Text(
+                            'https://www.vetassess.com.co',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFFE07A39),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Visa and migration information section
+                const Text(
+                  'Visa and migration information',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'The Department of Home Affairs ',
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                      WidgetSpan(
+                        child: GestureDetector(
+                          onTap:
+                              () =>
+                                  _launchURL('https://www.homeaffairs.gov.au'),
+                          child: const Text(
+                            'https://www.homeaffairs.gov.au',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFFE07A39),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Occupational information section
+                const Text(
+                  'Occupational information',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'VETASSESS\n',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap:
+                                  () => _launchURL(
+                                    'http://www.vetassess.com.au/skills-assessment-for-migration/general-occupations/nominate-an-occupation',
+                                  ),
+                              child: const Text(
+                                'http://www.vetassess.com.au/skills-assessment-for-migration/general-occupations/nominate-an-occupation',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFFE07A39),
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'The Department of Home Affairs\n',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap:
+                                  () => _launchURL(
+                                    'https://www.homeaffairs.gov.au',
+                                  ),
+                              child: const Text(
+                                'https://www.homeaffairs.gov.au',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFFE07A39),
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text:
+                                'The Australian Bureau of Statistics (ABS)\nnote this contains all occupations, not only those available for migration\n',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => _launchURL('http://www.abs.gov.au'),
+                              child: const Text(
+                                'http://www.abs.gov.au',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFFE07A39),
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Jobs guide\n',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap:
+                                  () => _launchURL(
+                                    'https://education.gov.au/job-guide',
+                                  ),
+                              child: const Text(
+                                'https://education.gov.au/job-guide',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFFE07A39),
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // Close button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00565B),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }

@@ -13,18 +13,22 @@ class AppliOptions extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
-    
+
     // Define responsive breakpoints
     final isMobile = screenWidth < 768;
     final isTablet = screenWidth >= 768 && screenWidth < 1024;
     final isDesktop = screenWidth >= 1024;
-    
+
     // Calculate responsive values
-    final verticalPadding = _getVerticalPadding(screenHeight, isMobile, isTablet);
+    final verticalPadding = _getVerticalPadding(
+      screenHeight,
+      isMobile,
+      isTablet,
+    );
     final cardSpacing = _getCardSpacing(isMobile, isTablet);
     final cardWidth = _getCardWidth(screenWidth, isMobile, isTablet);
     final cardHeight = _getCardHeight(screenHeight, isMobile, isTablet);
-    
+
     return LoginPageLayout(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: verticalPadding),
@@ -49,10 +53,9 @@ class AppliOptions extends StatelessWidget {
               title: 'Continue Incomplete Application',
               icon: Icons.edit_note,
               onPressed: () {
-              
-                      //context.go('/vetassess_upload');      
-                     // context.go('/doc_upload');
-                    // context.go('null');
+                //context.go('/vetassess_upload');
+                // context.go('/doc_upload');
+                // context.go('null');
               },
               color: const Color(0xFF006257),
               context: context,
@@ -66,7 +69,7 @@ class AppliOptions extends StatelessWidget {
               title: 'View Submitted Applications',
               icon: Icons.description_outlined,
               onPressed: () {
-                 //context.go('/get_all_forms');
+                //context.go('/get_all_forms');
                 //context.go('null');
               },
               color: const Color(0xFF006257),
@@ -77,19 +80,19 @@ class AppliOptions extends StatelessWidget {
               isTablet: isTablet,
             ),
             SizedBox(height: cardSpacing),
-            _buildOptionCard(
-              title: 'Update my details',
-              icon: Icons.person_outline,
-              onPressed: () {
-                 //context.go('null');
-              },
-              color: const Color(0xFF006257),
-              context: context,
-              width: cardWidth,
-              height: cardHeight,
-              isMobile: isMobile,
-              isTablet: isTablet,
-            ),
+            // _buildOptionCard(
+            //   title: 'Update my details',
+            //   icon: Icons.person_outline,
+            //   onPressed: () {
+            //      //context.go('null');
+            //   },
+            //   color: const Color(0xFF006257),
+            //   context: context,
+            //   width: cardWidth,
+            //   height: cardHeight,
+            //   isMobile: isMobile,
+            //   isTablet: isTablet,
+            // ),
           ],
         ),
       ),
@@ -110,7 +113,7 @@ class AppliOptions extends StatelessWidget {
     List<String> words = title.split(' ');
     String firstPart = words.first;
     String remainingPart = words.skip(1).join(' ');
-    
+
     // Responsive text and icon sizes
     final fontSize = _getFontSize(isMobile, isTablet);
     final iconSize = _getIconSize(isMobile, isTablet);
@@ -160,11 +163,7 @@ class AppliOptions extends StatelessWidget {
               ),
             ),
             SizedBox(width: isMobile ? 8 : 12),
-            Icon(
-              icon,
-              color: Colors.white,
-              size: iconSize,
-            ),
+            Icon(icon, color: Colors.white, size: iconSize),
           ],
         ),
       ),
@@ -172,7 +171,11 @@ class AppliOptions extends StatelessWidget {
   }
 
   // Responsive helper methods
-  double _getVerticalPadding(double screenHeight, bool isMobile, bool isTablet) {
+  double _getVerticalPadding(
+    double screenHeight,
+    bool isMobile,
+    bool isTablet,
+  ) {
     if (isMobile) {
       return screenHeight * 0.04; // 4% of screen height
     } else if (isTablet) {

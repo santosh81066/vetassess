@@ -63,7 +63,9 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
       } else if (next.response != null) {
         _showSuccessSnackBar(next.response!.message);
         // Navigate to next page on success
-        context.go('/app_priority_form');
+        context.go(
+          '/app_priority_form',
+        ); // <-- This line handles the navigation
         ref.read(licenceProvider.notifier).clearResponse();
       }
     });
@@ -84,18 +86,18 @@ class _LicenceFormState extends ConsumerState<LicenceForm> {
                     : size.width * 0.3,
             child: Align(
               alignment: Alignment.topRight,
-               child: ApplicationNavWithProgress(
-                  currentRoute: '/licence_form',
-            completedRoutes: {
-              '/personal_form',
-              '/occupation_form',
-              '/education_form',
-             '/tertiary_education_form',
-               '/employment_form',
-              // '/licence_form',
-              // '/app_priority_form',
-            },
-              )
+              child: ApplicationNavWithProgress(
+                currentRoute: '/licence_form',
+                completedRoutes: {
+                  '/personal_form',
+                  '/occupation_form',
+                  '/education_form',
+                  '/tertiary_education_form',
+                  '/employment_form',
+                  // '/licence_form',
+                  // '/app_priority_form',
+                },
+              ),
             ),
           ),
 

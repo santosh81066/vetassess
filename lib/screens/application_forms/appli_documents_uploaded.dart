@@ -8,7 +8,7 @@ import '../../providers/login_provider.dart';
 import '../../widgets/application_nav.dart';
 
 class DocumentUploadScreen extends ConsumerStatefulWidget {
-  const DocumentUploadScreen({Key? key}) : super(key: key);
+  const DocumentUploadScreen({super.key});
 
   @override
   ConsumerState<DocumentUploadScreen> createState() =>
