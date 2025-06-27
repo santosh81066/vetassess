@@ -3,13 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vetassess/widgets/application_record.dart';
 import 'package:vetassess/widgets/login_page_layout.dart';
+import '../../providers/get_allforms_providers.dart';
+import '../../providers/login_provider.dart';
 import '../../widgets/application_nav.dart';
 
 class DocumentUploadScreen extends ConsumerStatefulWidget {
   const DocumentUploadScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<DocumentUploadScreen> createState() => _DocumentUploadScreenState();
+  ConsumerState<DocumentUploadScreen> createState() =>
+      _DocumentUploadScreenState();
 }
 
 class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
@@ -19,6 +22,22 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     final isSmallScreen = size.width < 600;
     final isMediumScreen = size.width >= 600 && size.width < 1024;
     final isLargeScreen = size.width >= 1024;
+
+    final loginid = ref.read(loginProvider).response?.userId;
+    final data = ref.read(getAllformsProviders).users;
+    final filteredData =
+        data?.where((item) => item.userId == loginid).toList() ?? [];
+
+    // Extract the applicant's name from the filtered data
+    String applicantName = ''; // Default fallback
+    if (filteredData.isNotEmpty && filteredData.first.givenNames != null) {
+      applicantName = filteredData.first.givenNames!;
+      // Optionally include surname as well
+      if (filteredData.first.surname != null) {
+        applicantName =
+            '${filteredData.first.givenNames!} ${filteredData.first.surname!}';
+      }
+    }
 
     // Responsive dimensions
     final navWidth = isSmallScreen ? size.width * 0.2 : size.width * 0.3;
@@ -53,7 +72,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
                 children: [
                   _buildTitle(),
                   SizedBox(height: size.height * 0.025),
-                  _buildReferenceCard(),
+                  _buildReferenceCard(applicantName), // Pass the applicant name
                   SizedBox(height: size.height * 0.02),
                   _buildRequiredDocumentsCard(),
                   SizedBox(height: size.height * 0.02),
@@ -88,7 +107,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     ),
   );
 
-  Widget _buildReferenceCard() => _buildCard(
+  Widget _buildReferenceCard(String applicantName) => _buildCard(
     color: Colors.white,
     border: Colors.grey.shade300,
     child: IntrinsicWidth(
@@ -96,15 +115,20 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildInfoRow('Reference number:', ''),
-          _buildInfoRow('Applicant\'s name:', 'GCD Designers'),
+          _buildInfoRow(
+            'Applicant\'s name:',
+            applicantName,
+          ), // Use dynamic name
           _buildInfoRow(
             'Application Record:',
             'Click to download',
             isLink: true,
             onTap: () async {
-                await PdfGenerationService.generateApplicationRecordPdf(context, ref);
-              }
-
+              await PdfGenerationService.generateApplicationRecordPdf(
+                context,
+                ref,
+              );
+            },
           ),
         ],
       ),
@@ -162,7 +186,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     height: 40,
     child: ElevatedButton(
       onPressed: () {
-        context.go('/get_all_forms');
+        context.go('/vetassess_upload');
       },
       style: _buttonStyle(),
       child: const Text('Upload'),
@@ -317,46 +341,50 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
                 : child,
       );
 
-   // Updated _buildInfoRow method with onTap functionality
-  Widget _buildInfoRow(String label, String value, {bool isLink = false, VoidCallback? onTap}) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 150,
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF444444),
+  // Updated _buildInfoRow method with onTap functionality
+  Widget _buildInfoRow(
+    String label,
+    String value, {
+    bool isLink = false,
+    VoidCallback? onTap,
+  }) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4.0),
+    child: Row(
+      children: [
+        SizedBox(
+          width: 150,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF444444),
+            ),
+          ),
+        ),
+        isLink && onTap != null
+            ? GestureDetector(
+              onTap: onTap,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    color: isLink ? Colors.orange : const Color(0xFF444444),
+                    decoration: isLink ? TextDecoration.underline : null,
+                  ),
                 ),
               ),
+            )
+            : Text(
+              value,
+              style: TextStyle(
+                color: isLink ? Colors.orange : const Color(0xFF444444),
+                decoration: isLink ? TextDecoration.underline : null,
+              ),
             ),
-            isLink && onTap != null
-                ? GestureDetector(
-                    onTap: onTap,
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: isLink ? Colors.orange : const Color(0xFF444444),
-                          decoration: isLink ? TextDecoration.underline : null,
-                        ),
-                      ),
-                    ),
-                  )
-                : Text(
-                    value,
-                    style: TextStyle(
-                      color: isLink ? Colors.orange : const Color(0xFF444444),
-                      decoration: isLink ? TextDecoration.underline : null,
-                    ),
-                  ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 
   Widget _buildBulletPoint(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 2.0),

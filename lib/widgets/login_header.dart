@@ -12,25 +12,31 @@ class LoginHeader extends ConsumerWidget {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
-    
+
     // Define breakpoints
     final isTablet = screenWidth >= 768 && screenWidth < 1024;
     final isDesktop = screenWidth >= 1024;
     final isMobile = screenWidth < 768;
-    
+
     // Check if user is logged in and not on login screen
     final loginState = ref.watch(loginProvider);
     final currentRoute = GoRouterState.of(context).uri.path;
-   
-    final shouldShowLogout = (loginState.isSuccess && loginState.response != null) && currentRoute != '/login';
-    
+
+    final shouldShowLogout =
+        (loginState.isSuccess && loginState.response != null) &&
+        currentRoute != '/login';
+
     // Responsive values
     final headerHeight = _getResponsiveHeight(screenHeight, isMobile, isTablet);
     final logoSize = _getResponsiveLogoSize(isMobile, isTablet);
     final titleFontSize = _getResponsiveTitleSize(isMobile, isTablet);
-    final horizontalPadding = _getResponsivePadding(screenWidth, isMobile, isTablet);
+    final horizontalPadding = _getResponsivePadding(
+      screenWidth,
+      isMobile,
+      isTablet,
+    );
     final spacingBetweenElements = _getResponsiveSpacing(isMobile, isTablet);
-    
+
     return Column(
       children: [
         // Header with logo, title, and logout button
@@ -62,11 +68,7 @@ class LoginHeader extends ConsumerWidget {
         ),
 
         // Teal border line
-        Container(
-          height: 2,
-          width: double.infinity,
-          color: Colors.teal[700],
-        ),
+        Container(height: 2, width: double.infinity, color: Colors.teal[700]),
 
         // Navigation bar without logout button (since it's now in header)
         Container(
@@ -121,19 +123,19 @@ class LoginHeader extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
-             onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  },
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            },
             child: Image.asset(
               'assets/images/vetassess_logo.png',
               height: logoSize,
               fit: BoxFit.contain,
             ),
           ),
-          
+
           SizedBox(width: spacing),
           Flexible(
             child: Padding(
@@ -156,10 +158,15 @@ class LoginHeader extends ConsumerWidget {
     }
   }
 
-  Widget _buildNavigationBar(BuildContext context, WidgetRef ref, bool isMobile, bool isTablet) {
+  Widget _buildNavigationBar(
+    BuildContext context,
+    WidgetRef ref,
+    bool isMobile,
+    bool isTablet,
+  ) {
     final iconSize = isMobile ? 20.0 : 24.0;
     final textSize = isMobile ? 12.0 : 14.0;
-    
+
     if (isMobile) {
       // Mobile navigation without logout button (now in header)
       return SizedBox(
@@ -168,16 +175,13 @@ class LoginHeader extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             GestureDetector(
-              
               child: IconButton(
                 icon: Icon(
                   Icons.home,
                   color: Colors.orange[900],
                   size: iconSize,
                 ),
-                onPressed: () {
-                   
-                },
+                onPressed: () {},
               ),
             ),
             for (final item in ['Contact', 'Links', 'FAQs'])
@@ -202,11 +206,7 @@ class LoginHeader extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             IconButton(
-              icon: Icon(
-                Icons.home,
-                color: Colors.orange[900],
-                size: iconSize,
-              ),
+              icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
               onPressed: () {},
             ),
             for (final item in ['Contact us', 'Useful links', 'FAQs'])
@@ -227,14 +227,20 @@ class LoginHeader extends ConsumerWidget {
     }
   }
 
-  Widget _buildLogoutButton(BuildContext context, WidgetRef ref, bool isMobile, bool isTablet) {
+  Widget _buildLogoutButton(
+    BuildContext context,
+    WidgetRef ref,
+    bool isMobile,
+    bool isTablet,
+  ) {
     // Responsive button sizing
     final buttonTextSize = isMobile ? 10.0 : (isTablet ? 11.0 : 12.0);
     final buttonPadding = isMobile ? 6.0 : (isTablet ? 8.0 : 10.0);
     final iconSize = isMobile ? 14.0 : (isTablet ? 16.0 : 18.0);
     final borderRadius = isMobile ? 3.0 : 4.0;
-    
+
     return Container(
+      padding: EdgeInsets.only(top: 20, left: 20),
       child: TextButton(
         onPressed: () {
           _showLogoutDialog(context, ref);
@@ -243,26 +249,19 @@ class LoginHeader extends ConsumerWidget {
           foregroundColor: Colors.orange[900],
           padding: EdgeInsets.symmetric(
             horizontal: buttonPadding,
-            vertical: buttonPadding / 2,
+            vertical: buttonPadding,
           ),
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
-            side: BorderSide(
-              color: Colors.orange[900]!,
-              width: 1.0,
-            ),
+            side: BorderSide(color: Colors.orange[900]!, width: 1.0),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.logout,
-              size: iconSize,
-              color: Colors.orange[900],
-            ),
+            Icon(Icons.logout, size: iconSize, color: Colors.orange[900]),
             SizedBox(width: isMobile ? 3.0 : 4.0),
             Text(
               'Logout',
@@ -285,59 +284,61 @@ class LoginHeader extends ConsumerWidget {
         return Consumer(
           builder: (context, ref, child) {
             final loginState = ref.watch(loginProvider);
-            
+
             return AlertDialog(
               title: const Text('Logout'),
-              content: loginState.isLoading 
-                ? const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('Logging out...'),
-                    ],
-                  )
-                : const Text('Are you sure you want to logout?'),
-              actions: loginState.isLoading 
-                ? [] 
-                : [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                      },
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        // Perform logout using the provider
-                        await ref.read(loginProvider.notifier).logout();
-                        
-                        // Close dialog first
-                        if (dialogContext.mounted) {
-                          Navigator.of(dialogContext).pop();
-                        }
-                        
-                        // Navigate using GoRouter
-                        if (context.mounted) {
-                          // Use GoRouter to navigate and clear stack
-                          context.go('/login');
-                          
-                          // Show logout success message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Successfully logged out'),
-                              backgroundColor: Colors.green,
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
+              content:
+                  loginState.isLoading
+                      ? const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Logging out...'),
+                        ],
+                      )
+                      : const Text('Are you sure you want to logout?'),
+              actions:
+                  loginState.isLoading
+                      ? []
+                      : [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                          },
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            // Perform logout using the provider
+                            await ref.read(loginProvider.notifier).logout();
+
+                            // Close dialog first
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop();
+                            }
+
+                            // Navigate using GoRouter
+                            if (context.mounted) {
+                              // Use GoRouter to navigate and clear stack
+                              context.go('/login');
+
+                              // Show logout success message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Successfully logged out'),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
             );
           },
         );
@@ -345,7 +346,11 @@ class LoginHeader extends ConsumerWidget {
     );
   }
 
-  double _getResponsiveHeight(double screenHeight, bool isMobile, bool isTablet) {
+  double _getResponsiveHeight(
+    double screenHeight,
+    bool isMobile,
+    bool isTablet,
+  ) {
     if (isMobile) {
       return screenHeight * 0.15; // 15% of screen height
     } else if (isTablet) {
@@ -375,7 +380,11 @@ class LoginHeader extends ConsumerWidget {
     }
   }
 
-  double _getResponsivePadding(double screenWidth, bool isMobile, bool isTablet) {
+  double _getResponsivePadding(
+    double screenWidth,
+    bool isMobile,
+    bool isTablet,
+  ) {
     if (isMobile) {
       return 8.0;
     } else if (isTablet) {
