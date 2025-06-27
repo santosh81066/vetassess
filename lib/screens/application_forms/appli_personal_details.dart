@@ -823,18 +823,27 @@ class PersonalDetailsFormState extends ConsumerState<PersonalDetailsForm> {
     );
   }
 
-  Widget _buildDateField(String key, String fieldName) {
-    return GestureDetector(
-      onTap: () => _selectDate(key),
-      child: AbsorbPointer(
-        child: _buildTextField(
-          key,
-          maxWidth: _getFieldWidth(),
-          validator: (value) => _validateDate(value, fieldName),
-        ),
+Widget _buildDateField(String key, String fieldName) {
+  return GestureDetector(
+    onTap: () => _selectDate(key),
+    child: AbsorbPointer(
+      child: _buildTextField(
+        key,
+        maxWidth: _getFieldWidth(),
+        validator: (value) {
+          // Only validate the main Citizenship's passport issued date
+          if (key == 'passportIssuedDate') {
+            return _validateDate(value, fieldName); // Required
+          }
+
+          // Skip validation for otherPassportIssuedDate
+          return null;
+        },
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildMultiLineAddress(String prefix) {
     final size = MediaQuery.of(context).size;

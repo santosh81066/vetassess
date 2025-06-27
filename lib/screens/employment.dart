@@ -260,6 +260,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: businessNameController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateBusinessName(value),
+                                  isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -269,6 +270,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: alternateBusinsessnameController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateAlternateBusinsessname(value),
+                                   isRequired: true,
                                   ),
                                 ),
 
@@ -291,6 +293,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: streetaddressController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateStreetaddress(value),
+                                   isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -301,6 +304,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: suburbCityController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateSuburbCity(value),
+                                  isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -310,6 +314,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: stateController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateState(value),
+                                   isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -318,11 +323,12 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: postCodeController,
                                     width: _getFieldWidth(screenWidth, 150),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updatePostCode(value),
+                                    isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
                                   'Country',
-                                  buildDropdownField(width: _getFieldWidth(screenWidth, 250)),
+                                  buildDropdownField(width: _getFieldWidth(screenWidth, 250),isRequired: true),
                                   isRequired: true,
                                 ),
 
@@ -345,6 +351,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: nameofemployerController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateNameofemployer(value),
+                                 isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -354,6 +361,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: daytimePHnoController,
                                     width: _getFieldWidth(screenWidth, 200),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateDaytimePHno(value),
+                                  isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -363,6 +371,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: faxnumberController,
                                     width: _getFieldWidth(screenWidth, 200),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateFaxnumber(value),
+                                   isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -371,6 +380,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: mobileNoController,
                                     width: _getFieldWidth(screenWidth, 200),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateMobileNo(value),
+                                   isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -379,6 +389,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: emailaddressController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateEmailaddress(value),
+                                  isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -388,6 +399,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: webaddressController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateWebaddress(value),
+                                   isRequired: true,
                                   ),
                                 ),
 
@@ -410,6 +422,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: positionJobTitleController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updatePositionJobTitle(value),
+                                 isRequired: true,
                                   ),
                                   isRequired: true,
                                 ),
@@ -418,6 +431,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                   buildDateField(
                                     controller: dateofemploymentstartedController,
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateDateofemploymentstarted(value),
+                                   
                                   ),
                                   isRequired: true,
                                 ),
@@ -445,6 +459,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     'day(s)',
                                     controller: totallengthofUnpaidLeaveController,
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateTotallengthofUnpaidLeave(value),
+                                  
                                   ),
                                 ),
 
@@ -455,6 +470,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     'hours per week',
                                     controller: normalrequiredWorkinghoursController,
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateNormalrequiredWorkinghours(value),
+                                  
                                   ),
                                   isRequired: true,
                                 ),
@@ -558,28 +574,61 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                           vertical: isMobile ? 8 : 12,
                                         ),
                                       ),
-                                      onPressed: employmentState.isLoading ? null : () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          final success = await ref.read(employmentProvider.notifier).submitEmployment();
-                                          
-                                          if (success) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('Employment data submitted successfully!'),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                            context.go('/licence_form');
-                                          } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(employmentState.error ?? 'Failed to submit employment data'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
+                                     onPressed: employmentState.isLoading ? null : () async {
+  if (_formKey.currentState!.validate()) {
+    final success = await ref.read(employmentProvider.notifier).submitEmployment();
+
+    if (success) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Success'),
+          content: const Text('Employment data submitted successfully!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.go('/licence_form');
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Submission Failed'),
+          content: Text(
+            employmentState.error ?? 'Something went wrong. Please try again.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  } else {
+    showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+        title: Text('Incomplete Form'),
+        content: Text('Please fill all required fields before continuing.'),
+        actions: [
+          TextButton(
+            onPressed: null,
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+},
+
                                       child: employmentState.isLoading
                                           ? const SizedBox(
                                               width: 20,
@@ -867,15 +916,23 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
     required double width,
     required TextEditingController controller,
     required Function(String) onChanged,
-    String? validator(String)?,
+    bool isRequired = false,
+    String? Function(String?)? validator,
   }) {
     return SizedBox(
       width: width,
-      height: 34,
+      height: 60,
       child: TextFormField(
         controller: controller,
         onChanged: onChanged,
-        validator: validator,
+         validator: validator ?? (isRequired
+          ? (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            }
+          : null),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
@@ -889,6 +946,8 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.teal.shade400),
           ),
+            helperText: ' ', // Reserve space for error message
+        errorStyle: const TextStyle(fontSize: 12, height: 1),
         ),
       ),
     );
@@ -900,11 +959,18 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
   }) {
     return SizedBox(
       width: 150,
-      height: 34,
+      height: 60,
       child: TextFormField(
         controller: controller,
         onChanged: onChanged,
+         validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Date is required';
+        }
+        return null;
+      },
         decoration: InputDecoration(
+          hintText: 'yyy-mm-dd',
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 10,
             vertical: 8,
@@ -917,61 +983,68 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
             borderRadius: BorderRadius.circular(4),
             borderSide: BorderSide(color: Colors.teal.shade400),
           ),
-          hintText: 'dd/mm/yyyy',
+          helperText: ' ',
           hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
         ),
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Date is required';
-          }
-          return null;
-        },
+        // validator: (value) {
+        //   if (value == null || value.trim().isEmpty) {
+        //     return 'Date is required';
+        //   }
+        //   return null;
+        // },
       ),
     );
   }
 
-  Widget buildDropdownField({required double width}) {
-    return SizedBox(
-      width: width,
-      height: 34,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+ Widget buildDropdownField({
+  required double width,
+  bool isRequired = false,
+}) {
+  return SizedBox(
+    width: width,
+    height: 60,
+    child: DropdownButtonFormField<String>(
+      isExpanded: true,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        child: DropdownButtonHideUnderline(
-          child: ButtonTheme(
-            alignedDropdown: true,
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              hint: Text(
-                'Select one',
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-              ),
-              icon: const Icon(Icons.arrow_drop_down),
-              items: ['Australia', 'India', 'USA', 'UK', 'Canada']
-                  .map((country) => DropdownMenuItem(
-                        value: country,
-                        child: Text(country),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(employmentProvider.notifier).updateCountry(value);
-                }
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Country is required';
-                }
-                return null;
-              },
-            ),
-          ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(color: Colors.teal.shade400),
         ),
+        helperText: ' ',
+        errorStyle: const TextStyle(fontSize: 12, height: 1),
       ),
-    );
-  }
+      hint: Text(
+        'Select one',
+        style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+      ),
+      icon: const Icon(Icons.arrow_drop_down),
+      items: ['Australia', 'India', 'USA', 'UK', 'Canada']
+          .map((country) => DropdownMenuItem(
+                value: country,
+                child: Text(country),
+              ))
+          .toList(),
+      onChanged: (value) {
+        if (value != null) {
+          ref.read(employmentProvider.notifier).updateCountry(value);
+        }
+      },
+      validator: isRequired
+          ? (value) {
+              if (value == null || value.isEmpty) {
+                return 'Country is required';
+              }
+              return null;
+            }
+          : null,
+    ),
+  );
+}
 
   Widget buildRadioButtons(bool currentValue) {
     return Row(
@@ -1014,10 +1087,19 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
       children: [
         SizedBox(
           width: 80,
-          height: 34,
+          height: 60,
           child: TextFormField(
             controller: controller,
             onChanged: onChanged,
+             keyboardType: TextInputType.number,
+    validator: label.contains('hours per week')
+        ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Required';
+            }
+            return null;
+          }
+        : null,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 10,
@@ -1031,16 +1113,10 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide(color: Colors.teal.shade400),
               ),
+               helperText: ' ',
+               errorStyle: const TextStyle(fontSize: 12, height: 1),
             ),
-            keyboardType: TextInputType.number,
-            validator: label.contains('hours per week')
-                ? (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Required';
-                    }
-                    return null;
-                  }
-                : null,
+           
           ),
         ),
         const SizedBox(width: 8),

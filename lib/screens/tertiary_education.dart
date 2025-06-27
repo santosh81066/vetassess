@@ -357,7 +357,18 @@ class _TertiaryEducationFormState extends ConsumerState<TertiaryEducationForm> {
                       width: _getNavWidth(context),
                       child: const Align(
                         alignment: Alignment.topRight,
-                        child: ApplicationNav(),
+                        child: ApplicationNavWithProgress(
+                  currentRoute: '/tertiary_education_form',
+            completedRoutes: {
+              '/personal_form',
+               '/occupation_form',
+               '/education_form',
+              //'/tertiary_education_form',
+              // '/employment_form',
+              // '/licence_form',
+              // '/app_priority_form',
+            },
+              ),
                       ),
                     ),
                     Expanded(

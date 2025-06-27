@@ -90,9 +90,10 @@ class ApplicationNav extends StatelessWidget {
           ),
           _buildMenuItem(
             'Payment',
-            route: '/cashfree_pay',
+            route: '',
             currentRoute: route,
-            onTap: () => context.go('/cashfree_pay'),
+            onTap: () {},
+            //context.go('/cashfree_pay'),
             isLast: true,
           ),
         ],
@@ -289,30 +290,31 @@ class ApplicationNavWithProgress extends StatelessWidget {
             
             onTap: () => context.go('/tertiary_education_form'),
           ),
-          _buildProgressMenuItem(
-            'Employment',
-            route: '/employment_form',
-            currentRoute: route,
-            completedRoutes: completedRoutes,
-            
-            onTap: () => context.go('/employment_form'),
-          ),
-          _buildProgressMenuItem(
-            'Licence',
-            route: '/licence_form',
-            currentRoute: route,
-            completedRoutes: completedRoutes,
-            
-            onTap: () => context.go('/licence_form'),
-          ),
-          _buildProgressMenuItem(
-            'Priority Processing',
-            route: '/app_priority_form',
-            currentRoute: route,
-            completedRoutes: completedRoutes,
-            
-            onTap: () => context.go('/app_priority_form'),
-          ),
+         if (completedRoutes.contains('/tertiary_education_form')) ...[
+  _buildProgressMenuItem(
+    'Employment',
+    route: '/employment_form',
+    currentRoute: route,
+    completedRoutes: completedRoutes,
+    onTap: () => context.go('/employment_form'),
+  ),
+  _buildProgressMenuItem(
+    'Licence',
+    route: '/licence_form',
+    currentRoute: route,
+    completedRoutes: completedRoutes,
+    onTap: () => context.go('/licence_form'),
+  ),
+  _buildProgressMenuItem(
+    'Priority Processing',
+    route: '/app_priority_form',
+    currentRoute: route,
+    completedRoutes: completedRoutes,
+    onTap: () =>
+    context.go('/app_priority_form'),
+  ),
+],
+
 
           _buildProgressMenuItem(
             'Documents upload',
@@ -332,11 +334,12 @@ class ApplicationNavWithProgress extends StatelessWidget {
           ),
           _buildProgressMenuItem(
             'Payment',
-            route: '/cashfree_pay',
+            route: '',
             currentRoute: route,
             completedRoutes: completedRoutes,
            
-            onTap: () => context.go('/cashfree_pay'),
+            onTap: () {},
+             //context.go('/cashfree_pay'),
             isLast: true,
           ),
         ],
