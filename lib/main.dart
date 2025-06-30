@@ -31,6 +31,7 @@ import 'package:vetassess/screens/profissional_viewall.dart';
 import 'package:vetassess/screens/registration_page.dart';
 import 'package:vetassess/screens/review_and_confirm.dart';
 import 'package:vetassess/screens/skills_assessment_support.dart';
+import 'package:vetassess/screens/terms&conditions.dart';
 import 'package:vetassess/screens/tertiary_education.dart';
 import 'package:vetassess/widgets/SkillsAssessmentDropdownPanel.dart';
 import 'package:vetassess/widgets/skills_assessment_Viewallpage.dart';
@@ -247,6 +248,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/cashfree_pay',
         builder: (context, state) => const CashfreePaymentScreen(),
+      ),
+      GoRoute(
+        path: '/terms-conditions',
+        builder: (context, state) => const TermsAndConditions(),
       ),
     ],
   );

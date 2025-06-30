@@ -1,44 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:vetassess/widgets/BasePageLayout.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactUs extends StatelessWidget {
   const ContactUs({super.key});
 
   static const Color tealColor = Color(0xFF00565B);
+  static const Color primaryColor = Color(0xFF2D7A7B);
+  static const Color accentColor = Color(0xFF00BCD4);
+  static const Color orangeColor = Color(0xFFFFA000);
+  static const Color greyColor = Color(0xFF666666);
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 768;
+    final isTablet = size.width >= 768 && size.width < 1024;
 
     return BasePageLayout(
       child: Column(
         children: [
-          _buildHeaderBanner(screenHeight, screenWidth),
-          _buildBreadcrumb(screenWidth),
+          _buildHeaderBanner(size, isMobile),
+          _buildBreadcrumb(size.width, context),
           Container(
             padding: EdgeInsets.symmetric(
               vertical: 40,
-              horizontal: _getContentHorizontalPadding(screenWidth),
+              horizontal: _getContentPadding(size.width),
             ),
             color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header text
                 Text(
                   'Choose how you would like to contact us from\nthe options below.',
                   style: TextStyle(
-                    fontSize: _getResponsiveFontSize(screenWidth, 36),
+                    fontSize: _getFontSize(size.width, 36),
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
+                    color: primaryColor,
                     height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // Main content - responsive layout
-                _buildResponsiveContent(screenWidth),
+                _buildResponsiveContent(isMobile, isTablet, context),
               ],
             ),
           ),
@@ -47,19 +51,24 @@ class ContactUs extends StatelessWidget {
     );
   }
 
-  Widget _buildResponsiveContent(double screenWidth) {
-    final isMobile = screenWidth < 768;
-    final isTablet = screenWidth >= 768 && screenWidth < 1024;
+  Widget _buildResponsiveContent(
+    bool isMobile,
+    bool isTablet,
+    BuildContext context,
+  ) {
+    final sections = [
+      _buildEnquiriesSection(),
+      _buildCurrentApplicationsSection(context),
+      _buildBusinessEnquiriesSection(),
+    ];
 
     if (isMobile) {
       return Column(
-        children: [
-          _buildEnquiriesSection(),
-          const SizedBox(height: 40),
-          _buildCurrentApplicationsSection(),
-          const SizedBox(height: 40),
-          _buildBusinessEnquiriesSection(),
-        ],
+        children:
+            sections
+                .expand((section) => [section, const SizedBox(height: 40)])
+                .take(5)
+                .toList(),
       );
     } else if (isTablet) {
       return Column(
@@ -67,25 +76,28 @@ class ContactUs extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildEnquiriesSection()),
+              Expanded(child: sections[0]),
               const SizedBox(width: 30),
-              Expanded(child: _buildCurrentApplicationsSection()),
+              Expanded(child: sections[1]),
             ],
           ),
           const SizedBox(height: 40),
-          _buildBusinessEnquiriesSection(),
+          sections[2],
         ],
       );
     } else {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: _buildEnquiriesSection()),
-          const SizedBox(width: 60),
-          Expanded(child: _buildCurrentApplicationsSection()),
-          const SizedBox(width: 60),
-          Expanded(child: _buildBusinessEnquiriesSection()),
-        ],
+        children:
+            sections
+                .expand(
+                  (section) => [
+                    Expanded(child: section),
+                    const SizedBox(width: 60),
+                  ],
+                )
+                .take(5)
+                .toList(),
       );
     }
   }
@@ -94,350 +106,113 @@ class ContactUs extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Enquiries',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D7A7B),
-          ),
-        ),
+        _buildSectionTitle('Enquiries'),
         const SizedBox(height: 20),
-        const Text(
+        _buildInfoText(
           'Monday to Friday, 9am to 5pm AEDT\nexcept Public Holidays',
-          style: TextStyle(fontSize: 16, color: Color(0xFF666666), height: 1.4),
         ),
         const SizedBox(height: 24),
-
-        // Phone number with icon
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D7A7B),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(Icons.phone, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Color(0xFF00BCD4), width: 2),
-                      ),
-                    ),
-                    child: const Text(
-                      '1300 VETASSESS',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D7A7B),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Color(0xFF00BCD4), width: 2),
-                      ),
-                    ),
-                    child: const Text(
-                      '(1300 838 277)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D7A7B),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        _buildContactRow(Icons.phone, 'VETASSESS', '+91 9392183747'),
         const SizedBox(height: 32),
-
-        // International section
-        const Text(
-          'International',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D7A7B),
-          ),
-        ),
+        _buildSubTitle('International'),
         const SizedBox(height: 16),
-
-        // International phone
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D7A7B),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(Icons.phone, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFF00BCD4), width: 2),
-                  ),
-                ),
-                child: const Text(
-                  '+61 3 9655 4801',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        _buildSimpleContactRow(Icons.phone, '+91 9392 183 747'),
         const SizedBox(height: 24),
-
-        // Webchat info
-        const Text(
+        _buildInfoText(
           'Webchat available Monday to Friday,\n9am to 4:30pm AEDT except Public\nHolidays',
-          style: TextStyle(fontSize: 16, color: Color(0xFF666666), height: 1.4),
         ),
         const SizedBox(height: 20),
-
-        // Chat button
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D7A7B),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(
-                Icons.chat_bubble_outline,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFF00BCD4), width: 2),
-                  ),
-                ),
-                child: const Text(
-                  'Chat to VETASSESS',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        _buildSubTitle('Mail'),
+        const SizedBox(height: 16),
+        _buildSimpleContactRow(Icons.mail_outline, 'mrhostel09@gmail.com'),
+        const SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _buildCurrentApplicationsSection() {
+  Widget _buildCurrentApplicationsSection(BuildContext context) {
+    final options = [
+      ('Check your status online', () {}),
+      ('View current processing times', () {}),
+      ('View FAQs page', () {}),
+      (
+        'Terms & Conditions',
+        () async {
+          // Get the current base URL and construct the terms page URL
+          final Uri termsUrl = Uri.parse(
+            '${Uri.base.origin}/#/terms-conditions',
+          );
+
+          if (await canLaunchUrl(termsUrl)) {
+            await launchUrl(
+              termsUrl,
+              mode: LaunchMode.externalApplication, // Opens in new tab/window
+            );
+          }
+        },
+      ),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'For current applications',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D7A7B),
-          ),
-        ),
+        _buildSectionTitle('For current applications'),
         const SizedBox(height: 40),
-
-        // Option 1
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Color(0xFFFFB74D), width: 1),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(
-                child: Text(
-                  'Check your status online',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2D7A7B),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Option 2
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Color(0xFFFFB74D), width: 1),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(
-                child: Text(
-                  'View current processing times',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2D7A7B),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Option 3
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(
-                child: Text(
-                  'View FAQs page',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2D7A7B),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
-            ],
-          ),
+        ...options.asMap().entries.map(
+          (entry) =>
+              _buildOptionRow(entry.value.$1, entry.key < 3, entry.value.$2),
         ),
       ],
     );
   }
 
   Widget _buildBusinessEnquiriesSection() {
+    final addressInfo = [
+      (
+        'Registered Address',
+        "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
+      ),
+      (
+        'Operational Address',
+        "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
+      ),
+      ('Merchant Legal entity name', "MRHOSTEL PRIVATE LIMITED"),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Business & industry\nenquiries',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D7A7B),
-            height: 1.2,
-          ),
-        ),
+        _buildSectionTitle('Business & industry\nenquiries'),
         const SizedBox(height: 20),
-        const Text(
+        _buildInfoText(
           'If you are a business, government or\neducational customer or have an inquiry.',
-          style: TextStyle(fontSize: 16, color: Color(0xFF666666), height: 1.4),
         ),
-        const SizedBox(height: 24),
-
-        // Business phone
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D7A7B),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(Icons.phone, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFF00BCD4), width: 2),
-                  ),
-                ),
-                child: const Text(
-                  '+61 3 9655 4801',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D7A7B),
-                  ),
-                ),
+        const SizedBox(height: 10),
+        _buildSimpleContactRow(Icons.phone, '+91 9392183747'),
+        const SizedBox(height: 28),
+        ...addressInfo.expand(
+          (info) => [
+            _buildSectionTitle(info.$1),
+            const SizedBox(height: 15),
+            Text(
+              info.$2,
+              style: TextStyle(
+                fontSize: info.$1.contains('entity') ? 18 : 16,
+                color: greyColor,
+                height: 1.4,
               ),
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildHeaderBanner(double screenHeight, double screenWidth) {
-    final isTablet = screenWidth >= 768 && screenWidth < 1024;
-    final isMobile = screenWidth < 768;
-
+  Widget _buildHeaderBanner(Size size, bool isMobile) {
     return Container(
-      width: screenWidth,
-      height: screenHeight * (isMobile ? 0.35 : 0.45),
+      width: size.width,
+      height: size.height * (isMobile ? 0.35 : 0.45),
       decoration: const BoxDecoration(color: tealColor),
       child: Stack(
         children: [
@@ -446,15 +221,15 @@ class ContactUs extends StatelessWidget {
               right: 0,
               child: Image.asset(
                 'assets/images/internal_page_banner.png',
-                height: screenHeight * (isMobile ? 0.35 : 0.45),
+                height: size.height * 0.45,
                 fit: BoxFit.fitHeight,
               ),
             ),
           Container(
-            width: isMobile ? screenWidth * 0.9 : screenWidth * 0.66,
+            width: isMobile ? size.width * 0.9 : size.width * 0.66,
             padding: EdgeInsets.only(
-              top: _getResponsiveSpacing(screenHeight, 100),
-              left: _getResponsiveHorizontalPadding(screenWidth),
+              top: _getSpacing(size.height, 100),
+              left: _getHorizontalPadding(size.width),
             ),
             child: Align(
               alignment: isMobile ? Alignment.center : Alignment.centerLeft,
@@ -467,8 +242,8 @@ class ContactUs extends StatelessWidget {
                   Text(
                     "Contact us",
                     style: TextStyle(
-                      color: Color(0xFFFFA000),
-                      fontSize: _getResponsiveFontSize(screenWidth, 42),
+                      color: orangeColor,
+                      fontSize: _getFontSize(size.width, 42),
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
@@ -478,7 +253,7 @@ class ContactUs extends StatelessWidget {
                     "All office opening hours are Monday - Friday, 9:00 a.m to 5:00 p.m, except \nPublic Holidays.",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: _getResponsiveFontSize(screenWidth, 16),
+                      fontSize: _getFontSize(size.width, 16),
                       height: 1.5,
                       letterSpacing: 0.3,
                     ),
@@ -493,16 +268,18 @@ class ContactUs extends StatelessWidget {
     );
   }
 
-  Widget _buildBreadcrumb(double screenWidth) {
+  Widget _buildBreadcrumb(double screenWidth, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 12,
-        horizontal: _getResponsiveHorizontalPadding(screenWidth),
+        horizontal: _getHorizontalPadding(screenWidth),
       ),
       child: Row(
         children: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              context.go('/');
+            },
             child: const Text(
               'Home',
               style: TextStyle(
@@ -519,28 +296,160 @@ class ContactUs extends StatelessWidget {
     );
   }
 
+  // Helper widgets
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: primaryColor,
+        height: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildSubTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: primaryColor,
+      ),
+    );
+  }
+
+  Widget _buildInfoText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 16, color: greyColor, height: 1.4),
+    );
+  }
+
+  Widget _buildContactRow(IconData icon, String title, String contact) {
+    return Row(
+      children: [
+        _buildIconContainer(icon),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildUnderlinedText(title),
+              const SizedBox(height: 4),
+              _buildUnderlinedText(contact),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSimpleContactRow(IconData icon, String contact) {
+    return Row(
+      children: [
+        _buildIconContainer(icon),
+        const SizedBox(width: 12),
+        Expanded(child: _buildUnderlinedText(contact)),
+      ],
+    );
+  }
+
+  Widget _buildOptionRow(String text, bool showBorder, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration:
+            showBorder
+                ? const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFFFFB74D), width: 1),
+                  ),
+                )
+                : null,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+            _buildArrowButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconContainer(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: primaryColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Icon(icon, color: Colors.white, size: 20),
+    );
+  }
+
+  Widget _buildUnderlinedText(String text) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: accentColor, width: 2)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: primaryColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArrowButton() {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: const BoxDecoration(
+        color: primaryColor,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+    );
+  }
+
   // Responsive helper methods
-  double _getResponsiveHorizontalPadding(double screenWidth) {
-    if (screenWidth < 768) return 16.0; // Mobile
-    if (screenWidth < 1024) return 32.0; // Tablet
-    return 50.0; // Desktop
-  }
-
-  double _getContentHorizontalPadding(double screenWidth) {
-    if (screenWidth < 768) return 16.0; // Mobile
-    if (screenWidth < 1024) return 32.0; // Tablet
-    return 150.0; // Desktop
-  }
-
-  double _getResponsiveFontSize(double screenWidth, double baseFontSize) {
-    if (screenWidth < 768) return baseFontSize * 0.8; // Mobile
-    if (screenWidth < 1024) return baseFontSize * 0.9; // Tablet
-    return baseFontSize; // Desktop
-  }
-
-  double _getResponsiveSpacing(double screenHeight, double baseSpacing) {
-    if (screenHeight < 600) return baseSpacing * 0.6;
-    if (screenHeight < 800) return baseSpacing * 0.8;
-    return baseSpacing;
-  }
+  double _getHorizontalPadding(double width) =>
+      width < 768
+          ? 16.0
+          : width < 1024
+          ? 32.0
+          : 50.0;
+  double _getContentPadding(double width) =>
+      width < 768
+          ? 16.0
+          : width < 1024
+          ? 32.0
+          : 150.0;
+  double _getFontSize(double width, double base) =>
+      width < 768
+          ? base * 0.8
+          : width < 1024
+          ? base * 0.9
+          : base;
+  double _getSpacing(double height, double base) =>
+      height < 600
+          ? base * 0.6
+          : height < 800
+          ? base * 0.8
+          : base;
 }
