@@ -210,6 +210,71 @@ class GetAllformsProviders extends StateNotifier<GetAllFormsModel> {
       print('Error clearing cache: $e');
     }
   }
+
+
+Future<void> uploadCertificateFile({
+  required String userId,
+  required String fileName,
+  required Uint8List fileBytes,
+}) async {
+  try {
+    final url = Uri.parse(VetassessApi.certificate_upload);
+    final headers = await AuthService.getAuthHeaders();
+
+    final request = http.MultipartRequest('POST', url);
+    request.headers.addAll(headers);
+    request.fields['userId'] = userId;
+
+    final multipartFile = http.MultipartFile.fromBytes(
+      'certificate',
+      fileBytes,
+      filename: fileName,
+    );
+
+    request.files.add(multipartFile);
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('✅ Certificate uploaded');
+    } else {
+      print('❌ Upload failed: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('❗ Error uploading certificate: $e');
+    rethrow;
+  }
+}
+
+
+
+Future<bool> updateApplicationStatus({
+  required int userId,
+  required String status,
+}) async {
+  final url = Uri.parse(VetassessApi.update_user_application); // From your Api constants
+  final headers = await AuthService.getAuthHeaders();
+
+  final response = await http.put(
+    url,
+    headers: headers,
+    body: jsonEncode({
+      'userId': userId,
+      'application_status': status,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Status updated: ${response.body}');
+    return true;
+  } else {
+    print('Failed to update status: ${response.body}');
+    return false;
+  }
+}
+
+
+
 }
 
 final getAllformsProviders =

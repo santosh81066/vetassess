@@ -19,4 +19,6 @@ class VetassessApi {
   static const String form_tertedu = "$baseUrl/user/tertiary-qualification";
   static const String form_upload_doc = "$baseUrl/user/upload";
   static const String allform_upload_doc = "$baseUrl/admin/users";
+  static const String certificate_upload = "$baseUrl/user/upload-certificate";
+  static const String update_user_application = "$baseUrl/user/update-forms";
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vetassess/models/get_forms_model.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/screens/about_us.dart';
 import 'package:vetassess/screens/admin_screens/user_application.dart';
@@ -31,6 +32,7 @@ import 'package:vetassess/screens/profissional_viewall.dart';
 import 'package:vetassess/screens/registration_page.dart';
 import 'package:vetassess/screens/review_and_confirm.dart';
 import 'package:vetassess/screens/skills_assessment_support.dart';
+import 'package:vetassess/screens/submitted_appl.dart';
 import 'package:vetassess/screens/terms&conditions.dart';
 import 'package:vetassess/screens/tertiary_education.dart';
 import 'package:vetassess/widgets/SkillsAssessmentDropdownPanel.dart';
@@ -140,13 +142,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => UsersListScreen(),
       ),
       GoRoute(
-        path: '/admin_user-details',
-        name: 'admin_user-details',
-        builder: (context, state) {
-          final user = state.extra as Map<String, dynamic>;
-          return UserDetailsScreen(user: user);
-        },
-      ),
+      path: '/admin_user-details',
+      name: 'admin_user-details',
+      builder: (context, state) {
+        final user = state.extra as Users; // ✅ cast as Users
+        return UserDetailsScreen(user: user);
+      },
+    ),
+
       // GoRoute(
       //   path: '/payment_screen',
       //   builder: (context, state) => const PaymentScreen(),
@@ -158,7 +161,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/application_process',
         builder: (context, state) => const ApplicationProcess(),
+        
       ),
+      
+       GoRoute(
+        path: '/submitted_opp',
+        builder: (context, state) => const SubmittedAppl(),
+      ),
+
       GoRoute(
         path: '/fee_screen',
         builder: (context, state) => const FeeScreen(),

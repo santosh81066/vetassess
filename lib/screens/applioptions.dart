@@ -69,7 +69,7 @@ class AppliOptions extends StatelessWidget {
               title: 'View Submitted Applications',
               icon: Icons.description_outlined,
               onPressed: () {
-                //context.go('/get_all_forms');
+                context.go('/submitted_opp');
                 //context.go('null');
               },
               color: const Color(0xFF006257),

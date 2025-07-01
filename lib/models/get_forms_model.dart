@@ -34,6 +34,8 @@ class Users {
   String? password;
   String? role;
   bool? isAgreedToReceiveNews;
+  String? applicationStatus;
+  String? certificate;
   List<PersonalDetails>? personalDetails;
   List<EducationQualifications>? educationQualifications;
   List<Educations>? educations;
@@ -56,6 +58,8 @@ class Users {
     this.password,
     this.role,
     this.isAgreedToReceiveNews,
+    this.applicationStatus,
+    this.certificate,
     this.personalDetails,
     this.educationQualifications,
     this.educations,
@@ -79,6 +83,8 @@ class Users {
     password = json['password'];
     role = json['role'];
     isAgreedToReceiveNews = json['isAgreedToReceiveNews'];
+    applicationStatus = json['application_status'];
+    certificate = json['certificate'];
     if (json['PersonalDetails'] != null) {
       personalDetails = <PersonalDetails>[];
       json['PersonalDetails'].forEach((v) {
@@ -148,6 +154,8 @@ class Users {
     data['password'] = this.password;
     data['role'] = this.role;
     data['isAgreedToReceiveNews'] = this.isAgreedToReceiveNews;
+    data['application_status'] = this.applicationStatus;
+    data['certificate'] = this.certificate;
     if (this.personalDetails != null) {
       data['PersonalDetails'] =
           this.personalDetails!.map((v) => v.toJson()).toList();
