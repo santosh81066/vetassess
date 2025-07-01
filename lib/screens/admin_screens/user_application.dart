@@ -486,8 +486,6 @@ Future<void> _pickCertificateFile() async {
   }
 }
 
-
-
 void _showSnackBar(String message, Color color, {bool showUndo = false}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -545,17 +543,4 @@ void _showSnackBar(String message, Color color, {bool showUndo = false}) {
   );
 }
 
- 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'approved':
-        return const Color(0xFF4CAF50);
-      case 'under review':
-        return const Color(0xFFFF8C42);
-      case 'rejected':
-        return const Color(0xFFE57373);
-      default:
-        return const Color(0xFF2E8B8B);
-    }
-  }
 }

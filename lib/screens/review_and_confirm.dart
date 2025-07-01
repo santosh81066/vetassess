@@ -111,12 +111,8 @@ class _ReviewAndConfirmState extends ConsumerState<ReviewAndConfirm> {
 Widget build(BuildContext context) {
   final loginid = ref.read(loginProvider).response?.userId;
   final data = ref.read(getAllformsProviders).users;
- final filteredData = data?.where((item) => item.userId == loginid).toList() ?? [];
-
-      final currentUser = filteredData.isNotEmpty ? filteredData.first : null;
-final applicationStatus = currentUser?.applicationStatus?.toLowerCase();
-final isStatusFinal = applicationStatus == 'approved' || applicationStatus == 'rejected';
-
+  final filteredData =
+      data?.where((item) => item.userId == loginid).toList() ?? [];
 
   // Show informative popup
   void showInfoPopup() {
@@ -161,90 +157,42 @@ final isStatusFinal = applicationStatus == 'approved' || applicationStatus == 'r
 
   return LoginPageLayout(
     child: Column(
-  children: [
-    Container(
-      height: 100,
-      color: const Color(0xFF00565B),
-      child: const Center(
-        child: Text(
-          "Review & Confirm",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ),
-    isLoading
-        ? const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Color(0xFF00565B),
+      children: [
+        Container(
+          height: 100,
+          color: const Color(0xFF00565B),
+          child: const Center(
+            child: Text(
+              "Review & Confirm",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          )
-        : filteredData.isEmpty
-            ? _buildEmptyState()
-            : Column(
-                children: [
-                  _buildFormsList(filteredData),
-                  if (isStatusFinal) ...[
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: applicationStatus == 'approved'
-                            ? Colors.green.shade50
-                            : Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: applicationStatus == 'approved'
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            applicationStatus == 'approved'
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color: applicationStatus == 'approved'
-                                ? Colors.green
-                                : Colors.red,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              applicationStatus == 'approved'
-                                  ? "Your application has been **Approved**. Congratulations!"
-                                  : "Your application has been **Rejected**. Please check your email for more information.",
-                              style: TextStyle(
-                                color: applicationStatus == 'approved'
-                                    ? Colors.green.shade800
-                                    : Colors.red.shade800,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+          ),
+        ),
+        Container(
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF00565B),
                     ),
-                  ],
-                ],
-              ),
-    const SizedBox(height: 20),
-    ElevatedButton(
-      onPressed: showInfoPopup,
-      child: const Text('Confirm'),
+                  ),
+                )
+              : filteredData.isEmpty
+                  ? _buildEmptyState()
+                  : _buildFormsList(filteredData),
+        ),
+        ElevatedButton(
+          onPressed: showInfoPopup,
+          child: const Text('Confirm'),
+        ),
+      ],
     ),
-  ],
-),
   );
-    
-  }
+}
  
  Widget _buildEmptyState() {
   return Padding(
