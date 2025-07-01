@@ -136,12 +136,13 @@ class ContactUs extends StatelessWidget {
       ('View current processing times', () {}),
       ('View FAQs page', () {}),
       (
-        'Terms & Conditions',
-        () async {
-          // Get the current base URL and construct the terms page URL
-          final Uri termsUrl = Uri.parse(
-            '${Uri.base.origin}/#/terms-conditions',
-          );
+    // Your existing Terms link in ContactUs works perfectly
+    'Terms & Conditions',
+    () async {
+    final Uri termsUrl = Uri.parse('${Uri.base.origin}/#/terms-conditions');
+    if (await canLaunchUrl(termsUrl)) {
+    await launchUrl(termsUrl, mode: LaunchMode.externalApplication);
+    }
 
           if (await canLaunchUrl(termsUrl)) {
             await launchUrl(

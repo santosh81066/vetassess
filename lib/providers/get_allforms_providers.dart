@@ -250,7 +250,7 @@ Future<void> uploadCertificateFile({
 
 Future<bool> updateApplicationStatus({
   required int userId,
-  required String status,
+  required String status, String? rejectionReason,
 }) async {
   final url = Uri.parse(VetassessApi.update_user_application); // From your Api constants
   final headers = await AuthService.getAuthHeaders();

@@ -89,7 +89,6 @@ class HomeScreen extends StatelessWidget {
           EverythingYouNeedToKnow(),
           SupportSection(),
           WhyChooseVetassessSection(),
-
           NewsUpdatesSection(),
         ],
       ),
