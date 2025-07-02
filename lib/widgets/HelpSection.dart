@@ -147,7 +147,7 @@ class HelpSection extends StatelessWidget {
         iconAsset: 'assets/images/icon-logo_3.svg',
         title: 'Call our office',
         description: 'Speak to our friendly customer support team.',
-        buttonText: 'Call 1300 838 277',
+        buttonText: '+91 9392183747',
         isMobile: isMobile,
         isTablet: isTablet,
         onPressed: () {

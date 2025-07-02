@@ -54,6 +54,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   open_file: ^3.5.10
   flutter_cashfree_pg_sdk: ^2.2.8+46
+  equatable: ^2.0.7
    
 
 dev_dependencies:

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vetassess/models/get_forms_model.dart';
 import 'package:vetassess/providers/get_allforms_providers.dart';
 import 'package:vetassess/screens/admin_screens/admin_download_appl_record.dart';
+import 'package:vetassess/screens/admin_screens/download_user_doc.dart';
 import 'package:vetassess/widgets/application_record.dart';
 
 class UserDetailsScreen extends ConsumerStatefulWidget {
@@ -936,53 +937,92 @@ class _UserDetailsScreenState extends ConsumerState<UserDetailsScreen> {
     );
   }
 
-  Widget _buildActionSection(bool isDesktop) {
-    return Column(
-      children: [
-        // Download button
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ElevatedButton.icon(
-            onPressed: () => _showDialog(
-              'Download Application',
-              'Are you sure you want to download the complete application package?',
-              'Download',
-              const Color(0xFFFF8C42),
-                  () async {
-                _showSnackBar('Download started...', const Color(0xFF4CAF50));
-                await PdfDownloadService.downloadApplicationRecordPdf(
-                  context,
-                  ref,
-                  widget.user,
-                );
-              },
-            ),
-            icon: const Icon(Icons.download, color: Colors.white),
-            label: const Text(
-              'Download Application Package',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF8C42),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
+Widget _buildActionSection(bool isDesktop) {
+  return Column(
+    children: [
+      // 🔽 Download Certificate Button
+      Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 16),
+        child: ElevatedButton.icon(
+          onPressed: () => _showDialog(
+            'Download Certificate',
+            'Are you sure you want to download the certificate?',
+            'Download',
+            Colors.teal,
+                () async {
+              _showSnackBar('Certificate download started...', Colors.teal);
+              await PdfDownloaduserService.downloadCertificatePdf(
+                context,
+                ref,
+                widget.user,
+              );
+            },
+          ),
+          icon: const Icon(Icons.file_download, color: Colors.white),
+          label: const Text(
+            'Download Certificate',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
+          ),
         ),
+      ),
 
-        // Action buttons
-        _buildActionButtons(isDesktop),
-      ],
-    );
-  }
+      // 🔽 Download Application Button
+      Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 16),
+        child: ElevatedButton.icon(
+          onPressed: () => _showDialog(
+            'Download Application',
+            'Are you sure you want to download the complete application package?',
+            'Download',
+            const Color(0xFFFF8C42),
+                () async {
+              _showSnackBar('Download started...', const Color(0xFF4CAF50));
+              await PdfDownloadService.downloadApplicationRecordPdf(
+                context,
+                ref,
+                widget.user,
+              );
+            },
+          ),
+          icon: const Icon(Icons.download, color: Colors.white),
+          label: const Text(
+            'Download Application Package',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFF8C42),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 2,
+          ),
+        ),
+      ),
+
+      // 🔽 Action Buttons (Approve/Reject/etc.)
+      _buildActionButtons(isDesktop),
+    ],
+  );
+}
 
   Widget _buildActionButtons(bool isDesktop) {
     Future<void> handleApplicationAction(String status, {String? rejectionReason}) async {

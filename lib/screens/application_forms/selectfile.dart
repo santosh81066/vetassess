@@ -170,9 +170,18 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
 
     // Get document types based on selected subcategory
     List<DocType.Data> documentTypesList = [];
-    if (selectedSubCategoryId != null && documentTypes.data != null) {
-      documentTypesList = _getDocumentTypes(documentTypes.data!, selectedSubCategoryId!);
-    }
+if (documentTypes.data != null) {
+  if (selectedSubCategoryId != null) {
+    documentTypesList = _getDocumentTypes(documentTypes.data!, selectedSubCategoryId!);
+  } else if (selectedCategoryId != null &&
+      (subCategories.isEmpty ||
+       parentCategories.firstWhere((cat) => cat.id == selectedCategoryId!).subtype == null ||
+       parentCategories.firstWhere((cat) => cat.id == selectedCategoryId!).subtype == 0)) {
+    // Show document types directly for parent category if there are no subcategories
+    documentTypesList = _getDocumentTypes(documentTypes.data!, selectedCategoryId!);
+  }
+}
+
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -319,7 +328,13 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
               ],
 
                               // Third Dropdown - Document Types
-              if (selectedSubCategoryId != null) ...[
+              if ((selectedSubCategoryId != null ||
+     (selectedCategoryId != null &&
+      (subCategories.isEmpty ||
+       parentCategories.firstWhere((cat) => cat.id == selectedCategoryId!).subtype == null ||
+       parentCategories.firstWhere((cat) => cat.id == selectedCategoryId!).subtype == 0))
+    ) && documentTypesList.isNotEmpty) ...
+[
                 SizedBox(height: 16),
                 Text(
                   'Document type',
@@ -625,10 +640,12 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
       return;
     }
 
-    if (selectedSubCategoryId == null) {
-      _showErrorDialog('Please select a subcategory');
-      return;
-    }
+    final docCategoryIdToUse = selectedSubCategoryId ?? selectedCategoryId;
+if (docCategoryIdToUse == null) {
+  _showErrorDialog('Please select a document category or subcategory');
+  return;
+}
+
 
     if (selectedDocumentTypeId == null) {
       _showErrorDialog('Please select a document type');
@@ -658,7 +675,7 @@ class _FileSelectionDialogState extends ConsumerState<FileSelectionDialog> {
       // Upload the document
       final result = await ref.read(uploadProvider.notifier).uploadFile(
             description: descriptionController.text.trim(),
-            docCategoryId: selectedSubCategoryId!,
+            docCategoryId: docCategoryIdToUse,
             docTypeId: selectedDocumentTypeId!,
             userId: _currentUserId!,
             file: selectedFile, // For mobile platforms

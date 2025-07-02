@@ -732,11 +732,11 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
     String skillsRequirementText = selectedOccupation?.skillsRequirement ??
         'This occupation requires a qualification assessed as comparable to the education level of an Australian Qualifications Framework (AQF) Bachelor Degree or higher degree and in a field highly relevant to the nominated occupation.';
 
-    const bullets = [
-      'at least one year of post-qualification employment at an appropriate skill level, undertaken in the last five years,',
-      'working 20 hours or more per week, and',
-      'highly relevant to the nominated occupation.',
-    ];
+    // const bullets = [
+    //   'at least one year of post-qualification employment at an appropriate skill level, undertaken in the last five years,',
+    //   'working 20 hours or more per week, and',
+    //   'highly relevant to the nominated occupation.',
+    // ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -745,16 +745,16 @@ class _OccupationFormState extends ConsumerState<OccupationForm> {
           skillsRequirementText,
           style: textStyle,
         ),
-        const SizedBox(height: 15),
-        Text(
-          'In addition to the above, it is essential for applicants to meet the following employment criteria:',
-          style: textStyle,
-        ),
-        const SizedBox(height: 10),
-        ...bullets.map((text) => Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: _buildBulletPoint(text, responsive),
-        )),
+        // const SizedBox(height: 15),
+        // Text(
+        //   'In addition to the above, it is essential for applicants to meet the following employment criteria:',
+        //   style: textStyle,
+        // ),
+        // const SizedBox(height: 10),
+        // ...bullets.map((text) => Padding(
+        //   padding: const EdgeInsets.only(bottom: 8),
+        //   child: _buildBulletPoint(text, responsive),
+        // )),
         const SizedBox(height: 15),
         Text(
           'Please note in order to achieve a successful Skills Assessment Outcome, a positive assessment for both qualifications and employment is required.',

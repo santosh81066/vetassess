@@ -340,10 +340,10 @@ class _ContactSection extends StatelessWidget {
           ),
           SizedBox(height: isMobile ? 12 : 16),
           Text(
-            'Level 1,\n'
-            '85 Cremorne Street\n'
-            'Cremorne, Victoria 3121\n'
-            'Australia',
+            'Govindapur,Pargi,Vikarabad,Purgi S.0,\n'
+            'Pargi,Telangana,India,501501,\n'
+            'Pargi,TELANGANA,PIN:501591'
+            ,
             style: TextStyle(
               color: Colors.white,
               fontSize: isMobile ? 13 : 14,
