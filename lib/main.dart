@@ -5,8 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:vetassess/models/get_forms_model.dart';
 import 'package:vetassess/providers/login_provider.dart';
 import 'package:vetassess/screens/about_us.dart';
+import 'package:vetassess/screens/admin_screens/dashboard.dart';
+import 'package:vetassess/screens/admin_screens/document_category_screen.dart';
 import 'package:vetassess/screens/admin_screens/user_application.dart';
 import 'package:vetassess/screens/admin_screens/users_list.dart';
+import 'package:vetassess/screens/admin_screens/visa_occupation_ui.dart';
 import 'package:vetassess/screens/application_forms/appli_documents_uploaded.dart';
 import 'package:vetassess/screens/application_forms/appli_general_edu.dart';
 import 'package:vetassess/screens/application_forms/appli_occupation.dart';
@@ -75,13 +78,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/appli_type',
       ];
 
-      // Define protected routes for admins
-      final adminProtectedRoutes = ['/admin_users', '/admin_user-details'];
+      // Updated protected routes for admins - include ALL new dashboard routes
+      final adminProtectedRoutes = [
+        '/admin',
+        '/admin/dashboard',
+        '/admin/users',
+        '/admin/categories',
+        '/admin/document-categories',
+        '/admin/visa-occupation',
+        '/admin_users', // Keep for backward compatibility
+        '/admin_user-details', // Keep for backward compatibility
+      ];
 
       final isApplicantProtectedRoute = applicantProtectedRoutes.contains(
         currentPath,
       );
-      final isAdminProtectedRoute = adminProtectedRoutes.contains(currentPath);
+      final isAdminProtectedRoute = adminProtectedRoutes.contains(currentPath) ||
+          currentPath!.startsWith('/admin/');
       final isAnyProtectedRoute =
           isApplicantProtectedRoute || isAdminProtectedRoute;
 
@@ -96,7 +109,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       // If user is logged in and trying to access login page
       if (loginState.isSuccess && loginState.response != null && isLoginPath) {
         // Navigate based on user role
-        return loginNotifier.getNavigationRouteForRole();
+        final defaultRoute = loginNotifier.getNavigationRouteForRole();
+        // If admin, redirect to new dashboard
+        if (loginState.userRole == 'admin') {
+          return '/admin/dashboard';
+        }
+        return defaultRoute;
       }
 
       // If user is not logged in and trying to access protected routes
@@ -110,7 +128,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
         // Admin trying to access applicant routes
         if (userRole == 'admin' && isApplicantProtectedRoute) {
-          return '/admin_users';
+          return '/admin/dashboard';
         }
 
         // Applicant/Agent trying to access admin routes
@@ -136,24 +154,52 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const VetassessRegistrationForm(),
       ),
 
-      // Admin routes
+      // NEW COMPLETE Admin Dashboard Routes
+      GoRoute(
+        path: '/admin',
+        redirect: (context, state) => '/admin/dashboard',
+      ),
+      GoRoute(
+        path: '/admin/dashboard',
+        name: 'admin_dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/users',
+        name: 'admin_users_new',
+        builder: (context, state) => const UsersListScreen(),
+      ),
+      /* GoRoute(
+        path: '/admin/categories',
+        name: 'admin_categories',
+        builder: (context, state) => const CategoriesManagementScreen(),
+      ),*/
+      GoRoute(
+        path: '/admin/document-categories',
+        name: 'admin_document_categories',
+        builder: (context, state) => const DocumentCategoryScreen(),
+      ),
+      GoRoute(
+        path: '/admin/visa-occupation',
+        name: 'admin_visa_occupation',
+        builder: (context, state) => const VisaOccupationManagementScreen(),
+      ),
+
+      // Legacy Admin routes (keep for backward compatibility)
       GoRoute(
         path: '/admin_users',
         builder: (context, state) => UsersListScreen(),
       ),
       GoRoute(
-      path: '/admin_user-details',
-      name: 'admin_user-details',
-      builder: (context, state) {
-        final user = state.extra as Users; // ✅ cast as Users
-        return UserDetailsScreen(user: user);
-      },
-    ),
+        path: '/admin_user-details',
+        name: 'admin_user-details',
+        builder: (context, state) {
+          final user = state.extra as Users;
+          return UserDetailsScreen(user: user);
+        },
+      ),
 
-      // GoRoute(
-      //   path: '/payment_screen',
-      //   builder: (context, state) => const PaymentScreen(),
-      // ),
+      // Contact and About pages
       GoRoute(path: '/contact_us', builder: (context, state) => ContactUs()),
       GoRoute(path: '/about_us', builder: (context, state) => AboutUs()),
 
@@ -161,10 +207,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/application_process',
         builder: (context, state) => const ApplicationProcess(),
-        
       ),
-      
-       GoRoute(
+
+      GoRoute(
         path: '/submitted_opp',
         builder: (context, state) => const SubmittedAppl(),
       ),

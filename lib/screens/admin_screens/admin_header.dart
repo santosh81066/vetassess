@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vetassess/providers/login_provider.dart';
-import 'package:vetassess/screens/home_screen.dart';
-
 
 class AdminHeader extends ConsumerWidget {
   const AdminHeader({super.key});
@@ -72,11 +70,11 @@ class AdminHeader extends ConsumerWidget {
         // Teal border line
         Container(height: 2, width: double.infinity, color: Colors.teal[700]),
 
-        // Navigation bar without logout button (since it's now in header)
+        // Navigation bar with admin navigation
         Container(
           color: Colors.white,
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: _buildNavigationBar(context, ref, isMobile, isTablet),
+          child: _buildNavigationBar(context, ref, isMobile, isTablet, currentRoute),
         ),
       ],
     );
@@ -96,25 +94,8 @@ class AdminHeader extends ConsumerWidget {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // In the _buildHeaderContent method, replace the GestureDetector onTap:
           GestureDetector(
-            onTap: () {
-              final currentRoute = GoRouterState.of(context).uri.path;
-
-              // If on login page, just navigate to home
-              if (currentRoute == '/login') {
-                context.go('/');
-              } else {
-                // If logged in and not on login page, show logout dialog
-                final loginState = ref.watch(loginProvider);
-                if (loginState.isSuccess && loginState.response != null) {
-                  _showLogoutDialogImage(context, ref);
-                } else {
-                  // Not logged in, navigate to home
-                  context.go('/');
-                }
-              }
-            },
+            onTap: () => _handleLogoTap(context, ref),
             child: Image.asset(
               'assets/images/vetassess_logo.png',
               height: logoSize,
@@ -144,25 +125,8 @@ class AdminHeader extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // In the _buildHeaderContent method, replace the GestureDetector onTap:
           GestureDetector(
-            onTap: () {
-              final currentRoute = GoRouterState.of(context).uri.path;
-
-              // If on login page, just navigate to home
-              if (currentRoute == '/login') {
-                context.go('/');
-              } else {
-                // If logged in and not on login page, show logout dialog
-                final loginState = ref.watch(loginProvider);
-                if (loginState.isSuccess && loginState.response != null) {
-                  _showLogoutDialogImage(context, ref);
-                } else {
-                  // Not logged in, navigate to home
-                  context.go('/');
-                }
-              }
-            },
+            onTap: () => _handleLogoTap(context, ref),
             child: Image.asset(
               'assets/images/vetassess_logo.png',
               height: logoSize,
@@ -196,79 +160,293 @@ class AdminHeader extends ConsumerWidget {
     WidgetRef ref,
     bool isMobile,
     bool isTablet,
+    String currentRoute,
   ) {
     final iconSize = isMobile ? 20.0 : 24.0;
     final textSize = isMobile ? 12.0 : 14.0;
 
+    // Check if user is logged in to show admin navigation
+    final loginState = ref.watch(loginProvider);
+    final isLoggedIn = loginState.isSuccess && loginState.response != null;
+
     if (isMobile) {
-      // Mobile navigation without logout button (now in header)
       return SizedBox(
         height: 48,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            GestureDetector(
-              child: IconButton(
-                icon: Icon(
-                  Icons.home,
-                  color: Colors.orange[900],
-                  size: iconSize,
-                ),
-                onPressed: () {
-                  context.go('/appli_opt');
-                },
-              ),
-            ),
-            for (final item in ['Contact', 'Links', 'FAQs'])
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: Colors.orange[900],
-                    fontSize: textSize,
-                  ),
-                ),
-              ),
-          ],
-        ),
+        child: isLoggedIn
+            ? _buildMobileAdminNavigation(context, iconSize, textSize, currentRoute)
+            : _buildMobilePublicNavigation(context, iconSize, textSize),
       );
     } else {
-      // Original navigation for tablet and desktop
       return SizedBox(
         height: 56,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
-              onPressed: () {
-                context.go('/appli_opt');
-              },
-            ),
-            for (final item in ['Contact us', 'Useful links', 'FAQs'])
-              TextButton(
-                onPressed: () {
-                  if (item == 'Contact us') {
-                    _launchURL('https://www.vetassess.com.co/#/contact_us');
-                  }
-                  if (item == 'Useful links') {
-                    showUsefulLinksDialog(context);
-                  }
-                },
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: Colors.orange[900],
-                    fontSize: textSize,
-                  ),
-                ),
-              ),
-            SizedBox(width: isTablet ? 20 : 50),
-          ],
-        ),
+        child: isLoggedIn
+            ? _buildDesktopAdminNavigation(context, iconSize, textSize, currentRoute, isTablet)
+            : _buildDesktopPublicNavigation(context, iconSize, textSize, isTablet),
       );
     }
+  }
+
+  Widget _buildMobileAdminNavigation(
+    BuildContext context,
+    double iconSize,
+    double textSize,
+    String currentRoute,
+  ) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildNavItem(
+            context: context,
+            icon: Icons.dashboard_outlined,
+            label: 'Dashboard',
+            isActive: currentRoute.startsWith('/admin/dashboard') || currentRoute == '/admin',
+            onTap: () => context.go('/admin/dashboard'),
+            iconSize: iconSize,
+            textSize: textSize,
+            isMobile: true,
+          ),
+          const SizedBox(width: 8),
+          _buildNavItem(
+            context: context,
+            icon: Icons.people_outline,
+            label: 'Users',
+            isActive: currentRoute.startsWith('/admin/users') || currentRoute.startsWith('/admin_users'),
+            onTap: () => context.go('/admin/users'),
+            iconSize: iconSize,
+            textSize: textSize,
+            isMobile: true,
+          ),
+          const SizedBox(width: 8),
+          _buildNavItem(
+            context: context,
+            icon: Icons.category_outlined,
+            label: 'Categories',
+            isActive: currentRoute.startsWith('/admin/visa-occupation'),
+            onTap: () => context.go('/admin/visa-occupation'),
+            iconSize: iconSize,
+            textSize: textSize,
+            isMobile: true,
+          ),
+          const SizedBox(width: 8),
+          _buildNavItem(
+            context: context,
+            icon: Icons.home,
+            label: 'Home',
+            isActive: currentRoute == '/appli_opt',
+            onTap: () => context.go('/appli_opt'),
+            iconSize: iconSize,
+            textSize: textSize,
+            isMobile: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobilePublicNavigation(
+    BuildContext context,
+    double iconSize,
+    double textSize,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        IconButton(
+          icon: Icon(
+            Icons.home,
+            color: Colors.orange[900],
+            size: iconSize,
+          ),
+          onPressed: () => context.go('/appli_opt'),
+        ),
+        for (final item in ['Contact', 'Links', 'FAQs'])
+          TextButton(
+            onPressed: () {
+              if (item == 'Links') {
+                showUsefulLinksDialog(context);
+              }
+            },
+            child: Text(
+              item,
+              style: TextStyle(
+                color: Colors.orange[900],
+                fontSize: textSize,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopAdminNavigation(
+    BuildContext context,
+    double iconSize,
+    double textSize,
+    String currentRoute,
+    bool isTablet,
+  ) {
+    return Row(
+      children: [
+        // Admin navigation items
+        _buildNavItem(
+          context: context,
+          icon: Icons.dashboard_outlined,
+          label: 'Dashboard',
+          isActive: currentRoute.startsWith('/admin/dashboard') || currentRoute == '/admin',
+          onTap: () => context.go('/admin/dashboard'),
+          iconSize: iconSize,
+          textSize: textSize,
+          isMobile: false,
+        ),
+        const SizedBox(width: 20),
+        _buildNavItem(
+          context: context,
+          icon: Icons.people_outline,
+          label: 'Users',
+          isActive: currentRoute.startsWith('/admin/users') || currentRoute.startsWith('/admin_users'),
+          onTap: () => context.go('/admin/users'),
+          iconSize: iconSize,
+          textSize: textSize,
+          isMobile: false,
+        ),
+        const SizedBox(width: 20),
+        _buildNavItem(
+          context: context,
+          icon: Icons.category_outlined,
+          label: 'Categories',
+          isActive: currentRoute.startsWith('/admin/visa-occupation'),
+          onTap: () => context.go('/admin/visa-occupation'),
+          iconSize: iconSize,
+          textSize: textSize,
+          isMobile: false,
+        ),
+
+        const Spacer(),
+
+        // Right side navigation
+        IconButton(
+          icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
+          onPressed: () => context.go('/appli_opt'),
+        ),
+        for (final item in ['Contact us', 'Useful links', 'FAQs'])
+          TextButton(
+            onPressed: () {
+              if (item == 'Contact us') {
+                _launchURL('https://www.vetassess.com.co/#/contact_us');
+              }
+              if (item == 'Useful links') {
+                showUsefulLinksDialog(context);
+              }
+            },
+            child: Text(
+              item,
+              style: TextStyle(
+                color: Colors.orange[900],
+                fontSize: textSize,
+              ),
+            ),
+          ),
+        SizedBox(width: isTablet ? 20 : 50),
+      ],
+    );
+  }
+
+  Widget _buildDesktopPublicNavigation(
+    BuildContext context,
+    double iconSize,
+    double textSize,
+    bool isTablet,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          icon: Icon(Icons.home, color: Colors.orange[900], size: iconSize),
+          onPressed: () => context.go('/appli_opt'),
+        ),
+        for (final item in ['Contact us', 'Useful links', 'FAQs'])
+          TextButton(
+            onPressed: () {
+              if (item == 'Contact us') {
+                _launchURL('https://www.vetassess.com.co/#/contact_us');
+              }
+              if (item == 'Useful links') {
+                showUsefulLinksDialog(context);
+              }
+            },
+            child: Text(
+              item,
+              style: TextStyle(
+                color: Colors.orange[900],
+                fontSize: textSize,
+              ),
+            ),
+          ),
+        SizedBox(width: isTablet ? 20 : 50),
+      ],
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+    required double iconSize,
+    required double textSize,
+    required bool isMobile,
+  }) {
+    final activeColor = const Color(0xFF3282B8);
+    final inactiveColor = Colors.orange[900]!;
+    final currentColor = isActive ? activeColor : inactiveColor;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 12 : 16,
+          vertical: isMobile ? 8 : 12,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? activeColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: isActive ? Border.all(color: activeColor.withOpacity(0.3)) : null,
+        ),
+        child: isMobile
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: currentColor, size: iconSize),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: currentColor,
+                      fontSize: textSize,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: currentColor, size: iconSize),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: currentColor,
+                      fontSize: textSize,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
   }
 
   Widget _buildLogoutButton(
@@ -284,7 +462,7 @@ class AdminHeader extends ConsumerWidget {
     final borderRadius = isMobile ? 3.0 : 4.0;
 
     return Container(
-      padding: EdgeInsets.only(top: 20, left: 20),
+      padding: const EdgeInsets.only(top: 20, left: 20),
       child: TextButton(
         onPressed: () {
           _showLogoutDialog(context, ref);
@@ -320,6 +498,24 @@ class AdminHeader extends ConsumerWidget {
     );
   }
 
+  void _handleLogoTap(BuildContext context, WidgetRef ref) {
+    final currentRoute = GoRouterState.of(context).uri.path;
+    final loginState = ref.watch(loginProvider);
+
+    // If on login page, just navigate to home
+    if (currentRoute == '/login') {
+      context.go('/');
+    } else {
+      // If logged in and not on login page, show logout dialog
+      if (loginState.isSuccess && loginState.response != null) {
+        _showLogoutDialogImage(context, ref);
+      } else {
+        // Not logged in, navigate to home
+        context.go('/');
+      }
+    }
+  }
+
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
@@ -331,58 +527,56 @@ class AdminHeader extends ConsumerWidget {
 
             return AlertDialog(
               title: const Text('Logout'),
-              content:
-                  loginState.isLoading
-                      ? const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text('Logging out...'),
-                        ],
-                      )
-                      : const Text('Are you sure you want to logout?'),
-              actions:
-                  loginState.isLoading
-                      ? []
-                      : [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            // Perform logout using the provider
-                            await ref.read(loginProvider.notifier).logout();
-
-                            // Close dialog first
-                            if (dialogContext.mounted) {
-                              Navigator.of(dialogContext).pop();
-                            }
-
-                            // Navigate using GoRouter
-                            if (context.mounted) {
-                              // Use GoRouter to navigate and clear stack
-                              context.go('/login');
-
-                              // Show logout success message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Successfully logged out'),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          },
-                          child: const Text(
-                            'Logout',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
+              content: loginState.isLoading
+                  ? const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Logging out...'),
                       ],
+                    )
+                  : const Text('Are you sure you want to logout?'),
+              actions: loginState.isLoading
+                  ? []
+                  : [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Perform logout using the provider
+                          await ref.read(loginProvider.notifier).logout();
+
+                          // Close dialog first
+                          if (dialogContext.mounted) {
+                            Navigator.of(dialogContext).pop();
+                          }
+
+                          // Navigate using GoRouter
+                          if (context.mounted) {
+                            // Use GoRouter to navigate and clear stack
+                            context.go('/login');
+
+                            // Show logout success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Successfully logged out'),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
             );
           },
         );
@@ -401,56 +595,54 @@ class AdminHeader extends ConsumerWidget {
 
             return AlertDialog(
               title: const Text('Logout'),
-              content:
-                  loginState.isLoading
-                      ? const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text('Logging out...'),
-                        ],
-                      )
-                      : const Text('Are you sure you want to logout?'),
-              actions:
-                  loginState.isLoading
-                      ? []
-                      : [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            // Perform logout using the provider
-                            await ref.read(loginProvider.notifier).logout();
-
-                            // Close dialog first
-                            if (dialogContext.mounted) {
-                              Navigator.of(dialogContext).pop();
-                            }
-
-                            if (context.mounted) {
-                              context.pushReplacement('/');
-
-                              // Show logout success message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Successfully logged out'),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          },
-                          child: const Text(
-                            'Logout',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
+              content: loginState.isLoading
+                  ? const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Logging out...'),
                       ],
+                    )
+                  : const Text('Are you sure you want to logout?'),
+              actions: loginState.isLoading
+                  ? []
+                  : [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Perform logout using the provider
+                          await ref.read(loginProvider.notifier).logout();
+
+                          // Close dialog first
+                          if (dialogContext.mounted) {
+                            Navigator.of(dialogContext).pop();
+                          }
+
+                          if (context.mounted) {
+                            context.pushReplacement('/');
+
+                            // Show logout success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Successfully logged out'),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
             );
           },
         );
@@ -594,8 +786,8 @@ class AdminHeader extends ConsumerWidget {
                       ),
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap:
-                              () => _launchURL('https://www.vetassess.com.co'),
+                          onTap: () =>
+                              _launchURL('https://www.vetassess.com.co'),
                           child: const Text(
                             'https://www.vetassess.com.co',
                             style: TextStyle(
@@ -633,9 +825,8 @@ class AdminHeader extends ConsumerWidget {
                       ),
                       WidgetSpan(
                         child: GestureDetector(
-                          onTap:
-                              () =>
-                                  _launchURL('https://www.homeaffairs.gov.au'),
+                          onTap: () =>
+                              _launchURL('https://www.homeaffairs.gov.au'),
                           child: const Text(
                             'https://www.homeaffairs.gov.au',
                             style: TextStyle(
@@ -679,10 +870,9 @@ class AdminHeader extends ConsumerWidget {
                           ),
                           WidgetSpan(
                             child: GestureDetector(
-                              onTap:
-                                  () => _launchURL(
-                                    'http://www.vetassess.com.au/skills-assessment-for-migration/general-occupations/nominate-an-occupation',
-                                  ),
+                              onTap: () => _launchURL(
+                                'http://www.vetassess.com.au/skills-assessment-for-migration/general-occupations/nominate-an-occupation',
+                              ),
                               child: const Text(
                                 'http://www.vetassess.com.au/skills-assessment-for-migration/general-occupations/nominate-an-occupation',
                                 style: TextStyle(
@@ -711,10 +901,9 @@ class AdminHeader extends ConsumerWidget {
                           ),
                           WidgetSpan(
                             child: GestureDetector(
-                              onTap:
-                                  () => _launchURL(
-                                    'https://www.homeaffairs.gov.au',
-                                  ),
+                              onTap: () => _launchURL(
+                                'https://www.homeaffairs.gov.au',
+                              ),
                               child: const Text(
                                 'https://www.homeaffairs.gov.au',
                                 style: TextStyle(
@@ -773,10 +962,9 @@ class AdminHeader extends ConsumerWidget {
                           ),
                           WidgetSpan(
                             child: GestureDetector(
-                              onTap:
-                                  () => _launchURL(
-                                    'https://education.gov.au/job-guide',
-                                  ),
+                              onTap: () => _launchURL(
+                                'https://education.gov.au/job-guide',
+                              ),
                               child: const Text(
                                 'https://education.gov.au/job-guide',
                                 style: TextStyle(
