@@ -312,6 +312,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+
 // Create a custom listenable that watches the login provider
 class RouterRefreshNotifier extends ChangeNotifier {
   late final ProviderSubscription _subscription;
