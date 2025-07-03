@@ -20,6 +20,7 @@ import 'package:vetassess/screens/application_process.dart';
 import 'package:vetassess/screens/application_type%20.dart';
 import 'package:vetassess/screens/applioptions.dart';
 import 'package:vetassess/screens/apply_screen.dart';
+import 'package:vetassess/screens/cancellation_refund_polic.dart';
 import 'package:vetassess/screens/contact_us.dart';
 import 'package:vetassess/screens/eligibility_criteria.dart';
 import 'package:vetassess/screens/employment.dart';
@@ -177,7 +178,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/document-categories',
         name: 'admin_document_categories',
-        builder: (context, state) => const DocumentCategoryScreen(),
+        builder: (context, state) => const DocumentManagementScreen(),
       ),
       GoRoute(
         path: '/admin/visa-occupation',
@@ -202,7 +203,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Contact and About pages
       GoRoute(path: '/contact_us', builder: (context, state) => ContactUs()),
       GoRoute(path: '/about_us', builder: (context, state) => AboutUs()),
-
+      
+      GoRoute(
+        path: '/cancellation-refund-policy',
+        builder: (context, state) => const CancellationRefundPolicy(),
+      ),
       // Public routes
       GoRoute(
         path: '/application_process',
