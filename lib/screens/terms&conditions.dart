@@ -11,6 +11,7 @@ class TermsAndConditions extends StatelessWidget {
   static const Color accentColor = Color(0xFF00BCD4);
   static const Color orangeColor = Color(0xFFFFA000);
   static const Color greyColor = Color(0xFF666666);
+  
   static const Color blackColor = Color(0xFF333333);
 
   @override
