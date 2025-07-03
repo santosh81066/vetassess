@@ -32,6 +32,9 @@ class ContactUs extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Add legal entity name prominently at the top
+                _buildLegalEntityBanner(size.width),
+                const SizedBox(height: 40),
                 Text(
                   'Choose how you would like to contact us from\nthe options below.',
                   style: TextStyle(
@@ -51,11 +54,46 @@ class ContactUs extends StatelessWidget {
     );
   }
 
+  // Add this new widget to prominently display the legal entity name
+  Widget _buildLegalEntityBanner(double screenWidth) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primaryColor.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Legal Entity',
+            style: TextStyle(
+              fontSize: _getFontSize(screenWidth, 18),
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'MRHOSTEL PRIVATE LIMITED',
+            style: TextStyle(
+              fontSize: _getFontSize(screenWidth, 24),
+              fontWeight: FontWeight.w700,
+              color: primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildResponsiveContent(
-    bool isMobile,
-    bool isTablet,
-    BuildContext context,
-  ) {
+      bool isMobile,
+      bool isTablet,
+      BuildContext context,
+      ) {
     final sections = [
       _buildEnquiriesSection(),
       _buildCurrentApplicationsSection(context),
@@ -65,10 +103,10 @@ class ContactUs extends StatelessWidget {
     if (isMobile) {
       return Column(
         children:
-            sections
-                .expand((section) => [section, const SizedBox(height: 40)])
-                .take(5)
-                .toList(),
+        sections
+            .expand((section) => [section, const SizedBox(height: 40)])
+            .take(5)
+            .toList(),
       );
     } else if (isTablet) {
       return Column(
@@ -89,15 +127,15 @@ class ContactUs extends StatelessWidget {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children:
-            sections
-                .expand(
-                  (section) => [
-                    Expanded(child: section),
-                    const SizedBox(width: 60),
-                  ],
-                )
-                .take(5)
-                .toList(),
+        sections
+            .expand(
+              (section) => [
+            Expanded(child: section),
+            const SizedBox(width: 60),
+          ],
+        )
+            .take(5)
+            .toList(),
       );
     }
   }
@@ -134,24 +172,19 @@ class ContactUs extends StatelessWidget {
     final options = [
       ('Check your status online', () {}),
       ('View current processing times', () {}),
-      ('View FAQs page', () {}),
       (
-        
-    // Your existing Terms link in ContactUs works perfectly
-    'Terms & Conditions',
-    () async {
-    final Uri termsUrl = Uri.parse('${Uri.base.origin}/#/terms-conditions');
-    if (await canLaunchUrl(termsUrl)) {
-    await launchUrl(termsUrl, mode: LaunchMode.externalApplication);
-    }
-
-          if (await canLaunchUrl(termsUrl)) {
-            await launchUrl(
-              termsUrl,
-              mode: LaunchMode.externalApplication, // Opens in new tab/window
-            );
-          }
-        },
+      'Terms & Conditions',
+          () {
+        // Use GoRouter navigation instead of URL launching
+        context.go('/terms-conditions');
+      },
+      ),
+      (
+      'Cancellation & Refund Policy',
+          () {
+        // Navigate to the Cancellation & Refund Policy page
+        context.go('/cancellation-refund-policy');
+      },
       ),
     ];
 
@@ -161,7 +194,7 @@ class ContactUs extends StatelessWidget {
         _buildSectionTitle('For current applications'),
         const SizedBox(height: 40),
         ...options.asMap().entries.map(
-          (entry) =>
+              (entry) =>
               _buildOptionRow(entry.value.$1, entry.key < 3, entry.value.$2),
         ),
       ],
@@ -171,14 +204,13 @@ class ContactUs extends StatelessWidget {
   Widget _buildBusinessEnquiriesSection() {
     final addressInfo = [
       (
-        'Registered Address',
-        "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
+      'Registered Address',
+      "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
       ),
       (
-        'Operational Address',
-        "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
+      'Operational Address',
+      "Govindapur,Pargi, Vikarabad, Purgi S.O, Pargi, Telangana, India, 501501, Pargi, TELANGANA, PIN: 501501",
       ),
-      ('Merchant Legal entity name', "MRHOSTEL PRIVATE LIMITED"),
     ];
 
     return Column(
@@ -192,14 +224,56 @@ class ContactUs extends StatelessWidget {
         const SizedBox(height: 10),
         _buildSimpleContactRow(Icons.phone, '+91 9392183747'),
         const SizedBox(height: 28),
+
+        // Enhanced legal entity name section
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: primaryColor.withOpacity(0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Legal Entity Name',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: primaryColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'MRHOSTEL PRIVATE LIMITED',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
         ...addressInfo.expand(
-          (info) => [
+              (info) => [
             _buildSectionTitle(info.$1),
             const SizedBox(height: 15),
             Text(
               info.$2,
               style: TextStyle(
-                fontSize: info.$1.contains('entity') ? 18 : 16,
+                fontSize: 16,
                 color: greyColor,
                 height: 1.4,
               ),
@@ -237,9 +311,9 @@ class ContactUs extends StatelessWidget {
               alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Column(
                 crossAxisAlignment:
-                    isMobile
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
+                isMobile
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Contact us",
@@ -248,6 +322,17 @@ class ContactUs extends StatelessWidget {
                       fontSize: _getFontSize(size.width, 42),
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Add legal entity name to header for better visibility
+                  Text(
+                    "MRHOSTEL PRIVATE LIMITED",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: _getFontSize(size.width, 18),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -364,13 +449,13 @@ class ContactUs extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration:
-            showBorder
-                ? const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFFFFB74D), width: 1),
-                  ),
-                )
-                : null,
+        showBorder
+            ? const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Color(0xFFFFB74D), width: 1),
+          ),
+        )
+            : null,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

@@ -402,7 +402,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
     final role = state.userRole;
     switch (role) {
       case 'admin':
-        return '/admin_users';
+        return '/admin/dashboard';
       case 'applicant':
         return '/appli_opt';
       case 'agent':
