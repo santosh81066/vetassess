@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import 'HelpSection.dart';
 
@@ -53,7 +54,7 @@ class Footer extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ..._getFooterSections().map((section) => Padding(
+          ..._getFooterSections(context).map((section) => Padding(
             padding: const EdgeInsets.only(bottom: 30),
             child: section,
           )),
@@ -66,14 +67,14 @@ class Footer extends StatelessWidget {
         runSpacing: isDesktop ? 30 : 20,
         alignment: WrapAlignment.spaceEvenly,
         children: [
-          ..._getFooterSections(),
+          ..._getFooterSections(context),
           _ContactSection(isMobile: isMobile),
         ],
       );
     }
   }
 
-  List<Widget> _getFooterSections() {
+  List<Widget> _getFooterSections(BuildContext context) {
     return [
       // Services column
       _FooterLinksSection(
@@ -84,6 +85,13 @@ class Footer extends StatelessWidget {
           'Business and Industry',
           'Recognition of Prior Learning',
           'Skills Assessment Support',
+        ],
+        linkRoutes: const [
+          null, // No specific route yet
+          null,
+          null,
+          null,
+          null,
         ],
       ),
 
@@ -97,6 +105,13 @@ class Footer extends StatelessWidget {
           'Required Documents',
           'Chinese Qualifications Verification services',
         ],
+        linkRoutes: const [
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
       ),
 
       // About Us column
@@ -106,10 +121,19 @@ class Footer extends StatelessWidget {
           'About Us',
           'Industry Partners',
           'Refund Policy',
-          'Complaints',
-          'Feedback',
+          'Terms & Conditions',
+          'Fee',
           'Customer services Charter',
           'Careers',
+        ],
+        linkRoutes: const [
+          null,
+          null,
+          '/cancellation-refund-policy', // Route for Refund Policy
+          '/terms-conditions', // Route for Terms & Conditions
+          '/fee_screen',
+          null,
+          null,
         ],
       ),
 
@@ -123,6 +147,13 @@ class Footer extends StatelessWidget {
           'For Migration Specialists',
           'FAQs',
         ],
+        linkRoutes: const [
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
       ),
 
       // Business & Industry column
@@ -135,13 +166,20 @@ class Footer extends StatelessWidget {
           'Global Initiatives',
           'Industry Partners',
         ],
+        linkRoutes: const [
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
       ),
     ];
   }
 
   Widget _buildLogoAndAcknowledgmentSection(BuildContext context, double screenWidth) {
     final isMobile = screenWidth <= 768;
-    
+
     return Container(
       color: const Color(0xFF0D5257),
       width: double.infinity,
@@ -170,7 +208,7 @@ class Footer extends StatelessWidget {
               },
             ),
           ),
-          
+
           // Aboriginal and Torres Strait Islander Flags
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
@@ -193,8 +231,8 @@ class Footer extends StatelessWidget {
           // Acknowledgment Text
           Text(
             'In the spirit of reconciliation VETASSESS acknowledges the Traditional Custodians of country throughout Australia and their '
-            'connections to land, sea and community. We pay our respects to their Elders past and present and extend that respect to all '
-            'Aboriginal and Torres Strait Islander peoples today.',
+                'connections to land, sea and community. We pay our respects to their Elders past and present and extend that respect to all '
+                'Aboriginal and Torres Strait Islander peoples today.',
             style: TextStyle(
               color: Colors.white70,
               fontSize: isMobile ? 11 : 12,
@@ -217,45 +255,45 @@ class Footer extends StatelessWidget {
       ),
       child: isMobile
           ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Copyright 2025 VETASSESS. All rights reserved. RTO No. 21097',
-                  style: TextStyle(color: Colors.white70, fontSize: 11),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 8,
-                  children: const [
-                    _BottomLink('Disclaimer'),
-                    _BottomLink('Privacy'),
-                    _BottomLink('Accessibility'),
-                    _BottomLink('Sitemap'),
-                    _BottomLink('Website by Pixelstorm'),
-                  ],
-                ),
-              ],
-            )
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Copyright 2025 VETASSESS. All rights reserved. RTO No. 21097',
+            style: TextStyle(color: Colors.white70, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              _BottomLink('Disclaimer', null),
+              _BottomLink('Privacy', null),
+              _BottomLink('Accessibility', null),
+              _BottomLink('Sitemap', null),
+              _BottomLink('Website by Pixelstorm', null),
+            ],
+          ),
+        ],
+      )
           : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Copyright 2025 VETASSESS. All rights reserved. RTO No. 21097',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                Wrap(
-                  spacing: 16,
-                  children: const [
-                    _BottomLink('Disclaimer'),
-                    _BottomLink('Privacy'),
-                    _BottomLink('Accessibility'),
-                    _BottomLink('Sitemap'),
-                    _BottomLink('Website by Pixelstorm'),
-                  ],
-                ),
-              ],
-            ),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Copyright 2025 VETASSESS. All rights reserved. RTO No. 21097',
+            style: TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          Wrap(
+            spacing: 16,
+            children: [
+              _BottomLink('Disclaimer', null),
+              _BottomLink('Privacy', null),
+              _BottomLink('Accessibility', null),
+              _BottomLink('Sitemap', null),
+              _BottomLink('Website by Pixelstorm', null),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -263,14 +301,19 @@ class Footer extends StatelessWidget {
 class _FooterLinksSection extends StatelessWidget {
   final String title;
   final List<String> links;
+  final List<String?> linkRoutes;
 
-  const _FooterLinksSection({required this.title, required this.links});
+  const _FooterLinksSection({
+    required this.title,
+    required this.links,
+    required this.linkRoutes,
+  });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth <= 768;
-    
+
     return SizedBox(
       width: isMobile ? double.infinity : _getSectionWidth(screenWidth),
       child: Column(
@@ -285,24 +328,42 @@ class _FooterLinksSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: isMobile ? 12 : 16),
-          ...links.map(
-            (link) => Padding(
-              padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
-              child: InkWell(
-                onTap: () {
-                  // Add navigation logic here
-                  print('Tapped on: $link');
-                },
-                child: Text(
-                  link,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isMobile ? 13 : 14,
-                    fontWeight: FontWeight.w500,
+          ...links.asMap().entries.map(
+                (entry) {
+              final index = entry.key;
+              final link = entry.value;
+              final route = linkRoutes[index];
+
+              return Padding(
+                padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
+                child: InkWell(
+                  onTap: () {
+                    if (route != null) {
+                      // Navigate to the specified route
+                      context.go(route);
+                    } else {
+                      // For links without routes, you can implement specific logic
+                      print('Tapped on: $link');
+                      // You can add navigation logic for other links here
+                    }
+                  },
+                  child: Text(
+                    link,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isMobile ? 13 : 14,
+                      fontWeight: FontWeight.w500,
+                      decoration: route != null
+                          ? TextDecoration.underline
+                          : TextDecoration.none,
+                      decorationColor: route != null
+                          ? Colors.white
+                          : null,
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -318,13 +379,13 @@ class _FooterLinksSection extends StatelessWidget {
 
 class _ContactSection extends StatelessWidget {
   final bool isMobile;
-  
+
   const _ContactSection({required this.isMobile});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return SizedBox(
       width: isMobile ? double.infinity : _getSectionWidth(screenWidth),
       child: Column(
@@ -341,8 +402,8 @@ class _ContactSection extends StatelessWidget {
           SizedBox(height: isMobile ? 12 : 16),
           Text(
             'Govindapur,Pargi,Vikarabad,Purgi S.0,\n'
-            'Pargi,Telangana,India,501501,\n'
-            'Pargi,TELANGANA,PIN:501591'
+                'Pargi,Telangana,India,501501,\n'
+                'Pargi,TELANGANA,PIN:501591'
             ,
             style: TextStyle(
               color: Colors.white,
@@ -375,8 +436,8 @@ class _ContactSection extends StatelessWidget {
             width: isMobile ? double.infinity : 150,
             child: ElevatedButton(
               onPressed: () {
-                // Add contact navigation logic
-                print('Contact Us button pressed');
+                // Navigate to Contact Us page
+                context.go('/contact_us');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFFA000),
@@ -411,7 +472,7 @@ class _ContactSection extends StatelessWidget {
   Widget _buildSocialMediaIcons(bool isMobile) {
     final iconSize = isMobile ? 20.0 : 24.0;
     final spacing = isMobile ? 8.0 : 12.0;
-    
+
     return Wrap(
       spacing: spacing,
       runSpacing: spacing,
@@ -461,15 +522,20 @@ class _SocialIcon extends StatelessWidget {
 
 class _BottomLink extends StatelessWidget {
   final String text;
+  final String? route;
 
-  const _BottomLink(this.text);
+  const _BottomLink(this.text, this.route);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Add navigation logic
-        print('Navigate to: $text');
+        if (route != null) {
+          context.go(route!);
+        } else {
+          // Add navigation logic for other links
+          print('Navigate to: $text');
+        }
       },
       child: Text(
         text,

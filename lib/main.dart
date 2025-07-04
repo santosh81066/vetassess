@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vetassess/models/get_forms_model.dart';
@@ -46,6 +48,10 @@ import 'package:vetassess/widgets/under_maintenance.dart';
 import 'screens/home_screen.dart';
 
 void main() {
+  // Remove the # from URLs on web
+  if (kIsWeb) {
+    usePathUrlStrategy();
+  }
   runApp(ProviderScope(child: VetassessApp()));
 }
 
@@ -203,7 +209,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Contact and About pages
       GoRoute(path: '/contact_us', builder: (context, state) => ContactUs()),
       GoRoute(path: '/about_us', builder: (context, state) => AboutUs()),
-      
+
       GoRoute(
         path: '/cancellation-refund-policy',
         builder: (context, state) => const CancellationRefundPolicy(),
