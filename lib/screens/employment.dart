@@ -270,7 +270,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: alternateBusinsessnameController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateAlternateBusinsessname(value),
-                                   isRequired: true,
+                                  //  isRequired: true,
                                   ),
                                 ),
 
@@ -314,7 +314,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: stateController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateState(value),
-                                   isRequired: true,
+                                  //  isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -323,7 +323,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: postCodeController,
                                     width: _getFieldWidth(screenWidth, 150),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updatePostCode(value),
-                                    isRequired: true,
+                                    // isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -371,7 +371,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: faxnumberController,
                                     width: _getFieldWidth(screenWidth, 200),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateFaxnumber(value),
-                                   isRequired: true,
+                                  //  isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -380,7 +380,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: mobileNoController,
                                     width: _getFieldWidth(screenWidth, 200),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateMobileNo(value),
-                                   isRequired: true,
+                                  //  isRequired: true,
                                   ),
                                 ),
                                 buildLabelledField(
@@ -399,7 +399,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: webaddressController,
                                     width: _getFieldWidth(screenWidth, 250),
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateWebaddress(value),
-                                   isRequired: true,
+                                  //  isRequired: true,
                                   ),
                                 ),
 
@@ -449,7 +449,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                     controller: dateofemploymentendedController,
                                     onChanged: (value) => ref.read(employmentProvider.notifier).updateDateofemploymentended(value),
                                   ),
-                                  isRequired: !employmentState.isapplicantemployed,
+                                  // isRequired: !employmentState.isapplicantemployed,
                                 ),
 
                                 // Unpaid leave row
