@@ -2,12 +2,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vetassess/models/admin_download_doc_model.dart';
 
 import 'package:vetassess/models/get_forms_model.dart';
+import 'package:vetassess/providers/download_user_doc_provider.dart';
 import 'package:vetassess/providers/get_allforms_providers.dart';
 import 'package:vetassess/screens/admin_screens/admin_download_appl_record.dart';
-import 'package:vetassess/screens/admin_screens/download_user_doc.dart';
-import 'package:vetassess/widgets/application_record.dart';
+
+import 'package:http/http.dart' as http;
 
 class UserDetailsScreen extends ConsumerStatefulWidget {
   final Users user;
@@ -21,6 +23,25 @@ class _UserDetailsScreenState extends ConsumerState<UserDetailsScreen> {
   String? selectedCertificateName;
   Uint8List? selectedCertificateBytes;
   bool isUploadingCertificate = false;
+
+   // ADD THIS METHOD - Download document functionality
+  void _downloadDocument(BuildContext context, Documents document) {
+    // Get the provider and call the download method
+    final downloadProvider = ref.read(downloadUserDocProvider.notifier);
+    downloadProvider.downloadDocument(context, document);
+  }
+
+  @override
+void initState() {
+  super.initState();
+  // Load user documents when screen loads
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (widget.user.userId != null) {
+      ref.read(downloadUserDocProvider.notifier)
+          .getUserDocDownloadsByUserId(widget.user.userId.toString());
+    }
+  });
+}
 
   // Check if application is finalized (approved or rejected)
   bool get isApplicationFinalized {
@@ -168,6 +189,7 @@ class _UserDetailsScreenState extends ConsumerState<UserDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final isDesktop = MediaQuery.of(context).size.width > 768;
     final isMobile = MediaQuery.of(context).size.width < 768;
 
@@ -940,45 +962,11 @@ class _UserDetailsScreenState extends ConsumerState<UserDetailsScreen> {
 Widget _buildActionSection(bool isDesktop) {
   return Column(
     children: [
-      // 🔽 Download Certificate Button
-      Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 16),
-        child: ElevatedButton.icon(
-          onPressed: () => _showDialog(
-            'Download Certificate',
-            'Are you sure you want to download the certificate?',
-            'Download',
-            Colors.teal,
-                () async {
-              _showSnackBar('Certificate download started...', Colors.teal);
-              await PdfDownloaduserService.downloadCertificatePdf(
-                context,
-                ref,
-                widget.user,
-              );
-            },
-          ),
-          icon: const Icon(Icons.file_download, color: Colors.white),
-          label: const Text(
-            'Download Certificate',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 2,
-          ),
-        ),
-      ),
 
+
+      _buildDocumentCategoriesSection(),
+      
+      const SizedBox(height: 24),
       // 🔽 Download Application Button
       Container(
         width: double.infinity,
@@ -1294,7 +1282,272 @@ Widget _buildActionSection(bool isDesktop) {
       },
     );
   }
+
+ // Method to build document categories section
+Widget _buildDocumentCategoriesSection() {
+  return Consumer(
+    builder: (context, ref, child) {
+      final userDocDownload = ref.watch(downloadUserDocProvider);
+      
+      if (userDocDownload.documents == null || userDocDownload.documents!.isEmpty) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 20, color: Colors.grey[600]),
+              const SizedBox(width: 12),
+              Text(
+                'No documents available for this user',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Group documents by category
+      final Map<String, List<Documents>> categorizedDocs = {};
+      for (var doc in userDocDownload.documents!) {
+        final category = doc.docCategory?.name ?? 'Uncategorized';
+        if (!categorizedDocs.containsKey(category)) {
+          categorizedDocs[category] = [];
+        }
+        categorizedDocs[category]!.add(doc);
+      }
+
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.withOpacity(0.1), Colors.blue.withOpacity(0.05)],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.folder_outlined, color: Colors.blue[700], size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Document Categories',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Categories
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: categorizedDocs.entries.map((entry) {
+                  final category = entry.key;
+                  final documents = entry.value;
+                  
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ExpansionTile(
+                      tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      title: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Icon(
+                              Icons.category_outlined,
+                              color: Colors.blue[700],
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              category,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${documents.length}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      children: documents.map((doc) => _buildDocumentTile(context, doc)).toList(),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
+
+// Method to build individual document tiles
+Widget _buildDocumentTile(BuildContext context, Documents document) {
+      final downloadProvider = ref.watch(downloadUserDocProvider.notifier);
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.grey.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(
+                Icons.description_outlined,
+                color: Colors.green[700],
+                size: 14,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    document.docType?.name ?? 'Unknown Document',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                  if (document.filename != null && document.filename!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      document.filename!,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+                  
+
+            ),
+          ],
+        ),
+         if (document.filePath != null && document.filePath!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            'Path: ${document.filePath!}',
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.grey[500],
+              fontStyle: FontStyle.italic,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: ()async {await downloadProvider.downloadDocument(context, document);},
+            icon: const Icon(Icons.download, size: 16, color: Colors.white),
+            label: const Text(
+              'Download',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              elevation: 1,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+}
+
 
 // Custom painter for background pattern
 class BackgroundPatternPainter extends CustomPainter {

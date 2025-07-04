@@ -1,5 +1,5 @@
 class VetassessApi {
-  static const String baseUrl = "https://vetassess.com.co";
+static const String baseUrl = "https://vetassess.com.co";
   static const String signup = "$baseUrl/auth/signup/applicant";
   static const String captcha = "$baseUrl/auth/captcha";
   static const String auth_refresh = "$baseUrl/auth/refresh";
@@ -21,4 +21,16 @@ class VetassessApi {
   static const String allform_upload_doc = "$baseUrl/admin/users";
   static const String certificate_upload = "$baseUrl/user/upload-certificate";
   static const String update_user_application = "$baseUrl/user/update-forms";
+  static const String download_user_doc = "$baseUrl/user/download";
+
+   // Add this method to construct file download URLs
+  static String getFileDownloadUrl(String filePath) {
+    if (filePath.startsWith('http')) {
+      return filePath;
+    }
+    
+    // Remove leading slash if present
+    String cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+    return "$baseUrl/$cleanPath";
+  }
 }

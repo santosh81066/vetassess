@@ -181,8 +181,7 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
       ),
     );
   }
-
-  Widget _buildTabBar(bool isMobile) {
+    Widget _buildTabBar(bool isMobile) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -199,13 +198,14 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
         controller: _tabController,
         indicator: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF9C27B0), Color(0xFF2E7D32)],
+             colors: [Color(0xFF9C27B0), Color(0xFF2E7D32)],
           ),
           borderRadius: BorderRadius.circular(8),
         ),
+        indicatorSize: TabBarIndicatorSize.tab,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.grey[600],
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelColor: const Color(0xFF2E7D32),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
         tabs: const [
           Tab(
             icon: Icon(Icons.folder_outlined),
@@ -219,6 +219,44 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
       ),
     );
   }
+
+  // Widget _buildTabBar(bool isMobile) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.05),
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: TabBar(
+  //       controller: _tabController,
+  //       indicator: BoxDecoration(
+  //         gradient: const LinearGradient(
+  //           colors: [Color(0xFF9C27B0), Color(0xFF2E7D32)],
+  //         ),
+  //         borderRadius: BorderRadius.circular(8),
+  //       ),
+  //       labelColor: Colors.white,
+  //       unselectedLabelColor: Colors.grey[600],
+  //       labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+  //       tabs: const [
+  //         Tab(
+  //           icon: Icon(Icons.folder_outlined),
+  //           text: 'Categories',
+  //         ),
+  //         Tab(
+  //           icon: Icon(Icons.description_outlined),
+  //           text: 'Types',
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildCategoriesTab(bool isMobile) {
     final state = ref.watch(documentManagementProvider);
@@ -823,6 +861,7 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               ),
             ),
           ),
+          
           Expanded(
             flex: 2,
             child: Text(
@@ -833,17 +872,17 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               ),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: Text(
-              'Actions',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: Text(
+          //     'Actions',
+          //     style: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //       color: Color(0xFF1F2937),
+          //     ),
+          //     textAlign: TextAlign.center,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -891,17 +930,17 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               ),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: Text(
-              'Actions',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: Text(
+          //     'Actions',
+          //     style: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //       color: Color(0xFF1F2937),
+          //     ),
+          //     textAlign: TextAlign.center,
+          //   ),
+          // ),
         ],
       ),
     );
@@ -941,7 +980,7 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
                     ),
                   ),
                 ),
-                _buildCategoryActionButtons(category, canDelete),
+              //  _buildCategoryActionButtons(category, canDelete),
               ],
             ),
             const SizedBox(height: 8),
@@ -1031,10 +1070,10 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: _buildCategoryActionButtons(category, canDelete),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: _buildCategoryActionButtons(category, canDelete),
+          // ),
         ],
       ),
     );
@@ -1072,7 +1111,7 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
                     ),
                   ),
                 ),
-                _buildCategoryActionButtons(category, canDelete),
+                // _buildCategoryActionButtons(category, canDelete),
               ],
             ),
             const SizedBox(height: 8),
@@ -1158,10 +1197,10 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: _buildCategoryActionButtons(category, canDelete),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: _buildCategoryActionButtons(category, canDelete),
+          // ),
         ],
       ),
     );
@@ -1209,7 +1248,7 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
                     ],
                   ),
                 ),
-                _buildCategoryActionButtons(category, canDelete),
+              //  _buildCategoryActionButtons(category, canDelete),
               ],
             ),
             const SizedBox(height: 8),
@@ -1303,37 +1342,37 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: _buildCategoryActionButtons(category, canDelete),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: _buildCategoryActionButtons(category, canDelete),
+          // ),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryActionButtons(DocumentCategory category, bool canDelete) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.edit_outlined, size: 20),
-          onPressed: () => _showEditCategoryDialog(category),
-          tooltip: 'Edit',
-          color: const Color(0xFF3282B8),
-        ),
-        IconButton(
-          icon: Icon(
-            Icons.delete_outline,
-            size: 20,
-            color: canDelete ? Colors.red.shade400 : Colors.grey.shade400,
-          ),
-          onPressed: canDelete ? () => _showDeleteCategoryConfirmation(category) : null,
-          tooltip: canDelete ? 'Delete' : 'Cannot delete - has subcategories',
-        ),
-      ],
-    );
-  }
+  // Widget _buildCategoryActionButtons(DocumentCategory category, bool canDelete) {
+  //   return Row(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       IconButton(
+  //        // icon: const Icon(Icons.edit_outlined, size: 20),
+  //         onPressed: () => _showEditCategoryDialog(category),
+  //         tooltip: 'Edit',
+  //         color: const Color(0xFF3282B8),
+  //       ),
+  //       IconButton(
+  //         icon: Icon(
+  //           Icons.delete_outline,
+  //           size: 20,
+  //           color: canDelete ? Colors.red.shade400 : Colors.grey.shade400,
+  //         ),
+  //         onPressed: canDelete ? () => _showDeleteCategoryConfirmation(category) : null,
+  //         tooltip: canDelete ? 'Delete' : 'Cannot delete - has subcategories',
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // Type-specific item builders
   Widget _buildTypeTableHeader() {
@@ -1378,17 +1417,17 @@ class _DocumentManagementScreenState extends ConsumerState<DocumentManagementScr
               ),
             ),
           ),
-          SizedBox(
-            width: 100,
-            child: Text(
-              'Actions',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
+          // SizedBox(
+          //   width: 100,
+          //   child: Text(
+          //     'Actions',
+          //     style: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //       color: Color(0xFF1F2937),
+          //     ),
+          //     textAlign: TextAlign.center,
+          //   ),
+          // ),
         ],
       ),
     );

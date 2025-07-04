@@ -311,14 +311,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               true,
             ),
             const SizedBox(height: 12),
-            _buildActionCard(
-              'Manage Categories',
-              'Add, edit, or remove application categories',
-              Icons.category_outlined,
-              const Color(0xFF9C27B0),
-                  () => context.go('/admin/categories'),
-              true,
-            ),
+            // _buildActionCard(
+            //   'Manage Categories',
+            //   'Add, edit, or remove application categories',
+            //   Icons.category_outlined,
+            //   const Color(0xFF9C27B0),
+            //       () => context.go('/admin/categories'),
+            //   true,
+            // ),
             const SizedBox(height: 12),
             _buildActionCard(
               'Document Categories',
@@ -338,14 +338,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               true,
             ),
             const SizedBox(height: 12),
-            _buildActionCard(
-              'System Settings',
-              'Configure application settings and preferences',
-              Icons.settings_outlined,
-              const Color(0xFF607D8B),
-                  () => _showComingSoon(),
-              true,
-            ),
+            // _buildActionCard(
+            //   'System Settings',
+            //   'Configure application settings and preferences',
+            //   Icons.settings_outlined,
+            //   const Color(0xFF607D8B),
+            //       () => _showComingSoon(),
+            //   true,
+            // ),
           ],
         )
             : screenWidth < 1200 // Adjusted breakpoint for 5 cards
@@ -364,16 +364,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: _buildActionCard(
-                    'Manage Categories',
-                    'Add, edit, or remove application categories',
-                    Icons.category_outlined,
-                    const Color(0xFF9C27B0),
-                        () => context.go('/admin/categories'),
-                    false,
-                  ),
-                ),
+               // Expanded(
+                  // child: _buildActionCard(
+                  //   'Manage Categories',
+                  //   'Add, edit, or remove application categories',
+                  //   Icons.category_outlined,
+                  //   const Color(0xFF9C27B0),
+                  //       () => context.go('/admin/categories'),
+                  //   false,
+                  // ),
+                //),
               ],
             ),
             const SizedBox(height: 16),
@@ -405,16 +405,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(
-                  child: _buildActionCard(
-                    'System Settings',
-                    'Configure application settings and preferences',
-                    Icons.settings_outlined,
-                    const Color(0xFF607D8B),
-                        () => _showComingSoon(),
-                    false,
-                  ),
-                ),
+                // Expanded(
+                //   child: _buildActionCard(
+                //     'System Settings',
+                //     'Configure application settings and preferences',
+                //     Icons.settings_outlined,
+                //     const Color(0xFF607D8B),
+                //         () => _showComingSoon(),
+                //     false,
+                //   ),
+                // ),
                 const Expanded(child: SizedBox()), // Empty space for alignment
               ],
             ),
@@ -433,16 +433,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildActionCard(
-                'Manage Categories',
-                'Add, edit, or remove application categories',
-                Icons.category_outlined,
-                const Color(0xFF9C27B0),
-                    () => context.go('/admin/categories'),
-                false,
-              ),
-            ),
+            // Expanded(
+            //   child: _buildActionCard(
+            //     'Manage Categories',
+            //     'Add, edit, or remove application categories',
+            //     Icons.category_outlined,
+            //     const Color(0xFF9C27B0),
+            //         () => context.go('/admin/categories'),
+            //     false,
+            //   ),
+            // ),
             const SizedBox(width: 16),
             Expanded(
               child: _buildActionCard(
@@ -466,16 +466,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _buildActionCard(
-                'System Settings',
-                'Configure application settings and preferences',
-                Icons.settings_outlined,
-                const Color(0xFF607D8B),
-                    () => _showComingSoon(),
-                false,
-              ),
-            ),
+            // Expanded(
+            //   child: _buildActionCard(
+            //     'System Settings',
+            //     'Configure application settings and preferences',
+            //     Icons.settings_outlined,
+            //     const Color(0xFF607D8B),
+            //         () => _showComingSoon(),
+            //     false,
+            //   ),
+            // ),
           ],
         ),
       ],

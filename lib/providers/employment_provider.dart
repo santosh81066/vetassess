@@ -153,6 +153,7 @@ class EmploymentProvider extends StateNotifier<EmploymentModel> {
   }
 
   Future<bool> submitEmployment() async {
+    print('empolyment data....');
     // Set loading state
     state = state.copyWith(isLoading: true, error: null);
 

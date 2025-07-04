@@ -575,59 +575,59 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                         ),
                                       ),
                                      onPressed: employmentState.isLoading ? null : () async {
-  if (_formKey.currentState!.validate()) {
-    final success = await ref.read(employmentProvider.notifier).submitEmployment();
+                                        if (_formKey.currentState!.validate()) {
+                                          final success = await ref.read(employmentProvider.notifier).submitEmployment();
 
-    if (success) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Success'),
-          content: const Text('Employment data submitted successfully!'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                context.go('/licence_form');
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Submission Failed'),
-          content: Text(
-            employmentState.error ?? 'Something went wrong. Please try again.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  } else {
-    showDialog(
-      context: context,
-      builder: (context) => const AlertDialog(
-        title: Text('Incomplete Form'),
-        content: Text('Please fill all required fields before continuing.'),
-        actions: [
-          TextButton(
-            onPressed: null,
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-},
+                                          if (success) {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text('Success'),
+                                                content: const Text('Employment data submitted successfully!'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                      context.go('/licence_form');
+                                                    },
+                                                    child: const Text('OK'),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          } else {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text('Submission Failed'),
+                                                content: Text(
+                                                  employmentState.error ?? 'Something went wrong. Please try again.',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.of(context).pop(),
+                                                    child: const Text('OK'),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        } else {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => const AlertDialog(
+                                              title: Text('Incomplete Form'),
+                                              content: Text('Please fill all required fields before continuing.'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: null,
+                                                  child: Text('OK'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },
 
                                       child: employmentState.isLoading
                                           ? const SizedBox(
