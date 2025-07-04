@@ -444,16 +444,16 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                 ),
 
                                  if (!employmentState.isapplicantemployed)
-  buildLabelledField(
-    'Date employment ended',
-    buildDateField(
-      controller: dateofemploymentendedController,
-      onChanged: (value) =>
-          ref.read(employmentProvider.notifier).updateDateofemploymentended(value),
-      isRequired: true,
-    ),
-    isRequired: true,
-  ),
+                                buildLabelledField(
+                                  'Date employment ended',
+                                  buildDateField(
+                                    controller: dateofemploymentendedController,
+                                    onChanged: (value) =>
+                                        ref.read(employmentProvider.notifier).updateDateofemploymentended(value),
+                                    isRequired: true,
+                                  ),
+                                  isRequired: true,
+                                ),
 
 
                                 // Unpaid leave row
