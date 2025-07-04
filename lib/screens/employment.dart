@@ -443,14 +443,18 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
                                   isRequired: true,
                                 ),
 
-                                buildLabelledField(
-                                  'Date employment ended',
-                                  buildDateField(
-                                    controller: dateofemploymentendedController,
-                                    onChanged: (value) => ref.read(employmentProvider.notifier).updateDateofemploymentended(value),
-                                  ),
-                                  // isRequired: !employmentState.isapplicantemployed,
-                                ),
+                                 if (!employmentState.isapplicantemployed)
+  buildLabelledField(
+    'Date employment ended',
+    buildDateField(
+      controller: dateofemploymentendedController,
+      onChanged: (value) =>
+          ref.read(employmentProvider.notifier).updateDateofemploymentended(value),
+      isRequired: true,
+    ),
+    isRequired: true,
+  ),
+
 
                                 // Unpaid leave row
                                 buildLabelledField(
@@ -956,6 +960,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
   Widget buildDateField({
     required TextEditingController controller,
     required Function(String) onChanged,
+     bool isRequired = false,
   }) {
     return SizedBox(
       width: 150,
@@ -964,7 +969,7 @@ class _EmploymentFormState extends ConsumerState<EmploymentForm> {
         controller: controller,
         onChanged: onChanged,
          validator: (value) {
-        if (value == null || value.trim().isEmpty) {
+         if (isRequired && (value == null || value.trim().isEmpty)) {
           return 'Date is required';
         }
         return null;
