@@ -1,18 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vetassess/screens/application_forms/selectfile.dart';
 import 'package:vetassess/widgets/upload_layout.dart';
+import 'package:vetassess/providers/download_user_doc_provider.dart';
+import 'package:vetassess/providers/login_provider.dart';
+import 'package:vetassess/models/admin_download_doc_model.dart';
 
-class VetassessUploadPage extends StatefulWidget {
+class VetassessUploadPage extends ConsumerStatefulWidget {
   @override
   _VetassessUploadPageState createState() => _VetassessUploadPageState();
 }
 
-class _VetassessUploadPageState extends State<VetassessUploadPage> {
+class _VetassessUploadPageState extends ConsumerState<VetassessUploadPage> {
   bool isInstructionsExpanded = true;
+  bool isLoadingDocuments = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchUserDocuments();
+    });
+  }
+
+  Future<void> _fetchUserDocuments() async {
+    try {
+      final loginState = ref.read(loginProvider);
+      final userId = loginState.response?.userId;
+
+      if (userId != null) {
+        await ref.read(downloadUserDocProvider.notifier)
+            .getUserDocDownloadsByUserId(userId.toString());
+      }
+    } catch (e) {
+      print('Error fetching user documents: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load documents: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoadingDocuments = false;
+      });
+    }
+  }
+
+  Future<void> _refreshDocuments() async {
+    setState(() {
+      isLoadingDocuments = true;
+    });
+    await _fetchUserDocuments();
+  }
+
+  // Group documents by category
+  Map<String, List<Documents>> _groupDocumentsByCategory(List<Documents> documents) {
+    Map<String, List<Documents>> groupedDocs = {
+      'Identification': [],
+      'Qualification': [],
+      'Employment': [],
+      'Other/Fees and Payment': [],
+    };
+
+    for (Documents doc in documents) {
+      String categoryName = doc.docCategory?.name?.toLowerCase() ?? '';
+
+      if (categoryName.contains('identification') || categoryName.contains('identity')) {
+        groupedDocs['Identification']!.add(doc);
+      } else if (categoryName.contains('qualification') || categoryName.contains('education')) {
+        groupedDocs['Qualification']!.add(doc);
+      } else if (categoryName.contains('employment') || categoryName.contains('work')) {
+        groupedDocs['Employment']!.add(doc);
+      } else {
+        groupedDocs['Other/Fees and Payment']!.add(doc);
+      }
+    }
+
+    return groupedDocs;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userDocDownload = ref.watch(downloadUserDocProvider);
+    final documents = userDocDownload.documents ?? [];
+    final groupedDocuments = _groupDocumentsByCategory(documents);
+
     return UploadLayout(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -20,6 +91,7 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20),
+
             // Instructions Section
             Container(
               width: double.infinity,
@@ -50,7 +122,11 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.remove, size: 18, color: Colors.black87),
+                          Icon(
+                            isInstructionsExpanded ? Icons.remove : Icons.add,
+                            size: 18,
+                            color: Colors.black87,
+                          ),
                           SizedBox(width: 12),
                           Text(
                             'Instructions for upload',
@@ -101,7 +177,7 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
                                   ),
                                   TextSpan(
                                     text:
-                                        'using spaces \' \', periods \'.\', ampersand \'&\', hash \'#\', star \'*\', exclamation marks \'!\', quotations \'\"\' and any other character that is not a letter, a number, a dash or an underscore.',
+                                    'using spaces \' \', periods \'.\', ampersand \'&\', hash \'#\', star \'*\', exclamation marks \'!\', quotations \'\"\' and any other character that is not a letter, a number, a dash or an underscore.',
                                   ),
                                 ],
                               ),
@@ -148,57 +224,62 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
 
             SizedBox(height: 16),
 
-            Container(
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Show the file selection dialog
-                  Map<String, dynamic>? result = await showFileSelectionDialog(
-                    context,
-                  );
+            // Action Buttons Row
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    // Show the file selection dialog
+                    Map<String, dynamic>? result = await showFileSelectionDialog(
+                      context,
+                    );
 
-                  if (result != null) {
-                    // Handle the selected data
-                    String? selectedCategory = result['category'];
-                    String? selectedSubCategory = result['subCategory'];
-                    String? selectedDocumentType = result['documentType'];
-                    String? description = result['description'];
-                    String? fileName = result['fileName'];
+                    if (result != null && result['success'] == true) {
+                      // Refresh the documents list after successful upload
+                      await _refreshDocuments();
 
-                    print('Selected category: $selectedCategory');
-                    if (selectedSubCategory != null) {
-                      print('Selected sub-category: $selectedSubCategory');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Document uploaded successfully!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                     }
-                    if (selectedDocumentType != null) {
-                      print('Selected document type: $selectedDocumentType');
-                    }
-                    if (description != null && description.isNotEmpty) {
-                      print('Description: $description');
-                    }
-                    if (fileName != null) {
-                      print('Selected file: $fileName');
-                    }
-
-                    // Here you can process the collected data
-                    // For example, upload the file, save the data, etc.
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[600],
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[600],
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: Text(
+                    'Select file',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                child: Text(
-                  'Select file',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                SizedBox(width: 16),
+                IconButton(
+                  onPressed: isLoadingDocuments ? null : _refreshDocuments,
+                  icon: isLoadingDocuments
+                      ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                  )
+                      : Icon(Icons.refresh, color: Colors.blue[600]),
+                  tooltip: 'Refresh documents',
                 ),
-              ),
+              ],
             ),
+
             SizedBox(height: 40),
 
             // Save & Continue Later Section
@@ -242,31 +323,35 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
             SizedBox(height: 40),
 
             // Document Categories Section
-            _buildDocumentCategory(
-              'Uploaded Identification Documents',
-              0,
-              'Documents yet to upload or already submitted to Vetassess',
-            ),
-            SizedBox(height: 16),
-            _buildDocumentCategory(
-              'Uploaded Qualification Documents',
-              0,
-              'Documents yet to upload or already submitted to Vetassess',
-              fileName: 'hgcrs - outds5ezx',
-            ),
-            SizedBox(height: 16),
-            _buildDocumentCategory(
-              'Uploaded Employment Documents',
-              0,
-              'Documents yet to upload or already submitted to Vetassess',
-              fileName: 'ouilykuyzstufrgh - tharun - (2024-2025)',
-            ),
-            SizedBox(height: 16),
-            _buildDocumentCategory(
-              'Uploaded Other/Fees and Payment Documents',
-              0,
-              'Documents yet to upload or already submitted to Vetassess',
-            ),
+            if (isLoadingDocuments)
+              Center(
+                child: CircularProgressIndicator(),
+              )
+            else ...[
+              _buildDocumentCategory(
+                'Uploaded Identification Documents',
+                groupedDocuments['Identification']!,
+                'Documents yet to upload or already submitted to Vetassess',
+              ),
+              SizedBox(height: 16),
+              _buildDocumentCategory(
+                'Uploaded Qualification Documents',
+                groupedDocuments['Qualification']!,
+                'Documents yet to upload or already submitted to Vetassess',
+              ),
+              SizedBox(height: 16),
+              _buildDocumentCategory(
+                'Uploaded Employment Documents',
+                groupedDocuments['Employment']!,
+                'Documents yet to upload or already submitted to Vetassess',
+              ),
+              SizedBox(height: 16),
+              _buildDocumentCategory(
+                'Uploaded Other/Fees and Payment Documents',
+                groupedDocuments['Other/Fees and Payment']!,
+                'Documents yet to upload or already submitted to Vetassess',
+              ),
+            ],
 
             SizedBox(height: 20),
           ],
@@ -276,10 +361,10 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
   }
 
   Widget _buildBulletPoint(
-    String text, {
-    String? highlight,
-    List<String>? highlights,
-  }) {
+      String text, {
+        String? highlight,
+        List<String>? highlights,
+      }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 10),
       child: Row(
@@ -306,10 +391,10 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
   }
 
   Widget _buildTextWithHighlights(
-    String text, {
-    String? highlight,
-    List<String>? highlights,
-  }) {
+      String text, {
+        String? highlight,
+        List<String>? highlights,
+      }) {
     if (highlight != null) {
       return RichText(
         text: TextSpan(
@@ -356,16 +441,16 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
   }
 
   List<TextSpan> _getTextSpansWithMultipleHighlights(
-    String text,
-    List<String> highlights,
-  ) {
+      String text,
+      List<String> highlights,
+      ) {
     List<TextSpan> spans = [];
     String remainingText = text;
 
     for (String highlight in highlights) {
       List<TextSpan> tempSpans = [];
       for (TextSpan span
-          in spans.isEmpty ? [TextSpan(text: remainingText)] : spans) {
+      in spans.isEmpty ? [TextSpan(text: remainingText)] : spans) {
         if (span.text != null && span.style?.fontWeight != FontWeight.bold) {
           tempSpans.addAll(_getTextSpansWithHighlight(span.text!, highlight));
         } else {
@@ -379,11 +464,10 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
   }
 
   Widget _buildDocumentCategory(
-    String title,
-    int count,
-    String subtitle, {
-    String? fileName,
-  }) {
+      String title,
+      List<Documents> documents,
+      String subtitle,
+      ) {
     IconData iconData;
     switch (title) {
       case 'Uploaded Identification Documents':
@@ -409,6 +493,7 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
       ),
       child: Column(
         children: [
+          // Header
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Row(
@@ -428,11 +513,11 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.grey[600],
+                    color: documents.isEmpty ? Colors.grey[600] : Colors.blue[600],
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    count.toString(),
+                    documents.length.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -443,32 +528,92 @@ class _VetassessUploadPageState extends State<VetassessUploadPage> {
               ],
             ),
           ),
-          if (fileName != null)
+
+          // Documents list
+          if (documents.isNotEmpty)
+            ...documents.map((document) => _buildDocumentItem(document))
+          else
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
                 children: [
-                  Icon(Icons.remove, size: 16, color: Colors.black87),
-                  SizedBox(width: 8),
-                  Text(
-                    fileName,
-                    style: TextStyle(fontSize: 13, color: Colors.black87),
+                  Expanded(
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
                   ),
                 ],
               ),
             ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Row(
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentItem(Documents document) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey[300]!, width: 0.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.description, size: 16, color: Colors.blue[600]),
+          SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                Text(
+                  document.filename ?? 'Unknown file',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
+                if (document.description != null && document.description!.isNotEmpty)
+                  Text(
+                    document.description!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                if (document.docType?.name != null)
+                  Text(
+                    'Type: ${document.docType!.name}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[500],
+                    ),
+                  ),
               ],
             ),
+          ),
+          IconButton(
+            onPressed: () async {
+              try {
+                await ref.read(downloadUserDocProvider.notifier)
+                    .downloadDocument(context, document);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to download: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            icon: Icon(Icons.download, size: 18, color: Colors.green[600]),
+            tooltip: 'Download document',
+            padding: EdgeInsets.all(4),
+            constraints: BoxConstraints(minWidth: 32, minHeight: 32),
           ),
         ],
       ),
