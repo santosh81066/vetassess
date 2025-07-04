@@ -40,7 +40,7 @@ class FeeScreen extends StatelessWidget {
                   _buildResponsiveTable(
                     context,
                     headerText:
-                    'For both qualifications and employment - Australian or Overseas',
+                        'For both qualifications and employment - Australian or Overseas',
                     rows: [
                       TableRowInfo(
                         label: 'Online application',
@@ -93,42 +93,6 @@ class FeeScreen extends StatelessWidget {
 
                   const SizedBox(height: 90),
 
-                  // Post-Vocational Education Work Visa section
-                  _buildSectionTitle(
-                    context,
-                    'Post-Vocational Education Work Visa (Subclass 485) visas',
-                  ),
-
-                  _buildResponsiveTable(
-                    context,
-                    headerText: 'Application Type',
-                    rows: [
-                      TableRowInfo(
-                        label:
-                        'Post-Vocational Education Work Visa (Subclass 485) visas',
-                        australiaPrice: '₹25,114',
-                        overseasPrice: '₹22,825',
-                      ),
-                      TableRowInfo(
-                        label:
-                        'Review – Post-Vocational Education Work Visa (Subclass 485) visas',
-                        australiaPrice: '₹16,017',
-                        overseasPrice: '₹14,562',
-                      ),
-                      TableRowInfo(
-                        label:
-                        'Change of Occupation – Post-Vocational Education Work Visa (Subclass 485) visas',
-                        australiaPrice: '₹22,882',
-                        overseasPrice: '₹20,801',
-                        isLastRow: true,
-                      ),
-                    ],
-                  ),
-
-                  _buildTaxOfficeFootnote(context),
-
-                  const SizedBox(height: 90),
-
                   // Post-485 section
                   _buildSectionTitle(
                     context,
@@ -141,7 +105,7 @@ class FeeScreen extends StatelessWidget {
                     rows: [
                       TableRowInfo(
                         label:
-                        'Assessment of employment for final Skills Assessment',
+                            'Assessment of employment for final Skills Assessment',
                         australiaPrice: '₹51,444',
                         overseasPrice: '₹46,775',
                         isLastRow: true,
@@ -204,7 +168,7 @@ class FeeScreen extends StatelessWidget {
                     rows: [
                       TableRowInfo(
                         label:
-                        'Full skills assessment for change of occupation',
+                            'Full skills assessment for change of occupation',
                         australiaPrice: '₹45,021',
                         overseasPrice: '₹40,928',
                         isLastRow: true,
@@ -321,7 +285,7 @@ class FeeScreen extends StatelessWidget {
                         children: [
                           const TextSpan(
                             text:
-                            'If you request to withdraw an application before the assessment commences, a full refund will be considered, less an administration fee of ₹9,389. Please see our',
+                                'If you request to withdraw an application before the assessment commences, a full refund will be considered, less an administration fee of ₹9,389. Please see our',
                           ),
                           TextSpan(
                             text: 'Refund Policy ',
@@ -352,7 +316,7 @@ class FeeScreen extends StatelessWidget {
                         children: [
                           const TextSpan(
                             text:
-                            'You are expected to provide complete documentation at the time you submit your application.. Please find the list of documents under',
+                                'You are expected to provide complete documentation at the time you submit your application.. Please find the list of documents under',
                           ),
                           TextSpan(
                             text: ' Required Documents. ',
@@ -364,7 +328,7 @@ class FeeScreen extends StatelessWidget {
                           ),
                           const TextSpan(
                             text:
-                            ' If any information or documents are missing from the application, we will provide 15 calendar days to submit them. If the outstanding documents are not submitted within the given timeframe, a final notice will be issued giving seven additional days before the application is closed without further communication. Please note that refunds don'
+                                ' If any information or documents are missing from the application, we will provide 15 calendar days to submit them. If the outstanding documents are not submitted within the given timeframe, a final notice will be issued giving seven additional days before the application is closed without further communication. Please note that refunds don'
                                 't apply to closed applications',
                           ),
                         ],
@@ -433,7 +397,7 @@ class FeeScreen extends StatelessWidget {
                         children: [
                           const TextSpan(
                             text:
-                            'You can find further information about our refund policy',
+                                'You can find further information about our refund policy',
                           ),
                           TextSpan(
                             text: 'here',
@@ -483,24 +447,27 @@ class FeeScreen extends StatelessWidget {
         final bool isDesktop = screenWidth >= 1024;
 
         // Responsive padding
-        double horizontalPadding = isMobile
-            ? 20
-            : isTablet
-            ? 60
-            : 150;
+        double horizontalPadding =
+            isMobile
+                ? 20
+                : isTablet
+                ? 60
+                : 150;
 
-        double verticalPadding = isMobile
-            ? 30
-            : isTablet
-            ? 45
-            : 60;
+        double verticalPadding =
+            isMobile
+                ? 30
+                : isTablet
+                ? 45
+                : 60;
 
         // Responsive font sizes
-        double titleFontSize = isMobile
-            ? 24
-            : isTablet
-            ? 28
-            : 32;
+        double titleFontSize =
+            isMobile
+                ? 24
+                : isTablet
+                ? 28
+                : 32;
 
         double viewAllFontSize = isMobile ? 14 : 16;
         double itemFontSize = isMobile ? 16 : 18;
@@ -512,27 +479,28 @@ class FeeScreen extends StatelessWidget {
             horizontal: horizontalPadding,
             vertical: verticalPadding,
           ),
-          child: isMobile
-              ? _buildMobileLayout(
-            title: title,
-            items: items,
-            isExpansionPanel: isExpansionPanel,
-            sectionColor: sectionColor,
-            titleFontSize: titleFontSize,
-            viewAllFontSize: viewAllFontSize,
-            itemFontSize: itemFontSize,
-            linkFontSize: linkFontSize,
-          )
-              : _buildDesktopLayout(
-            title: title,
-            items: items,
-            isExpansionPanel: isExpansionPanel,
-            sectionColor: sectionColor,
-            titleFontSize: titleFontSize,
-            viewAllFontSize: viewAllFontSize,
-            itemFontSize: itemFontSize,
-            linkFontSize: linkFontSize,
-          ),
+          child:
+              isMobile
+                  ? _buildMobileLayout(
+                    title: title,
+                    items: items,
+                    isExpansionPanel: isExpansionPanel,
+                    sectionColor: sectionColor,
+                    titleFontSize: titleFontSize,
+                    viewAllFontSize: viewAllFontSize,
+                    itemFontSize: itemFontSize,
+                    linkFontSize: linkFontSize,
+                  )
+                  : _buildDesktopLayout(
+                    title: title,
+                    items: items,
+                    isExpansionPanel: isExpansionPanel,
+                    sectionColor: sectionColor,
+                    titleFontSize: titleFontSize,
+                    viewAllFontSize: viewAllFontSize,
+                    itemFontSize: itemFontSize,
+                    linkFontSize: linkFontSize,
+                  ),
         );
       },
     );
@@ -578,13 +546,18 @@ class FeeScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.only(top: 6),
             child: Column(
-              children: items.map((item) {
-                if (isExpansionPanel) {
-                  return _buildExpansionItem(item, sectionColor, itemFontSize);
-                } else {
-                  return _buildLinkItem(item, sectionColor, linkFontSize);
-                }
-              }).toList(),
+              children:
+                  items.map((item) {
+                    if (isExpansionPanel) {
+                      return _buildExpansionItem(
+                        item,
+                        sectionColor,
+                        itemFontSize,
+                      );
+                    } else {
+                      return _buildLinkItem(item, sectionColor, linkFontSize);
+                    }
+                  }).toList(),
             ),
           ),
         ),
@@ -623,13 +596,14 @@ class FeeScreen extends StatelessWidget {
 
         // Items section
         Column(
-          children: items.map((item) {
-            if (isExpansionPanel) {
-              return _buildExpansionItem(item, sectionColor, itemFontSize);
-            } else {
-              return _buildLinkItem(item, sectionColor, linkFontSize);
-            }
-          }).toList(),
+          children:
+              items.map((item) {
+                if (isExpansionPanel) {
+                  return _buildExpansionItem(item, sectionColor, itemFontSize);
+                } else {
+                  return _buildLinkItem(item, sectionColor, linkFontSize);
+                }
+              }).toList(),
         ),
       ],
     );
@@ -655,11 +629,7 @@ class FeeScreen extends StatelessWidget {
             color: sectionColor,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.arrow_forward,
-            color: Colors.white,
-            size: 18,
-          ),
+          child: Icon(Icons.arrow_forward, color: Colors.white, size: 18),
         ),
       ],
     );
@@ -726,10 +696,7 @@ class FeeScreen extends StatelessWidget {
                 children: [
                   Text(
                     'This is the answer to the FAQ question.',
-                    style: TextStyle(
-                      fontSize: isMobile ? 14 : 15,
-                      height: 1.5,
-                    ),
+                    style: TextStyle(fontSize: isMobile ? 14 : 15, height: 1.5),
                   ),
                 ],
               ),
@@ -749,9 +716,7 @@ class FeeScreen extends StatelessWidget {
         return Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: isMobile ? 12 : 16,
-              ),
+              padding: EdgeInsets.symmetric(vertical: isMobile ? 12 : 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -789,7 +754,7 @@ class FeeScreen extends StatelessWidget {
     );
   }
 
-// Helper methods (add these if not already present)
+  // Helper methods (add these if not already present)
   bool _isMobiles(BuildContext context) {
     return MediaQuery.of(context).size.width < 600;
   }
@@ -800,7 +765,9 @@ class FeeScreen extends StatelessWidget {
   }
 
   double _getpreparingResponsiveFontSize(
-      BuildContext context, double baseFontSize) {
+    BuildContext context,
+    double baseFontSize,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     if (screenWidth < 600) {
@@ -815,7 +782,8 @@ class FeeScreen extends StatelessWidget {
     }
   }
 
-  EdgeInsets _getpreparingResponsivePadding(BuildContext context, {
+  EdgeInsets _getpreparingResponsivePadding(
+    BuildContext context, {
     double mobile = 16,
     double tablet = 32,
     double desktop = 50,
@@ -895,51 +863,56 @@ class FeeScreen extends StatelessWidget {
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: links.asMap().entries.map((entry) {
-                  final int index = entry.key;
-                  final String link = entry.value;
-                  return Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                link,
-                                style: TextStyle(
-                                  fontSize: _getpreparingResponsiveFontSize(
-                                      context, 16),
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
+                children:
+                    links.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final String link = entry.value;
+                      return Column(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    link,
+                                    style: TextStyle(
+                                      fontSize: _getpreparingResponsiveFontSize(
+                                        context,
+                                        16,
+                                      ),
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  margin: const EdgeInsets.only(left: 16),
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_forward,
+                                    color: Color(0xFF0A594C),
+                                    size: 22,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Container(
-                              width: 32,
-                              height: 32,
-                              margin: const EdgeInsets.only(left: 16),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.arrow_forward,
-                                color: Color(0xFF0A594C),
-                                size: 22,
-                              ),
+                          ),
+                          if (index < links.length - 1)
+                            _buildDottedLine(
+                              context,
+                              color: const Color(0xFFfd7e14),
                             ),
-                          ],
-                        ),
-                      ),
-                      if (index < links.length - 1)
-                        _buildDottedLine(context,
-                            color: const Color(0xFFfd7e14)),
-                    ],
-                  );
-                }).toList(),
+                        ],
+                      );
+                    }).toList(),
               ),
             ),
           ],
@@ -1004,50 +977,56 @@ class FeeScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 40, bottom: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: links.asMap().entries.map((entry) {
-                    final int index = entry.key;
-                    final String link = entry.value;
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  link,
-                                  style: TextStyle(
-                                    fontSize:
-                                    _getResponsiveFontSize(context, 16),
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87,
+                  children:
+                      links.asMap().entries.map((entry) {
+                        final int index = entry.key;
+                        final String link = entry.value;
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      link,
+                                      style: TextStyle(
+                                        fontSize: _getResponsiveFontSize(
+                                          context,
+                                          16,
+                                        ),
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    margin: const EdgeInsets.only(left: 16),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.arrow_forward,
+                                      color: Color(0xFF0A594C),
+                                      size: 22,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Container(
-                                width: 32,
-                                height: 32,
-                                margin: const EdgeInsets.only(left: 16),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.arrow_forward,
-                                  color: Color(0xFF0A594C),
-                                  size: 22,
-                                ),
+                            ),
+                            if (index < links.length - 1)
+                              _buildDottedLine(
+                                context,
+                                color: const Color(0xFFfd7e14),
                               ),
-                            ],
-                          ),
-                        ),
-                        if (index < links.length - 1)
-                          _buildDottedLine(context,
-                              color: const Color(0xFFfd7e14)),
-                      ],
-                    );
-                  }).toList(),
+                          ],
+                        );
+                      }).toList(),
                 ),
               ),
             ),
@@ -1122,9 +1101,10 @@ class FeeScreen extends StatelessWidget {
                 minHeight: isMobile ? 300 : 400,
               ),
               color: tealColor,
-              child: isMobile
-                  ? _buildMobileLayouts(screenWidth)
-                  : _buildDesktopLayouts(screenWidth, isTablet),
+              child:
+                  isMobile
+                      ? _buildMobileLayouts(screenWidth)
+                      : _buildDesktopLayouts(screenWidth, isTablet),
             );
           },
         ),
@@ -1247,7 +1227,8 @@ class FeeScreen extends StatelessWidget {
   }
 
   // Helper method to get responsive padding
-  EdgeInsets _getResponsivePadding(BuildContext context, {
+  EdgeInsets _getResponsivePadding(
+    BuildContext context, {
     double mobile = 16,
     double tablet = 32,
     double desktop = 50,
@@ -1306,9 +1287,10 @@ class FeeScreen extends StatelessWidget {
             child: Align(
               alignment: isMobile ? Alignment.center : Alignment.centerLeft,
               child: Column(
-                crossAxisAlignment: isMobile
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -1375,10 +1357,7 @@ class FeeScreen extends StatelessWidget {
               Text(' / ', style: TextStyle(color: Colors.grey, fontSize: 12)),
               TextButton(
                 onPressed: () {},
-                child: Text(
-                  'Skills Assessment',
-                  style: responsiveLinkStyle,
-                ),
+                child: Text('Skills Assessment', style: responsiveLinkStyle),
               ),
               Text(' / ', style: TextStyle(color: Colors.grey, fontSize: 14)),
               TextButton(
@@ -1392,8 +1371,9 @@ class FeeScreen extends StatelessWidget {
               Text(
                 'Professional Fees',
                 style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: _getResponsiveFontSize(context, 14)),
+                  color: Colors.grey[600],
+                  fontSize: _getResponsiveFontSize(context, 14),
+                ),
               ),
             ],
           ),
@@ -1403,7 +1383,9 @@ class FeeScreen extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-          vertical: 12, horizontal: screenWidth < 1024 ? 30 : 50),
+        vertical: 12,
+        horizontal: screenWidth < 1024 ? 30 : 50,
+      ),
       child: Wrap(
         children: [
           TextButton(
@@ -1430,8 +1412,9 @@ class FeeScreen extends StatelessWidget {
           Text(
             'Professional Fees and Payments',
             style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: _getResponsiveFontSize(context, 14)),
+              color: Colors.grey[600],
+              fontSize: _getResponsiveFontSize(context, 14),
+            ),
           ),
         ],
       ),
@@ -1449,9 +1432,9 @@ class FeeScreen extends StatelessWidget {
       {
         'step': 'Fees and payments',
         'description':
-        'Application fees include GST if you (the applicant) are an Australian resident for tax purposes. Please refer to the Australian Taxation Office website for information regarding tax residency.',
+            'Application fees include GST if you (the applicant) are an Australian resident for tax purposes. Please refer to the Australian Taxation Office website for information regarding tax residency.',
         'anzscoInfo':
-        'The SAS services aim to provide additional and tailored support to applicants, agents and lawyers in submitting a sufficiently complete/ ready to assess skills assessment application.',
+            'The SAS services aim to provide additional and tailored support to applicants, agents and lawyers in submitting a sufficiently complete/ ready to assess skills assessment application.',
         'image': 'assets/images/fees_and_payments.jpg',
         'imageOnRight': false,
       },
@@ -1465,15 +1448,12 @@ class FeeScreen extends StatelessWidget {
       final Widget stepInfoColumn = Flexible(
         flex: isMobile ? 1 : (isTablet ? 5 : 4),
         child: Container(
-          constraints: BoxConstraints(
-            minHeight: isMobile ? 200 : 400,
-          ),
+          constraints: BoxConstraints(minHeight: isMobile ? 200 : 400),
           padding: EdgeInsets.all(isMobile ? 16 : 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: isMobile
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
+            crossAxisAlignment:
+                isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
             children: [
               Text(
                 stepData['step'],
@@ -1518,24 +1498,18 @@ class FeeScreen extends StatelessWidget {
         return Container(
           color: Colors.white,
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 40,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: Column(
-            children: [
-              imageWidget,
-              const SizedBox(height: 30),
-              stepInfoColumn,
-            ],
+            children: [imageWidget, const SizedBox(height: 30), stepInfoColumn],
           ),
         );
       }
 
       // For tablet and desktop, use row layout with Flexible widgets
-      final List<Widget> rowChildren = stepData['imageOnRight']
-          ? [stepInfoColumn, const SizedBox(width: 20), imageWidget]
-          : [imageWidget, const SizedBox(width: 20), stepInfoColumn];
+      final List<Widget> rowChildren =
+          stepData['imageOnRight']
+              ? [stepInfoColumn, const SizedBox(width: 20), imageWidget]
+              : [imageWidget, const SizedBox(width: 20), stepInfoColumn];
 
       return Container(
         color: Colors.white,
@@ -1578,7 +1552,7 @@ class FeeScreen extends StatelessWidget {
                 ),
                 const TextSpan(
                   text:
-                  ' to apply or find out more about this application process',
+                      ' to apply or find out more about this application process',
                 ),
               ],
             ),
@@ -1591,10 +1565,10 @@ class FeeScreen extends StatelessWidget {
 
   // Helper method to build standard sections for consistent layout
   Widget _buildStandardSection(
-      BuildContext context,
-      String title,
-      List<Widget> content,
-      ) {
+    BuildContext context,
+    String title,
+    List<Widget> content,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -1702,10 +1676,10 @@ class FeeScreen extends StatelessWidget {
 
   // Build a responsive table that adapts to screen size
   Widget _buildResponsiveTable(
-      BuildContext context, {
-        required String headerText,
-        required List<TableRowInfo> rows,
-      }) {
+    BuildContext context, {
+    required String headerText,
+    required List<TableRowInfo> rows,
+  }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth >= 768;
     final isMobile = screenWidth < 600;
@@ -1716,9 +1690,7 @@ class FeeScreen extends StatelessWidget {
     }
 
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: screenWidth,
-      ),
+      constraints: BoxConstraints(minWidth: screenWidth),
       child: Table(
         border: TableBorder.all(
           color: Colors.grey.shade300,
@@ -1764,12 +1736,12 @@ class FeeScreen extends StatelessWidget {
 
   // Build responsive table rows
   List<TableRow> _buildResponsiveTableRows(
-      BuildContext context, {
-        required String headerText,
-        required List<TableRowInfo> rows,
-        required bool isMobile,
-        required bool isTablet,
-      }) {
+    BuildContext context, {
+    required String headerText,
+    required List<TableRowInfo> rows,
+    required bool isMobile,
+    required bool isTablet,
+  }) {
     List<TableRow> tableRows = [
       // Header Row
       TableRow(
@@ -1816,13 +1788,24 @@ class FeeScreen extends StatelessWidget {
   // Responsive table header cell
   Widget _buildResponsiveHeaderCell(String text, bool isMobile, bool isTablet) {
     return Padding(
-      padding: EdgeInsets.all(isMobile ? 6.0 : isTablet ? 10.0 : 12.0),
+      padding: EdgeInsets.all(
+        isMobile
+            ? 6.0
+            : isTablet
+            ? 10.0
+            : 12.0,
+      ),
       child: Text(
         text,
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: isMobile ? 12 : isTablet ? 14 : 16,
+          fontSize:
+              isMobile
+                  ? 12
+                  : isTablet
+                  ? 14
+                  : 16,
           height: 1.2,
         ),
         textAlign: TextAlign.center,
@@ -1841,40 +1824,42 @@ class FeeScreen extends StatelessWidget {
     required bool isMobile,
     required bool isTablet,
   }) {
-    final fontSize = isMobile ? 13.0 : isTablet ? 15.0 : 16.0;
-    final padding = isMobile ? 8.0 : isTablet ? 12.0 : 16.0;
+    final fontSize =
+        isMobile
+            ? 13.0
+            : isTablet
+            ? 15.0
+            : 16.0;
+    final padding =
+        isMobile
+            ? 8.0
+            : isTablet
+            ? 12.0
+            : 16.0;
 
     return TableRow(
-      decoration: isLastRow
-          ? null
-          : BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade300,
-            width: isMobile ? 0.5 : 1.0,
-          ),
-        ),
-      ),
+      decoration:
+          isLastRow
+              ? null
+              : BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: isMobile ? 0.5 : 1.0,
+                  ),
+                ),
+              ),
       children: [
         Padding(
           padding: EdgeInsets.all(padding),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: fontSize,
-              height: 1.3,
-            ),
-          ),
+          child: Text(label, style: TextStyle(fontSize: fontSize, height: 1.3)),
         ),
         Padding(
           padding: EdgeInsets.all(padding),
           child: Text(
             australiaPrice,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -1882,10 +1867,7 @@ class FeeScreen extends StatelessWidget {
           child: Text(
             overseasPrice,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -1894,10 +1876,10 @@ class FeeScreen extends StatelessWidget {
 
   // Card-based layout for very small screens
   Widget _buildCardLayout(
-      BuildContext context, {
-        required String headerText,
-        required List<TableRowInfo> rows,
-      }) {
+    BuildContext context, {
+    required String headerText,
+    required List<TableRowInfo> rows,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -2057,28 +2039,45 @@ class FeeScreen extends StatelessWidget {
         // Group A and E
         _buildCompactGroupSection(context, 'Group A and E', [
           _buildCompactReviewCard(
-              context, 'Qualification only', '₹20,532', '₹18,665'),
+            context,
+            'Qualification only',
+            '₹20,532',
+            '₹18,665',
+          ),
           _buildCompactReviewCard(
-              context, 'Employment only', '₹36,798', '₹33,451'),
-          _buildCompactReviewCard(
-              context, 'Both', '₹55,145', '₹50,148'),
+            context,
+            'Employment only',
+            '₹36,798',
+            '₹33,451',
+          ),
+          _buildCompactReviewCard(context, 'Both', '₹55,145', '₹50,148'),
         ]),
 
         // Group B, C, D and F
         _buildCompactGroupSection(context, 'Group B, C, D and F', [
           _buildCompactReviewCard(
-              context, 'Qualification only', '₹20,532', '₹18,665'),
+            context,
+            'Qualification only',
+            '₹20,532',
+            '₹18,665',
+          ),
           _buildCompactReviewCard(
-              context, 'Employment only', '₹36,798', '₹33,451'),
-          _buildCompactReviewCard(
-              context, 'Both', '₹55,145', '₹50,148'),
+            context,
+            'Employment only',
+            '₹36,798',
+            '₹33,451',
+          ),
+          _buildCompactReviewCard(context, 'Both', '₹55,145', '₹50,148'),
         ]),
       ],
     );
   }
 
   Widget _buildCompactGroupSection(
-      BuildContext context, String groupName, List<Widget> cards) {
+    BuildContext context,
+    String groupName,
+    List<Widget> cards,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
@@ -2105,7 +2104,11 @@ class FeeScreen extends StatelessWidget {
   }
 
   Widget _buildCompactReviewCard(
-      BuildContext context, String type, String inclGST, String exclGST) {
+    BuildContext context,
+    String type,
+    String inclGST,
+    String exclGST,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
@@ -2162,7 +2165,8 @@ class FeeScreen extends StatelessWidget {
         _buildResponsiveMobileReviewRow(
           context: context,
           reviewType: 'Qualification only',
-          qualOutcome: 'Negative (not highly relevant or not at the required level)',
+          qualOutcome:
+              'Negative (not highly relevant or not at the required level)',
           empOutcome: 'Negative due to qualification',
           evidence: 'Qualification',
           feeIncl: '₹20,532',
@@ -2180,7 +2184,8 @@ class FeeScreen extends StatelessWidget {
         _buildResponsiveMobileReviewRow(
           context: context,
           reviewType: 'Both Qualification and Employment',
-          qualOutcome: 'Negative (not highly relevant or not at the required level)',
+          qualOutcome:
+              'Negative (not highly relevant or not at the required level)',
           empOutcome: 'Negative due to any reason (including qualification)',
           evidence: 'Qualification and Employment',
           feeIncl: '₹55,145',
@@ -2193,7 +2198,8 @@ class FeeScreen extends StatelessWidget {
         _buildResponsiveMobileReviewRow(
           context: context,
           reviewType: 'Qualification only',
-          qualOutcome: 'Negative (not highly relevant or not at the required level)',
+          qualOutcome:
+              'Negative (not highly relevant or not at the required level)',
           empOutcome: 'Negative due to qualification',
           evidence: 'Qualification',
           feeIncl: '₹20,532',
@@ -2202,8 +2208,10 @@ class FeeScreen extends StatelessWidget {
         _buildResponsiveMobileReviewRow(
           context: context,
           reviewType: 'Employment only',
-          qualOutcome: 'Negative (not highly relevant and you are not contesting the relevance)',
-          empOutcome: 'Negative due to any reason (except qualification not at the required level)**',
+          qualOutcome:
+              'Negative (not highly relevant and you are not contesting the relevance)',
+          empOutcome:
+              'Negative due to any reason (except qualification not at the required level)**',
           evidence: 'Employment',
           feeIncl: '₹36,798',
           feeExcl: '₹33,451',
@@ -2220,7 +2228,8 @@ class FeeScreen extends StatelessWidget {
         _buildResponsiveMobileReviewRow(
           context: context,
           reviewType: 'Both Qualification and Employment',
-          qualOutcome: 'Negative (not highly relevant or not at the required level)',
+          qualOutcome:
+              'Negative (not highly relevant or not at the required level)',
           empOutcome: 'Negative due to any reason (including qualification)',
           evidence: 'Qualification and Employment',
           feeIncl: '₹55,145',
@@ -2274,9 +2283,10 @@ class FeeScreen extends StatelessWidget {
       padding: EdgeInsets.all(screenWidth * 0.025),
       decoration: BoxDecoration(
         border: Border(
-          bottom: isLastInGroup
-              ? BorderSide.none
-              : BorderSide(color: Colors.grey.shade300),
+          bottom:
+              isLastInGroup
+                  ? BorderSide.none
+                  : BorderSide(color: Colors.grey.shade300),
         ),
       ),
       child: Column(
@@ -2284,19 +2294,39 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildResponsiveMobileInfoRow(context, 'Review type:', reviewType),
           SizedBox(height: screenHeight * 0.008),
-          _buildResponsiveMobileInfoRow(context, 'Qualification outcome:', qualOutcome),
+          _buildResponsiveMobileInfoRow(
+            context,
+            'Qualification outcome:',
+            qualOutcome,
+          ),
           SizedBox(height: screenHeight * 0.008),
-          _buildResponsiveMobileInfoRow(context, 'Employment outcome:', empOutcome),
+          _buildResponsiveMobileInfoRow(
+            context,
+            'Employment outcome:',
+            empOutcome,
+          ),
           SizedBox(height: screenHeight * 0.008),
-          _buildResponsiveMobileInfoRow(context, 'Required evidence:', evidence),
+          _buildResponsiveMobileInfoRow(
+            context,
+            'Required evidence:',
+            evidence,
+          ),
           SizedBox(height: screenHeight * 0.01),
           Row(
             children: [
               Expanded(
-                child: _buildResponsiveMobileInfoRow(context, 'Incl. GST:', feeIncl),
+                child: _buildResponsiveMobileInfoRow(
+                  context,
+                  'Incl. GST:',
+                  feeIncl,
+                ),
               ),
               Expanded(
-                child: _buildResponsiveMobileInfoRow(context, 'Excl. GST:', feeExcl),
+                child: _buildResponsiveMobileInfoRow(
+                  context,
+                  'Excl. GST:',
+                  feeExcl,
+                ),
               ),
             ],
           ),
@@ -2306,7 +2336,11 @@ class FeeScreen extends StatelessWidget {
   }
 
   // Responsive mobile info row
-  Widget _buildResponsiveMobileInfoRow(BuildContext context, String label, String value) {
+  Widget _buildResponsiveMobileInfoRow(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return RichText(
@@ -2370,40 +2404,53 @@ class FeeScreen extends StatelessWidget {
     return [
       // Header Row
       TableRow(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0d5257),
-        ),
+        decoration: const BoxDecoration(color: Color(0xFF0d5257)),
         children: [
           _buildResponsiveHeaderCell('Occupation Group', isMobile, isTablet),
           _buildResponsiveHeaderCell(
-              'Review application type', isMobile, isTablet),
+            'Review application type',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Qualification outcome for initial application',
-              isMobile,
-              isTablet),
+            'Qualification outcome for initial application',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Employment outcome for initial application',
-              isMobile,
-              isTablet),
+            'Employment outcome for initial application',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Additional Supporting Evidence required', isMobile, isTablet),
+            'Additional Supporting Evidence required',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Fees (including GST)*', isMobile, isTablet),
+            'Fees (including GST)*',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Fees (excluding GST)*', isMobile, isTablet),
+            'Fees (excluding GST)*',
+            isMobile,
+            isTablet,
+          ),
         ],
       ),
       // Add all data rows here (similar to your existing structure)
       // Group A and E rows...
       _buildTabletDataRow(
-          context,
-          'Group\nA and E',
-          'Qualification only',
-          'Negative\n(not highly relevant or\nnot at the required level)',
-          'Negative due to qualification',
-          'Qualification',
-          '₹20,532',
-          '₹18,665'),
+        context,
+        'Group\nA and E',
+        'Qualification only',
+        'Negative\n(not highly relevant or\nnot at the required level)',
+        'Negative due to qualification',
+        'Qualification',
+        '₹20,532',
+        '₹18,665',
+      ),
       // Add more rows as needed...
     ];
   }
@@ -2470,27 +2517,39 @@ class FeeScreen extends StatelessWidget {
     return [
       // Header Row
       TableRow(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0d5257),
-        ),
+        decoration: const BoxDecoration(color: Color(0xFF0d5257)),
         children: [
           _buildResponsiveHeaderCell('Occupation Group', isMobile, isTablet),
           _buildResponsiveHeaderCell(
-              'Review application type', isMobile, isTablet),
+            'Review application type',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Qualification outcome for initial application',
-              isMobile,
-              isTablet),
+            'Qualification outcome for initial application',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Employment outcome for initial application',
-              isMobile,
-              isTablet),
+            'Employment outcome for initial application',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Additional Supporting Evidence required', isMobile, isTablet),
+            'Additional Supporting Evidence required',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Fees (including GST)*', isMobile, isTablet),
+            'Fees (including GST)*',
+            isMobile,
+            isTablet,
+          ),
           _buildResponsiveHeaderCell(
-              'Fees (excluding GST)*', isMobile, isTablet),
+            'Fees (excluding GST)*',
+            isMobile,
+            isTablet,
+          ),
         ],
       ),
 
@@ -2499,10 +2558,11 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildMultiRowCell('Group\nA and E', 3, TextAlign.center),
           _buildResponsiveDataCell(context, 'Qualification only'),
-          _buildResponsiveDataCell(context,
-              'Negative\n(not highly relevant or\nnot at the required level)'),
           _buildResponsiveDataCell(
-              context, 'Negative due to qualification'),
+            context,
+            'Negative\n(not highly relevant or\nnot at the required level)',
+          ),
+          _buildResponsiveDataCell(context, 'Negative due to qualification'),
           _buildResponsiveDataCell(context, 'Qualification'),
           _buildResponsiveDataCell(context, '₹20,532', TextAlign.center),
           _buildResponsiveDataCell(context, '₹18,665', TextAlign.center),
@@ -2515,8 +2575,10 @@ class FeeScreen extends StatelessWidget {
           _buildHiddenCell(),
           _buildResponsiveDataCell(context, 'Employment only'),
           _buildResponsiveDataCell(context, 'Positive'),
-          _buildResponsiveDataCell(context,
-              'Negative due to any reason\n(except qualification)'),
+          _buildResponsiveDataCell(
+            context,
+            'Negative due to any reason\n(except qualification)',
+          ),
           _buildResponsiveDataCell(context, 'Employment'),
           _buildResponsiveDataCell(context, '₹36,798', TextAlign.center),
           _buildResponsiveDataCell(context, '₹33,451', TextAlign.center),
@@ -2528,11 +2590,17 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildHiddenCell(),
           _buildResponsiveDataCell(
-              context, 'Both\nQualification and Employment'),
-          _buildResponsiveDataCell(context,
-              'Negative\n(not highly relevant or\nnot at the required level)'),
-          _buildResponsiveDataCell(context,
-              'Negative due to any reason\n(including qualification)'),
+            context,
+            'Both\nQualification and Employment',
+          ),
+          _buildResponsiveDataCell(
+            context,
+            'Negative\n(not highly relevant or\nnot at the required level)',
+          ),
+          _buildResponsiveDataCell(
+            context,
+            'Negative due to any reason\n(including qualification)',
+          ),
           _buildResponsiveDataCell(context, 'Qualification and Employment'),
           _buildResponsiveDataCell(context, '₹55,145', TextAlign.center),
           _buildResponsiveDataCell(context, '₹50,148', TextAlign.center),
@@ -2544,10 +2612,11 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildMultiRowCell('Group\nB, C, D and F', 4, TextAlign.center),
           _buildResponsiveDataCell(context, 'Qualification only'),
-          _buildResponsiveDataCell(context,
-              'Negative\n(not highly relevant or\nnot at the required level)'),
           _buildResponsiveDataCell(
-              context, 'Negative due to qualification'),
+            context,
+            'Negative\n(not highly relevant or\nnot at the required level)',
+          ),
+          _buildResponsiveDataCell(context, 'Negative due to qualification'),
           _buildResponsiveDataCell(context, 'Qualification'),
           _buildResponsiveDataCell(context, '₹20,532', TextAlign.center),
           _buildResponsiveDataCell(context, '₹18,665', TextAlign.center),
@@ -2559,10 +2628,14 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildHiddenCell(),
           _buildResponsiveDataCell(context, 'Employment only'),
-          _buildResponsiveDataCell(context,
-              'Negative\n(not highly relevant and\nyou are not contesting\nthe relevance)'),
-          _buildResponsiveDataCell(context,
-              'Negative due to any reason\n(except qualification not at\nthe required level)**'),
+          _buildResponsiveDataCell(
+            context,
+            'Negative\n(not highly relevant and\nyou are not contesting\nthe relevance)',
+          ),
+          _buildResponsiveDataCell(
+            context,
+            'Negative due to any reason\n(except qualification not at\nthe required level)**',
+          ),
           _buildResponsiveDataCell(context, 'Employment'),
           _buildResponsiveDataCell(context, '₹36,798', TextAlign.center),
           _buildResponsiveDataCell(context, '₹33,451', TextAlign.center),
@@ -2575,8 +2648,10 @@ class FeeScreen extends StatelessWidget {
           _buildHiddenCell(),
           _buildResponsiveDataCell(context, 'Employment only'),
           _buildResponsiveDataCell(context, 'Positive'),
-          _buildResponsiveDataCell(context,
-              'Negative due to any reason\n(except qualification)'),
+          _buildResponsiveDataCell(
+            context,
+            'Negative due to any reason\n(except qualification)',
+          ),
           _buildResponsiveDataCell(context, 'Employment'),
           _buildResponsiveDataCell(context, '₹36,798', TextAlign.center),
           _buildResponsiveDataCell(context, '₹33,451', TextAlign.center),
@@ -2588,11 +2663,17 @@ class FeeScreen extends StatelessWidget {
         children: [
           _buildHiddenCell(),
           _buildResponsiveDataCell(
-              context, 'Both\nQualification and Employment'),
-          _buildResponsiveDataCell(context,
-              'Negative\n(not highly relevant or\nnot at the required level)'),
-          _buildResponsiveDataCell(context,
-              'Negative due to any reason\n(including qualification)'),
+            context,
+            'Both\nQualification and Employment',
+          ),
+          _buildResponsiveDataCell(
+            context,
+            'Negative\n(not highly relevant or\nnot at the required level)',
+          ),
+          _buildResponsiveDataCell(
+            context,
+            'Negative due to any reason\n(including qualification)',
+          ),
           _buildResponsiveDataCell(context, 'Qualification and Employment'),
           _buildResponsiveDataCell(context, '₹55,145', TextAlign.center),
           _buildResponsiveDataCell(context, '₹50,148', TextAlign.center),
@@ -2602,8 +2683,11 @@ class FeeScreen extends StatelessWidget {
   }
 
   // Responsive data cell builder
-  Widget _buildResponsiveDataCell(BuildContext context, String text,
-      [TextAlign align = TextAlign.start]) {
+  Widget _buildResponsiveDataCell(
+    BuildContext context,
+    String text, [
+    TextAlign align = TextAlign.start,
+  ]) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
@@ -2621,14 +2705,15 @@ class FeeScreen extends StatelessWidget {
 
   // Tablet data row builder
   TableRow _buildTabletDataRow(
-      BuildContext context,
-      String group,
-      String reviewType,
-      String qualOutcome,
-      String empOutcome,
-      String evidence,
-      String feeIncl,
-      String feeExcl) {
+    BuildContext context,
+    String group,
+    String reviewType,
+    String qualOutcome,
+    String empOutcome,
+    String evidence,
+    String feeIncl,
+    String feeExcl,
+  ) {
     return TableRow(
       children: [
         _buildResponsiveDataCell(context, group, TextAlign.center),
@@ -2650,8 +2735,7 @@ class FeeScreen extends StatelessWidget {
       height: 60.0 * rowSpan, // Approximate height
       padding: const EdgeInsets.all(8.0),
       alignment: Alignment.center,
-      child: Text(text,
-          textAlign: align, style: const TextStyle(fontSize: 14)),
+      child: Text(text, textAlign: align, style: const TextStyle(fontSize: 14)),
     );
   }
 
@@ -2702,10 +2786,11 @@ class DottedLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round;
+    final Paint paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1
+          ..strokeCap = StrokeCap.round;
 
     const double dashWidth = 3;
     const double dashSpace = 3;
